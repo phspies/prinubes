@@ -21,17 +21,17 @@ namespace Prinubes.Common.Models
             {
                 JWT_SECRET = "EBOHltOtlvsBorhGvfOxq27k5X334nYU";
                 JWT_EXPIRE_TIME = 100;
-                MYSQL_SERVER = "10.0.0.103";
+                MYSQL_SERVER = "10.0.1.23";
                 MYSQL_PORT = 3306;
                 MYSQL_DATABASE = _MYSQL_DATABASE ?? "prinubes";
                 MYSQL_USER = "root";
-                MYSQL_PASSWORD = "VMware1!";
+                MYSQL_PASSWORD = "1qazxsw2";
                 REDIS_CACHE_USE = true;
-                REDIS_CACHE_HOST = "10.0.0.103";
+                REDIS_CACHE_HOST = "10.0.1.28";
                 REDIS_CACHE_PORT = 6379;
                 REDIS_CACHE_PASSWORD = "";
                 REDIS_TTL = 30;
-                KAFKA_BOOTSTRAP = "10.0.0.103";
+                KAFKA_BOOTSTRAP = "10.0.1.24";
                 KAFKA_IDEMPOTENCE = true;
                 KAFKA_RETRIES = 20;
                 KAFKA_CONSUMER_GROUP_ID = System.Reflection.Assembly.GetEntryAssembly().GetName().Name;
