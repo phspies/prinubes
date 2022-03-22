@@ -1,0 +1,8 @@
+﻿version: '3.4'
+
+services:
+  customer-microservice:
+    image: ${DOCKER_REGISTRY-}platform
+    build:
+      context: .
+      dockerfile: customer-microservice/Dockerfile

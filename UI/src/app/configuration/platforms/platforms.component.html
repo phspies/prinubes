@@ -1,0 +1,40 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="block-header">
+      <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+          <ul class="breadcrumb breadcrumb-style ">
+            <li class="breadcrumb-item">
+              <h4 class="page-title">Platforms</h4>
+            </li>
+            <li class="breadcrumb-item bcrumb-1">
+              <a routerLink="/dashboard/main">
+                <i class="fas fa-home"></i> Dashboard</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <!-- Example Tab -->
+    <div class="row">
+      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="card">
+          <div class="body">
+            <mat-tab-group>
+              <mat-tab label="Compute Platforms">
+                <computeplatforms-outlet></computeplatforms-outlet>
+              </mat-tab>
+              <mat-tab label="Network Platforms">
+                <networkplatforms-outlet></networkplatforms-outlet>
+              </mat-tab>
+              <mat-tab label="Load Balancer Platforms">
+                <loadbalancerplatforms-outlet></loadbalancerplatforms-outlet>
+              </mat-tab>
+            </mat-tab-group>
+          </div>
+        </div>
+      </div>
+    </div>
+ </div>
+
+</section>

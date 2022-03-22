@@ -1,0 +1,56 @@
+version: '3.4'
+
+services:
+  Identity:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+:443
+      - JWT_SECRET=EBOHltOtlvsBorhGvfOxq27k5X334nYU
+      - JWT_EXPIRE_TIME=100
+      - MYSQL_SERVER=10.0.0.103
+      - MYSQL_PORT=3306
+      - MYSQL_DATABASE=prinubes_identity
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=VMware1!
+      - REDIS_CACHE_USE=true
+      - REDIS_CACHE_HOST=10.0.0.103
+      - REDIS_CACHE_PORT=6379
+      - REDIS_CACHE_PASSWORD=
+      - REDIS_TTL=30
+      - KAFKA_BOOTSTRAP=10.0.0.103
+      - KAFKA_IDEMPOTENCE=true
+      - KAFKA_RETRIES=20
+      - CREDENTIAL_ENCRYPTION_KEY=7U5K4bnqMXJez8yNaGuETWNx
+      - KAFKA_ENABLE_AUTO_COMMIT=false
+
+    ports:
+      - "7001:443"
+    volumes:
+      - ~/.aspnet/https:/root/.aspnet/https:ro
+      - ~/.microsoft/usersecrets:/root/.microsoft/usersecrets:ro
+  Platform:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+:443      
+      - JWT_SECRET=EBOHltOtlvsBorhGvfOxq27k5X334nYU
+      - JWT_EXPIRE_TIME=100
+      - MYSQL_SERVER=10.0.0.103
+      - MYSQL_PORT=3306
+      - MYSQL_DATABASE=prinubes_platform
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=VMware1!
+      - REDIS_CACHE_USE=true
+      - REDIS_CACHE_HOST=10.0.0.103
+      - REDIS_CACHE_PORT=6379
+      - REDIS_CACHE_PASSWORD=
+      - REDIS_TTL=30
+      - KAFKA_BOOTSTRAP=10.0.0.103
+      - KAFKA_IDEMPOTENCE=true
+      - KAFKA_RETRIES=20
+      - KAFKA_ENABLE_AUTO_COMMIT=false
+      - CREDENTIAL_ENCRYPTION_KEY=7U5K4bnqMXJez8yNaGuETWNx
+    ports:
+      - "7002:443"
+    volumes:
+      - ~/.aspnet/https:/root/.aspnet/https:ro
+      - ~/.microsoft/usersecrets:/root/.microsoft/usersecrets:ro

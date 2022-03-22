@@ -1,0 +1,166 @@
+
+      <div class="body">
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="ngxTableHeader">
+              <ul class="header-buttons-left ms-0 mb-0">
+                <li class="dropdown m-l-0">
+                  <label for="search-input"><i class="material-icons search-icon">search</i></label>
+                  <input placeholder="Search" type="text" class="browser-default search-field"
+                    (keyup)='filterDatatable($event)' aria-label="Search box">
+                </li>
+              </ul>
+              <ul class="header-buttons">
+                <li>
+                  <button mat-mini-fab color="primary" (click)='loadData()'>
+                    <mat-icon class="col-white">autorenew</mat-icon>
+                  </button>
+                </li>
+                <li>
+                  <button mat-mini-fab color="primary" (click)='AddRecord(addRecord)'>
+                    <mat-icon class="col-white">add</mat-icon>
+                  </button>
+                </li>
+              </ul>
+            </div>
+            <ngx-datatable #table class="material" [rows]="loadbalancerplatformsData"  [loadingIndicator]="loadingIndicator" [columns]="columns" [sortType]="'multi'"
+              [columnMode]="'force'" [headerHeight]="50" [footerHeight]="60" [rowHeight]="'60'" [limit]="10">
+              <ngx-datatable-column name="Platform" [width]="130"></ngx-datatable-column>
+              <ngx-datatable-column name="URL" [width]="130"></ngx-datatable-column>
+              <!-- <ngx-datatable-column *ngFor="let col of columns" [name]="col.name">
+                                </ngx-datatable-column> -->
+              <!-- action buttons -->
+              <ngx-datatable-column name="Actions" sortable="false" [width]="120">
+                <ng-template let-value="value" let-row="row" let-rowIndex="rowIndex" ngx-datatable-cell-template>
+                  <span>
+                    <button class="btn tblActnBtn h-auto" (click)='EditRecord(row, editRecord)'>
+                      <i class="material-icons">mode_edit</i>
+                    </button>
+                    <button class="btn tblActnBtn h-auto" (click)='DeleteRecord(row)'>
+                      <i class="material-icons">delete</i>
+                    </button>
+                  </span>
+                </ng-template>
+              </ngx-datatable-column>
+            </ngx-datatable>
+            <!-- Add Record Modal Window -->
+            <ng-template #addRecord let-modal>
+              <div class="modal-header editRowModal">
+                <h4 class="modal-title" id="modal-basic-title">
+                  <div class="modal-header ">
+                    <div class="modal-about">
+                      <div class="font-weight-bold p-t-10 font-17">
+                        New Compute Platform</div>
+                    </div>
+                  </div>
+                </h4>
+                <button type="button" class="close" aria-label="Close" (click)="loadingIndicator = false; modal.dismiss()">
+                  <span aria-hidden="true"><i class="material-icons">close</i></span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <form [formGroup]="createLoadBalancerPlatformFG" (ngSubmit)="onAddRecordSave(createLoadBalancerPlatformFG)">
+                  <div class="row">
+                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
+                      <mat-form-field class="example-full-width" appearance="outline">
+                        <mat-label>Platform Name</mat-label>
+                        <input matInput formControlName="platform" required>
+                        <mat-error *ngIf="createLoadBalancerPlatformFG.get('platform').hasError('required')">
+                          Platform name is required
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
+                      <mat-form-field class="example-full-width" appearance="outline">
+                        <mat-label>Service URL</mat-label>
+                        <input matInput formControlName="url_endpoint">
+                        <mat-error *ngIf="createLoadBalancerPlatformFG.get('url_endpoint').hasError('required')">
+                          Service URL is required
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-2">
+                      <mat-checkbox formControlName="verify_ssl_cert" matInput>Verify SSL Cert</mat-checkbox>
+                    </div>
+                    <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-2">
+                      <mat-form-field class="example-full-width" appearance="outline">
+                        <mat-label>Location</mat-label>
+                        <input matInput formControlName="location">
+                      </mat-form-field>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
+                      <button class="btn-space" [disabled]="!createLoadBalancerPlatformFG.valid" mat-raised-button
+                        color="primary">Submit</button>
+                      <button type="button" mat-button data-dismiss="modal" (click)="modal.dismiss('Cross click')" >Cancel</button>
+                    </div>
+                  </div>  
+                </form>
+              </div>
+            </ng-template>
+            <!-- Edit Record Modal Window -->
+            <ng-template #editRecord let-modal>
+              <div class="modal-header editRowModal">
+                <h4 class="modal-title" id="modal-basic-title">
+                  <div class="modal-header ">
+                    <div class="modal-about">
+                      <div class="font-weight-bold p-t-10 font-17">
+                        Edit Compute Platform</div>
+                    </div>
+                  </div>
+                </h4>
+                <button type="button" class="close" aria-label="Close" (click)="loadingIndicator = false; modal.dismiss()">
+                  <span aria-hidden="true"><i class="material-icons">close</i></span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <form [formGroup]="updateLoadBalancerPlatformFG" (ngSubmit)="onEditSave(updateLoadBalancerPlatformFG)">
+                  <div class="row">
+                    <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-2">
+                      <mat-form-field class="example-full-width" appearance="outline">
+                        <mat-label>Platform Name</mat-label>
+                        <input matInput formControlName="platform" required>
+                        <mat-error *ngIf="updateLoadBalancerPlatformFG.get('platform').hasError('required')">
+                          Platform name is required
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+                    <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-2">
+                      <mat-form-field class="example-full-width" appearance="outline">
+                        <mat-label>Service URL</mat-label>
+                        <input matInput formControlName="url_endpoint">
+                        <mat-error *ngIf="updateLoadBalancerPlatformFG.get('url_endpoint').hasError('required')">
+                          Service URL is required
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-2">
+                      <mat-checkbox formControlName="verify_ssl_cert" matInput>Verify SSL Cert</mat-checkbox>
+                    </div>
+                    <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-2">
+                      <mat-form-field class="example-full-width" appearance="outline">
+                        <mat-label>Location</mat-label>
+                        <input matInput formControlName="location">
+                      </mat-form-field>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
+                      <button class="btn-space" [disabled]="!updateLoadBalancerPlatformFG.valid" mat-raised-button
+                        color="primary">Submit</button>
+                      <button type="button" mat-button data-dismiss="modal" (click)="modal.dismiss('Cross click')" >Cancel</button>
+                    </div>
+                  </div>  
+                </form>
+              </div>
+            </ng-template>
+          </div>
+        </div>
+      </div>

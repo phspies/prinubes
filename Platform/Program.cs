@@ -1,0 +1,163 @@
+using Confluent.Kafka;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
+using AutoMapper;
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Prinubes.Common.Kafka.Producer;
+using Prinubes.Common.Helpers;
+using Prinubes.Platforms.Datamodels;
+using Prinubes.Common.Models;
+using Prinubes.Common.Kafka;
+using Prinubes.Common.Kafka.Consumer;
+using Prinubes.Platforms.Datamodels.Domain;
+using StackExchange.Redis;
+
+var builder = WebApplication.CreateBuilder(args);
+builder.WebHost.UseKestrel(options =>
+{
+    //options.Limits.MaxConcurrentConnections = 100;
+    options.Limits.KeepAliveTimeout = TimeSpan.FromMinutes(5);
+});
+
+//Build ServiceSettings object from environment variables
+ServiceSettings serviceSettings = new ServiceSettings(_MYSQL_DATABASE: "prinubes_platform");
+builder.Services.AddSingleton<ServiceSettings>(serviceSettings);
+
+// Add services to the container.
+
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "IdentityMicroservice", Version = "v1" });
+});
+builder.Services.AddSwaggerGenNewtonsoftSupport();
+
+var mapperConfig = new MapperConfiguration(mc =>
+{
+    mc.AddProfile(new AutoMapperProfile());
+});
+
+IMapper mapper = mapperConfig.CreateMapper();
+builder.Services.AddSingleton(mapper);
+builder.Services.AddControllers().AddNewtonsoftJson(StartupFactory.MvcNewtonsoftJsonOptionsBuilder());
+
+builder.Services.AddLogging(StartupFactory.LoggingBuilder());
+ILogger<Program> logger = builder.Services.BuildServiceProvider().GetRequiredService<ILogger<Program>>();
+using ILoggerFactory loggerFactory = LoggerFactory.Create(StartupFactory.LoggingBuilder());
+
+
+logger.LogInformation("KAFKA Details: {0}@{1}", serviceSettings.KAFKA_BOOTSTRAP, serviceSettings.KAFKA_CONSUMER_GROUP_ID);
+builder.Services.AddKafkaProducer();
+
+if (!args.Any(x => x.ToLower().Contains("testing")))
+{
+    logger.LogInformation("MYSQL Details: {0}@{1}:{2}/{3}", serviceSettings.MYSQL_USER, serviceSettings.MYSQL_SERVER, serviceSettings.MYSQL_PORT, serviceSettings.MYSQL_DATABASE);
+
+    //setup database connection and logging
+    builder.Services.AddDbContextPool<PrinubesPlatformDBContext>((serviceProvider, optionsBuilder) =>
+    {
+        optionsBuilder.UseLoggerFactory(LoggerFactory.Create(StartupFactory.LoggingBuilder()));
+        optionsBuilder.UseMySql(serviceSettings.GetMysqlConnection().ConnectionString, ServerVersion.AutoDetect(serviceSettings.GetMysqlConnection().ConnectionString));
+    });
+
+    //perform migrations
+    builder.Services.BuildServiceProvider().GetRequiredService<PrinubesPlatformDBContext>().MigrateIfRequired();;
+
+}
+//redis caching
+if (serviceSettings.REDIS_CACHE_USE)
+{
+    builder.Services.AddStackExchangeRedisCache(builder =>
+    {
+        builder.InstanceName = $"{System.Reflection.Assembly.GetEntryAssembly().GetName().Name.ToLower()}-";
+        builder.ConfigurationOptions = new ConfigurationOptions()
+        {
+            EndPoints = { serviceSettings.REDIS_CACHE_HOST, serviceSettings.REDIS_CACHE_PORT.ToString() },
+            AllowAdmin = true,
+            ClientName = System.Reflection.Assembly.GetEntryAssembly().GetName().Name
+        };
+    });
+}
+else
+{
+    builder.Services.AddMemoryCache();
+}
+
+//Kafka producer
+var kafkaProducerConfig = new ProducerConfig() { BootstrapServers = serviceSettings.KAFKA_BOOTSTRAP, EnableIdempotence = serviceSettings.KAFKA_IDEMPOTENCE, MessageSendMaxRetries = serviceSettings.KAFKA_RETRIES };
+builder.Services.AddSingleton<ProducerConfig>(kafkaProducerConfig);
+builder.Configuration.Bind("producer", kafkaProducerConfig);
+
+//start kafka consumers
+var consumerConfig = new ConsumerConfig()
+{
+    BootstrapServers = serviceSettings.KAFKA_BOOTSTRAP,
+    GroupId = serviceSettings.KAFKA_CONSUMER_GROUP_ID,
+    EnableAutoCommit = serviceSettings.KAFKA_ENABLE_AUTO_COMMIT,
+    AllowAutoCreateTopics = true
+};
+
+builder.Services.AddSingleton<ConsumerConfig>(consumerConfig);
+builder.Configuration.Bind("consumer", consumerConfig);
+builder.Services.AddHostedService<KafkaWorker>();
+
+
+builder.Services.AddKafkaConsumer(typeof(Program));
+builder.Services.AddKafkaProducer();
+
+// configure jwt authentication
+builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+builder.Services.AddSingleton<JwtBearer<PrinubesPlatformDBContext>>();
+builder.Services.AddAuthentication(x =>
+{
+    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(x =>
+{
+    x.EventsType = typeof(JwtBearer<PrinubesPlatformDBContext>);
+    x.RequireHttpsMetadata = false;
+    x.SaveToken = true;
+    x.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(serviceSettings.JWT_SECRET)),
+        ValidateIssuer = false,
+        ValidateAudience = false,
+        LifetimeValidator = Prinubes.Common.Helpers.LifetimeValidatorHelper.LifetimeValidator
+    };
+}).AddCookie(options => options.LoginPath = "/identity/users/authenticate");
+
+
+var app = builder.Build();
+//update routemap information for this service and publish to service bus
+using (var scope = app.Services.CreateScope())
+{
+    var routePathDOA = new RoutePathDOA(scope.ServiceProvider);
+    await routePathDOA.SyncronizeAsync(builder.Services.BuildServiceProvider().GetService<IActionDescriptorCollectionProvider>().ActionDescriptors.Items);
+}
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
+app.UseHttpsRedirection();
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapControllers();
+
+app.UseCors(x => x
+             .AllowAnyMethod()
+             .AllowAnyHeader()
+             .SetIsOriginAllowed(origin => true) // allow any origin
+             .AllowCredentials()); // allow credentials
+
+
+
+app.Run();
