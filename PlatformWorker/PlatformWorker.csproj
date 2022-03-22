@@ -27,20 +27,23 @@
 	  <PackageReference Include="System.ServiceModel.Primitives" Version="4.9.0" />
 	  <PackageReference Include="System.ServiceProcess.ServiceController" Version="6.0.0" />
 	</ItemGroup>
-	<ItemGroup>
-		<Reference Include="nsxtalbsdk">
-			<HintPath>..\..\nsxtalbsdk\nsxtalbsdk\bin\Debug\net6.0\nsxtalbsdk.dll</HintPath>
-		</Reference>
-		<Reference Include="nsxtsdk">
-			<HintPath>..\..\nsxtsdk\nsxtsdk\bin\Debug\net6.0\nsxtsdk.dll</HintPath>
-		</Reference>
-		<Reference Include="vCenterSDK">
-		  <HintPath>..\..\vCenterSDK\bin\Debug\net6.0\vCenterSDK.dll</HintPath>
-		</Reference>
-	</ItemGroup>
+
 	<ItemGroup>
 	  <Folder Include="Datamodels\Domain\" />
 	  <Folder Include="Datamodels\Slave\" />
+	  <Folder Include="NewFolder\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Reference Include="nsxtalbsdk">
+	    <HintPath>Libraries\nsxtalbsdk.dll</HintPath>
+	  </Reference>
+	  <Reference Include="nsxtsdk">
+	    <HintPath>Libraries\nsxtsdk.dll</HintPath>
+	  </Reference>
+	  <Reference Include="vCenterSDK">
+	    <HintPath>Libraries\vCenterSDK.dll</HintPath>
+	  </Reference>
 	</ItemGroup>
 	<ItemGroup>
 	  <Content Update="appsettings.Development.json">
