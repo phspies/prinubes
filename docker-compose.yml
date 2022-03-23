@@ -11,3 +11,8 @@ services:
     build:
       context: .
       dockerfile: Platform/Dockerfile
+  PlatformWorker:
+    image: prinubes-platformworker
+    build:
+      context: .
+      dockerfile: PlatformWorker/Dockerfile
