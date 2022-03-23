@@ -1,15 +1,17 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
 	<PropertyGroup>
 		<TargetFramework>net6.0</TargetFramework>
-		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<RootNamespace>Prinubes.Common</RootNamespace>
-		<PackageId>Common</PackageId>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+		<EnableUnsafeBinaryFormatterSerialization>true</EnableUnsafeBinaryFormatterSerialization>
+		<AssemblyName>Identity</AssemblyName>
+		<RootNamespace>Prinubes.Identity</RootNamespace>
+		<UserSecretsId>e8b03d33-466a-4878-a876-2057234a4a1d</UserSecretsId>
 	</PropertyGroup>
-
 	<ItemGroup>
-		<Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+		<InternalsVisibleTo Include="UnitTesting" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -26,8 +28,8 @@
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 			<PrivateAssets>all</PrivateAssets>
 		</PackageReference>
+		<PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="6.0.3" />
 		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.14.0" />
-		<PackageReference Include="shortid" Version="3.0.1" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.3" />
 		<PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="6.0.1" />
@@ -40,9 +42,25 @@
 		<PackageReference Include="Swashbuckle.AspNetCore.Newtonsoft" Version="6.3.0" />
 		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.16.0" />
 	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\Common\Common.csproj" />
+	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Models\Attributes\" />
+		<Content Update="appsettings.Development.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+		</Content>
+		<Content Update="appsettings.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+		</Content>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Utilities\" />
 	</ItemGroup>
 
 </Project>
