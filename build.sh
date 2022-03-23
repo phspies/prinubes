@@ -1,3 +1,4 @@
-for p in $(find . -name *.csproj); do 
-	dotnet build $p || exit 1;
-done
+dotnet build Common/Common.csproj
+dotnet build Identity/Identity.csproj 
+dotnet build Platform/Platform.csproj
+dotnet build PlatformWorker/PlatformWorker.csproj
