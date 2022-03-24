@@ -35,6 +35,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Include="..\.dockerignore" Link=".dockerignore">
+	    <DependentUpon>$(DockerDefaultDockerfile)</DependentUpon>
+	  </None>
+	</ItemGroup>
+
+	<ItemGroup>
 	  <Reference Include="nsxtalbsdk">
 	    <HintPath>Libraries\nsxtalbsdk.dll</HintPath>
 	  </Reference>
