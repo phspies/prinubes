@@ -1,5 +1,5 @@
 #See https://aka.ms/containerfastmode to understand how Visual Studio uses this Dockerfile to build your images for faster debugging.
-#force webhook`ff df
+#force webhook`ff df 
 
 FROM mcr.microsoft.com/dotnet/sdk:latest AS base
 WORKDIR /app
