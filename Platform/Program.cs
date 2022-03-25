@@ -69,7 +69,7 @@ if (!args.Any(x => x.ToLower().Contains("testing")))
 
 }
 //redis caching
-if (serviceSettings.REDIS_CACHE_USE)
+if (serviceSettings.REDIS_CACHE_USE ?? false)
 {
     builder.Services.AddStackExchangeRedisCache(builder =>
     {

@@ -42,7 +42,7 @@ namespace Prinubes.Common.Kafka
                                 ArgumentNullException.ThrowIfNull(messageTypeEncoded);
                                 var messageTypeHeader = Encoding.UTF8.GetString(messageTypeEncoded);
 
-                                response = JsonConvert.DeserializeObject<T>(consumeResult.Message.Value);
+                                response = JsonConvert.DeserializeObject<T>(consumeResult.Message.Value) ?? new T();
 
                                 ArgumentNullException.ThrowIfNull(response);
 
