@@ -1,4 +1,4 @@
-dotnet build Common/Common.csproj
-dotnet build Identity/Identity.csproj 
-dotnet build Platform/Platform.csproj
-dotnet build PlatformWorker/PlatformWorker.csproj
+dotnet build -nowarn Common/Common.csproj
+dotnet build -nowarn Identity/Identity.csproj 
+dotnet build -nowarn Platform/Platform.csproj
+dotnet build -nowarn PlatformWorker/PlatformWorker.csproj

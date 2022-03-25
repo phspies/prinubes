@@ -69,23 +69,21 @@ if (!args.Any(x => x.ToLower().Contains("testing")))
 
 }
 //redis caching
-if (serviceSettings.REDIS_CACHE_USE ?? false)
-{
+
     builder.Services.AddStackExchangeRedisCache(builder =>
     {
-        builder.InstanceName = $"{System.Reflection.Assembly.GetEntryAssembly().GetName().Name.ToLower()}-";
+        string? assemblyName = System.Reflection.Assembly.GetEntryAssembly()?.GetName()?.Name;
+        ArgumentNullException.ThrowIfNull(assemblyName);
+        builder.InstanceName = $"{assemblyName.ToLower()}-";
         builder.ConfigurationOptions = new ConfigurationOptions()
         {
             EndPoints = { serviceSettings.REDIS_CACHE_HOST, serviceSettings.REDIS_CACHE_PORT.ToString() },
             AllowAdmin = true,
-            ClientName = System.Reflection.Assembly.GetEntryAssembly().GetName().Name
+            ClientName = assemblyName
         };
     });
 }
-else
-{
-    builder.Services.AddMemoryCache();
-}
+
 
 //Kafka producer
 var kafkaProducerConfig = new ProducerConfig() { BootstrapServers = serviceSettings.KAFKA_BOOTSTRAP, EnableIdempotence = serviceSettings.KAFKA_IDEMPOTENCE, MessageSendMaxRetries = serviceSettings.KAFKA_RETRIES };
@@ -157,7 +155,5 @@ app.UseCors(x => x
              .AllowAnyHeader()
              .SetIsOriginAllowed(origin => true) // allow any origin
              .AllowCredentials()); // allow credentials
-
-
 
 app.Run();

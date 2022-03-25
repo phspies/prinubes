@@ -71,27 +71,19 @@ if (!args.Any(x => x.ToLower().Contains("testing")))
 
 }
 //redis caching
-if (serviceSettings.REDIS_CACHE_USE ?? false)
+
+builder.Services.AddStackExchangeRedisCache(builder =>
 {
-    builder.Services.AddStackExchangeRedisCache(builder =>
+    string? assemblyName = System.Reflection.Assembly.GetEntryAssembly()?.GetName()?.Name;
+    ArgumentNullException.ThrowIfNull(assemblyName);
+    builder.InstanceName = $"{assemblyName.ToLower()}-";
+    builder.ConfigurationOptions = new ConfigurationOptions()
     {
-        builder.InstanceName = $"{System.Reflection.Assembly.GetEntryAssembly().GetName().Name.ToLower()}-";
-        builder.ConfigurationOptions = new ConfigurationOptions()
-        {
-            EndPoints = { serviceSettings.REDIS_CACHE_HOST, serviceSettings.REDIS_CACHE_PORT.ToString() },
-            AllowAdmin = true,
-            ClientName = System.Reflection.Assembly.GetEntryAssembly().GetName().Name
-        };
-    });
-}
-else
-{
-    builder.Services.AddMemoryCache();
-}
-
-
-
-
+        EndPoints = { serviceSettings.REDIS_CACHE_HOST, serviceSettings.REDIS_CACHE_PORT.ToString() },
+        AllowAdmin = true,
+        ClientName = assemblyName
+    };
+});
 
 var app = builder.Build();
 
