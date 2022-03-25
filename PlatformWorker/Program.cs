@@ -8,7 +8,6 @@ using Prinubes.Common.Kafka.Producer;
 using Prinubes.Common.Models;
 using Prinubes.Platforms.Datamodels;
 using Prinubes.PlatformWorker;
-using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -71,19 +70,7 @@ if (!args.Any(x => x.ToLower().Contains("testing")))
 
 }
 //redis caching
-
-builder.Services.AddStackExchangeRedisCache(builder =>
-{
-    string? assemblyName = System.Reflection.Assembly.GetEntryAssembly()?.GetName()?.Name;
-    ArgumentNullException.ThrowIfNull(assemblyName);
-    builder.InstanceName = $"{assemblyName.ToLower()}-";
-    builder.ConfigurationOptions = new ConfigurationOptions()
-    {
-        EndPoints = { serviceSettings.REDIS_CACHE_HOST, serviceSettings.REDIS_CACHE_PORT.ToString() },
-        AllowAdmin = true,
-        ClientName = assemblyName
-    };
-});
+builder.Services.CachingBuilder(serviceSettings);
 
 var app = builder.Build();
 

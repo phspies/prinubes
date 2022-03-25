@@ -62,23 +62,7 @@ if (!args.Any(x => x.ToLower().Contains("testing")))
 }
 
 //redis caching
-if (serviceSettings.REDIS_CACHE_USE ?? false)
-{
-    builder.Services.AddStackExchangeRedisCache(builder =>
-    {
-        builder.InstanceName = $"{System.Reflection.Assembly.GetEntryAssembly().GetName().Name.ToLower()}-";
-        builder.ConfigurationOptions = new ConfigurationOptions()
-        {
-            EndPoints = { serviceSettings.REDIS_CACHE_HOST, serviceSettings.REDIS_CACHE_PORT.ToString() },
-            AllowAdmin = true,
-            ClientName = System.Reflection.Assembly.GetEntryAssembly().GetName().Name
-        };
-    });
-}
-else
-{
-    builder.Services.AddMemoryCache();
-}
+builder.Services.CachingBuilder(serviceSettings);
 
 //Kafka
 var kafkaProducerConfig = new ProducerConfig()

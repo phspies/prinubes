@@ -26,7 +26,6 @@ namespace Prinubes.Common.Models
                 MYSQL_DATABASE = _MYSQL_DATABASE ?? "prinubes";
                 MYSQL_USER = "root";
                 MYSQL_PASSWORD = "1qazxsw2";
-                REDIS_CACHE_USE = true;
                 REDIS_CACHE_HOST = "10.0.1.28";
                 REDIS_CACHE_PORT = 6379;
                 REDIS_CACHE_PASSWORD = "";
@@ -86,7 +85,6 @@ namespace Prinubes.Common.Models
         public string? MYSQL_DATABASE { get; set; }
         public string? MYSQL_USER { get; set; }
         public string? MYSQL_PASSWORD { get; set; }
-        public bool? REDIS_CACHE_USE { get; set; }
         public string? REDIS_CACHE_HOST { get; set; }
         public int? REDIS_CACHE_PORT { get; set; }
         public string? REDIS_CACHE_PASSWORD { get; set; }

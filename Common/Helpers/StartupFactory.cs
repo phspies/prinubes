@@ -1,12 +1,15 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Console;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using Prinubes.Common.Models;
+using StackExchange.Redis;
 
 namespace Prinubes.Common.Helpers
 {
-    public class StartupFactory
+    public static class StartupFactory
     {
         public static Action<MvcNewtonsoftJsonOptions> MvcNewtonsoftJsonOptionsBuilder()
         {
@@ -31,6 +34,22 @@ namespace Prinubes.Common.Helpers
                     options.TimestampFormat = "[yyyy-MM-dd HH:mm:ss] ";
                 });
             });
+        }
+        public static IServiceCollection CachingBuilder(this IServiceCollection services, ServiceSettings serviceSettings)
+        {
+            services.AddStackExchangeRedisCache(builder =>
+            {
+                string? assemblyName = System.Reflection.Assembly.GetEntryAssembly()?.GetName()?.Name;
+                ArgumentNullException.ThrowIfNull(assemblyName);
+                builder.InstanceName = $"{assemblyName.ToLower()}-";
+                builder.ConfigurationOptions = new ConfigurationOptions()
+                {
+                    EndPoints = { serviceSettings.REDIS_CACHE_HOST, serviceSettings.REDIS_CACHE_PORT.ToString() },
+                    AllowAdmin = true,
+                    ClientName = assemblyName
+                };
+            });
+            return services;
         }
 
     }
