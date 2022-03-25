@@ -1,7 +1,5 @@
 ﻿using PlatformWorker.VMware.Interfaces;
-using System.Collections.Generic;
 using Prinubes.vCenterSDK;
-using System.Threading.Tasks;
 
 namespace PlatformWorker.VMware
 {
@@ -45,10 +43,10 @@ namespace PlatformWorker.VMware
         public override async Task<IVimManagedItem[]> GetChildrenAsync()
         {
             ManagedObjectAndProperties[] objectAndProperties1 = await GetManagedObjectAndPropertiesAsync(ManagedObject, "hostFolder", "Folder", new string[1] { "name" });
-            IVimManagedItem[] vimManagedItemArray = (IVimManagedItem[])null;
+            IVimManagedItem[] vimManagedItemArray = null;
             foreach (ManagedObjectAndProperties objectAndProperties2 in objectAndProperties1)
             {
-                IVimFolderInsideDC vimFolderInsideDc = (IVimFolderInsideDC)new FolderInsideDC(VcService, objectAndProperties2.ManagedObject);
+                IVimFolderInsideDC vimFolderInsideDc = new FolderInsideDC(VcService, objectAndProperties2.ManagedObject);
                 vimFolderInsideDc.Name = (string)objectAndProperties2.Properties["name"];
                 if (vimFolderInsideDc.Name == "host")
                     vimManagedItemArray = await vimFolderInsideDc.GetChildrenAsync();

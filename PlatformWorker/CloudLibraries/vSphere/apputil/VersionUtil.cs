@@ -10,13 +10,11 @@
  * NON-INFRINGEMENT AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-using System;
+using Prinubes.vCenterSDK;
 using System.Collections;
-using System.IO;
 using System.Net;
 using System.Text;
 using System.Xml;
-using Prinubes.vCenterSDK;
 
 namespace PlatformWorker
 {

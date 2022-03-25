@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Prinubes.Common.Models;
+using Prinubes.Platform;
 using Prinubes.Platforms.Datamodels;
 using System;
 using System.Linq;
 using System.Net.Http;
-using Prinubes.Platform;
 
 namespace UnitTesting
 {

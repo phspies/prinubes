@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Net;
 
@@ -266,7 +265,7 @@ namespace PlatformWorker
             String defaultVal = "";
             IEnumerator It;
             String help = "";
-            ICollection generalKeys = (ICollection)Opts.Keys;
+            ICollection generalKeys = Opts.Keys;
             It = generalKeys.GetEnumerator();
             while (It.MoveNext())
             {

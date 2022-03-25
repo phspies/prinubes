@@ -1,6 +1,5 @@
-﻿using Prinubes.Common.Kafka;
-using Newtonsoft.Json;
-using Prinubes.Common.DatabaseModels.ManyToMany;
+﻿using Newtonsoft.Json;
+using Prinubes.Common.Kafka;
 
 namespace Prinubes.Common.DatabaseModels
 {
@@ -51,7 +50,7 @@ namespace Prinubes.Common.DatabaseModels
         [JsonProperty("value")]
         public string Value { get; set; }
     }
-    public class TaggingDisplayDataModel 
+    public class TaggingDisplayDataModel
     {
         [JsonProperty("id")]
         public Guid? Id { get; set; }

@@ -1,6 +1,6 @@
 ﻿namespace PlatformWorker.VMware.Interfaces
 {
-  public interface IVimFolderInsideDC : IVimManagedItem
-  {
-  }
+    public interface IVimFolderInsideDC : IVimManagedItem
+    {
+    }
 }

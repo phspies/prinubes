@@ -3,9 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
 using Prinubes.Common.DatabaseModels;
-using Prinubes.Common.Kafka;
-using Prinubes.Common.Kafka.Producer;
 using Prinubes.Common.Helpers;
+using Prinubes.Common.Kafka.Producer;
 
 namespace Prinubes.Identity.Datamodels
 {

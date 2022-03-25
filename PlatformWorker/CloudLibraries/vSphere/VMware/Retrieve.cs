@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Prinubes.vCenterSDK;
+﻿using Prinubes.vCenterSDK;
 using ObjectContent = Prinubes.vCenterSDK.ObjectContent;
 
 namespace PlatformWorker.VMware
@@ -15,7 +10,7 @@ namespace PlatformWorker.VMware
         {
             List<ObjectContent> listobjcontent = new List<ObjectContent>();
             // RetrievePropertiesEx() returns the properties selected from the PropertyFilterSpec
-            RetrieveResult rslts = (await _service.RetrievePropertiesExAsync(new RetrievePropertiesExRequest(_sic.propertyCollector,new PropertyFilterSpec[] { pfSpec },new RetrieveOptions()))).returnval;
+            RetrieveResult rslts = (await _service.RetrievePropertiesExAsync(new RetrievePropertiesExRequest(_sic.propertyCollector, new PropertyFilterSpec[] { pfSpec }, new RetrieveOptions()))).returnval;
             if (rslts != null && rslts.objects != null && rslts.objects.Length != 0)
             {
                 listobjcontent.AddRange(rslts.objects);

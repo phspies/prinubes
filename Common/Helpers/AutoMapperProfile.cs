@@ -39,7 +39,7 @@ namespace Prinubes.Common.Helpers
             CreateMap<LoadBalancerPlatformDatabaseModel, LoadBalancerPlatformDisplayDataModel>();
 
             //CreateMap<TaggingDatabaseModel, TaggingDisplayDataModel>();
-            
+
         }
     }
 }

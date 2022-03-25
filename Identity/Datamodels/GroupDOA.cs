@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
-using Prinubes.Common.Kafka.Producer;
 using Microsoft.EntityFrameworkCore;
-using Prinubes.Common.DatabaseModels;
-using Prinubes.Common.Helpers;
 using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
+using Prinubes.Common.DatabaseModels;
+using Prinubes.Common.Helpers;
+using Prinubes.Common.Kafka.Producer;
 
 namespace Prinubes.Identity.Datamodels
 {

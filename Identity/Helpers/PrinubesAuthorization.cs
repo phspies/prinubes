@@ -1,13 +1,7 @@
-﻿using Prinubes.Identity.Datamodels;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Controllers;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Prinubes.Common.DatabaseModels;
-using System.Net;
-using Prinubes.Common.Datamodels;
 using Prinubes.Common.Helpers;
+using Prinubes.Identity.Datamodels;
 
 namespace Prinubes.Identity.Helpers
 {

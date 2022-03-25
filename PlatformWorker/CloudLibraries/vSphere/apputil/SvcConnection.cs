@@ -1,14 +1,9 @@
-using System;
-using System.IO;
+using Prinubes.vCenterSDK;
 using System.Net;
 using System.Net.Security;
 using System.Runtime.Serialization.Formatters.Binary;
-using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
-using System.Xml;
-using Prinubes.vCenterSDK;
-using System.Threading.Tasks;
 using System.ServiceModel.Channels;
 
 namespace PlatformWorker
@@ -34,7 +29,7 @@ namespace PlatformWorker
         public event ConnectionEventHandler AfterDisconnect;
         public event ConnectionEventHandler BeforeDisconnect;
         public UserSession VimUserSession { get; private set; }
-     
+
         private bool _ignoreCert;
         public bool ignoreCert
         {

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace PlatformWorker.VMware
+﻿namespace PlatformWorker.VMware
 {
     public class VMSDEntry
     {
@@ -15,7 +13,7 @@ namespace PlatformWorker.VMware
         {
             get
             {
-                ulong num = (((ulong)(uint)this._HighCreateTime << 32) + (ulong)(uint)this._LowCreateTime) * 10UL;
+                ulong num = (((ulong)(uint)this._HighCreateTime << 32) + (uint)this._LowCreateTime) * 10UL;
                 DateTime dateTime = new DateTime(1970, 1, 1);
                 dateTime = dateTime.AddTicks((long)num);
                 return dateTime;

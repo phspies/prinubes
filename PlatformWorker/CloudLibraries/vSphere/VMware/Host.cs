@@ -1,12 +1,6 @@
 ﻿using PlatformWorker.VMware.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Globalization;
-using System.Linq;
-using System.Threading;
 using Prinubes.vCenterSDK;
-using System.Threading.Tasks;
+using System.Globalization;
 using ObjectContent = Prinubes.vCenterSDK.ObjectContent;
 
 namespace PlatformWorker.VMware
@@ -101,7 +95,7 @@ namespace PlatformWorker.VMware
             if (hostProperties.ContainsKey("summary.quickStats.overallCpuUsage"))
                 _properties.CpuUsageMHz = (int)hostProperties["summary.quickStats.overallCpuUsage"];
             if (hostProperties.ContainsKey("summary.quickStats.overallMemoryUsage"))
-                _properties.MemoryUsageMB = (long)(int)hostProperties["summary.quickStats.overallMemoryUsage"];
+                _properties.MemoryUsageMB = (int)hostProperties["summary.quickStats.overallMemoryUsage"];
             if (hostProperties.ContainsKey("summary.hardware.memorySize"))
                 _properties.MemoryMB = (long)hostProperties["summary.hardware.memorySize"] / 1048576L;
             Name = _properties.Name;
@@ -119,7 +113,7 @@ namespace PlatformWorker.VMware
             {
                 if (!(objectsAndProperty.ManagedObject.type != "VirtualMachine"))
                 {
-                    IVimVm vimVm = (IVimVm)new Vm(VcService, objectsAndProperty.ManagedObject);
+                    IVimVm vimVm = new Vm(VcService, objectsAndProperty.ManagedObject);
                     vimVm.GetCommonProperties(objectsAndProperty.Properties);
                     if (!vimVm.VMProperties.IsTemplate)
                         vimVmList.Add(vimVm);
@@ -151,7 +145,7 @@ namespace PlatformWorker.VMware
                         datastoreList.Add(datastore);
                 }
             }
-            return (IVimDatastore[])datastoreList.ToArray();
+            return datastoreList.ToArray();
         }
 
         public async Task<IVimNetwork[]> GetNetworksAsync()
@@ -173,7 +167,7 @@ namespace PlatformWorker.VMware
                         networkList.Add(network);
                 }
             }
-            return (IVimNetwork[])networkList.ToArray();
+            return networkList.ToArray();
         }
 
         public async Task<Dictionary<string, string>> GetDistributedVirtualPortgroupsAsync()
@@ -181,7 +175,7 @@ namespace PlatformWorker.VMware
             Dictionary<string, string> dictionary = new Dictionary<string, string>(StringComparer.CurrentCultureIgnoreCase);
             try
             {
-                DVSManagerDvsConfigTarget managerDvsConfigTarget = await _vimService.Service.QueryDvsConfigTargetAsync(((VCService)_vimService).DVSManager, ManagedObject, (ManagedObjectReference)null);
+                DVSManagerDvsConfigTarget managerDvsConfigTarget = await _vimService.Service.QueryDvsConfigTargetAsync(((VCService)_vimService).DVSManager, ManagedObject, null);
                 if (managerDvsConfigTarget.distributedVirtualPortgroup != null)
                 {
                     foreach (DistributedVirtualPortgroupInfo virtualPortgroupInfo in managerDvsConfigTarget.distributedVirtualPortgroup)
@@ -199,16 +193,16 @@ namespace PlatformWorker.VMware
 
         public async Task<Dictionary<string, string>> GetDistributedVirtualSwitchUuidsAsync()
         {
-            Dictionary<string, string> dictionary = new Dictionary<string, string>((IEqualityComparer<string>)StringComparer.CurrentCultureIgnoreCase);
+            Dictionary<string, string> dictionary = new Dictionary<string, string>(StringComparer.CurrentCultureIgnoreCase);
             try
             {
-                DVSManagerDvsConfigTarget managerDvsConfigTarget = await _vimService.Service.QueryDvsConfigTargetAsync(((VCService)_vimService).DVSManager, ManagedObject, (ManagedObjectReference)null);
+                DVSManagerDvsConfigTarget managerDvsConfigTarget = await _vimService.Service.QueryDvsConfigTargetAsync(((VCService)_vimService).DVSManager, ManagedObject, null);
                 if (managerDvsConfigTarget.distributedVirtualPortgroup != null)
                 {
                     foreach (DistributedVirtualPortgroupInfo virtualPortgroupInfo in managerDvsConfigTarget.distributedVirtualPortgroup)
                     {
                         if (!virtualPortgroupInfo.uplinkPortgroup)
-                            Utils.AddOrReplace<string, string>((IDictionary<string, string>)dictionary, virtualPortgroupInfo.portgroupKey, virtualPortgroupInfo.switchUuid);
+                            Utils.AddOrReplace<string, string>(dictionary, virtualPortgroupInfo.portgroupKey, virtualPortgroupInfo.switchUuid);
                     }
                 }
             }
@@ -230,7 +224,7 @@ namespace PlatformWorker.VMware
             traversalSpec2.selectSet = new SelectionSpec[2]
             {
         selectionSpec,
-        (SelectionSpec) traversalSpec1
+         traversalSpec1
             };
             TraversalSpec traversalSpec3 = traversalSpec2;
             IVimService vcService = VcService;
@@ -256,16 +250,16 @@ namespace PlatformWorker.VMware
         {
           obj = ((VCService) VcService).Root,
           skip = true,
-          selectSet = (SelectionSpec[]) new TraversalSpec[1]
+          selectSet =  (new TraversalSpec[1]
           {
             traversalSpec3
-          }
+          })
         }
             };
             PropertyFilterSpec propertyFilterSpec2 = propertyFilterSpec1;
             pfSpec[index1] = propertyFilterSpec2;
             ObjectContent[] objectContentArray = await vcService.RetrievePropertiesAsync(pfSpec);
-            Host[] hostArray = (Host[])null;
+            Host[] hostArray = null;
             for (int index2 = 0; index2 < objectContentArray.Length; ++index2)
             {
                 ManagedObjectReference managedObjectReference = (ManagedObjectReference)((Array)objectContentArray[index2].propSet[0].val).GetValue(0);
@@ -311,7 +305,7 @@ namespace PlatformWorker.VMware
             traversalSpec2.skip = true;
             traversalSpec2.selectSet = new SelectionSpec[2]
             {
-        (SelectionSpec) traversalSpec1,
+         traversalSpec1,
         new SelectionSpec()
             };
             traversalSpec2.selectSet[1].name = "computeResourceTraversalSpec";
@@ -322,7 +316,7 @@ namespace PlatformWorker.VMware
             traversalSpec3.skip = true;
             traversalSpec3.selectSet = new SelectionSpec[1]
             {
-        (SelectionSpec) traversalSpec2
+         traversalSpec2
             };
             PropertySpec[] propertySpecArray = new PropertySpec[1] { new PropertySpec() };
             propertySpecArray[0].all = false;
@@ -338,13 +332,13 @@ namespace PlatformWorker.VMware
             propertyFilterSpec.objectSet[0].skip = false;
             propertyFilterSpec.objectSet[0].selectSet = new SelectionSpec[1]
             {
-        (SelectionSpec) traversalSpec3
+         traversalSpec3
             };
             IVimService vcService = VcService;
             PropertyFilterSpec[] pfSpec = new PropertyFilterSpec[1] { propertyFilterSpec };
             foreach (ObjectContent retrieveProperty in await vcService.RetrievePropertiesAsync(pfSpec))
             {
-                vimDatacenter = (IVimDatacenter)new Datacenter(VcService, retrieveProperty.obj);
+                vimDatacenter = new Datacenter(VcService, retrieveProperty.obj);
                 Dictionary<string, object> dictionary = VcService.PropSetToDictionary(retrieveProperty.propSet);
                 vimDatacenter.GetCommonProperties(dictionary);
             }
@@ -354,7 +348,7 @@ namespace PlatformWorker.VMware
         public async Task<IVimDatastore> GetDatastoreByUrlAsync(string url)
         {
             IVimDatastore[] datastoresAndProperties = await GetDatastoresAndPropertiesAsync();
-            IVimDatastore vimDatastore1 = (IVimDatastore)null;
+            IVimDatastore vimDatastore1 = null;
             foreach (IVimDatastore vimDatastore2 in datastoresAndProperties)
             {
                 if (string.Compare(url, vimDatastore2.DsProperties.Url, true, CultureInfo.InvariantCulture) == 0)
@@ -374,7 +368,7 @@ namespace PlatformWorker.VMware
         public async Task<IVimDatastore> GetDatastoreByNameAsync(string name)
         {
             IVimDatastore[] datastoresAndProperties = await GetDatastoresAndPropertiesAsync();
-            IVimDatastore vimDatastore1 = (IVimDatastore)null;
+            IVimDatastore vimDatastore1 = null;
             foreach (IVimDatastore vimDatastore2 in datastoresAndProperties)
             {
                 if (string.Compare(name, vimDatastore2.DsProperties.Name, true, CultureInfo.InvariantCulture) == 0)
@@ -414,7 +408,7 @@ namespace PlatformWorker.VMware
         {
             IVimDatastore datastoreByUrl = await GetDatastoreByUrlAsync(url);
             if (datastoreByUrl == null)
-                return (string)null;
+                return null;
             return datastoreByUrl.GetPath();
         }
 
@@ -428,12 +422,12 @@ namespace PlatformWorker.VMware
             ManagedObjectReference vmFolder = (await GetDatacenterAndPropertiesAsync()).DatacenterProperties.VmFolder;
             if (vmFolder == null)
                 throw new Exception("vmFolder is null");
-            IVimResourcePool vimResourcePool = (IVimResourcePool)null;
+            IVimResourcePool vimResourcePool = null;
             if (!string.IsNullOrEmpty(resPoolName))
                 vimResourcePool = await GetResourcePoolByNameAsync(resPoolName);
             if (vimResourcePool == null)
                 vimResourcePool = await GetDefaultResourcePoolAsync();
-            ManagedObjectReference managedObject = await VcService.Service.RegisterVM_TaskAsync(vmFolder, dsPath, (string)null, false, vimResourcePool.ManagedObject, ManagedObject);
+            ManagedObjectReference managedObject = await VcService.Service.RegisterVM_TaskAsync(vmFolder, dsPath, null, false, vimResourcePool.ManagedObject, ManagedObject);
             ctx.IsRetriableCall = false;
             VCTask task = new VCTask(VcService, managedObject);
             string op = "RegisterVm";
@@ -442,7 +436,7 @@ namespace PlatformWorker.VMware
             string[] properties1 = new string[1] { "info.result" };
             Dictionary<string, object> properties2 = await task.GetPropertiesAsync(properties1);
             if (properties2.ContainsKey("info.result"))
-                return (IVimVm)new Vm(VcService, (ManagedObjectReference)properties2["info.result"]);
+                return new Vm(VcService, (ManagedObjectReference)properties2["info.result"]);
             throw new Exception("Vm managed object reference does not exist");
         }
 
@@ -471,7 +465,7 @@ namespace PlatformWorker.VMware
             traversalSpec2.skip = true;
             traversalSpec2.selectSet = new SelectionSpec[1]
             {
-        (SelectionSpec) traversalSpec1
+         traversalSpec1
             };
             PropertySpec[] propertySpecArray = new PropertySpec[1] { new PropertySpec() };
             propertySpecArray[0].all = false;
@@ -491,7 +485,7 @@ namespace PlatformWorker.VMware
             propertyFilterSpec.objectSet[0].skip = false;
             propertyFilterSpec.objectSet[0].selectSet = new SelectionSpec[1]
             {
-        (SelectionSpec) traversalSpec2
+         traversalSpec2
             };
             ObjectContent[] objectContentArray = await VcService.RetrievePropertiesAsync(new PropertyFilterSpec[1] { propertyFilterSpec });
             List<ResourcePool> resourcePoolList = new List<ResourcePool>();
@@ -524,7 +518,7 @@ namespace PlatformWorker.VMware
 
         public async Task<IVimResourcePool> GetResourcePoolByNameAsync(string resPoolName)
         {
-            IVimResourcePool vimResourcePool = (IVimResourcePool)null;
+            IVimResourcePool vimResourcePool = null;
             if (!string.IsNullOrEmpty(resPoolName))
             {
                 foreach (IVimResourcePool allResourcePool in await GetAllResourcePoolsAsync())
@@ -542,7 +536,7 @@ namespace PlatformWorker.VMware
         public async Task MoveVmToResourcePoolAsync(IVimVm vm, string resPoolName)
         {
             IVimResourcePool[] allResourcePools = await GetAllResourcePoolsAsync();
-            IVimResourcePool vimResourcePool1 = (IVimResourcePool)null;
+            IVimResourcePool vimResourcePool1 = null;
             foreach (IVimResourcePool vimResourcePool2 in allResourcePools)
             {
                 if (string.Compare(vimResourcePool2.Name, resPoolName, true, CultureInfo.InvariantCulture) == 0)
@@ -558,7 +552,7 @@ namespace PlatformWorker.VMware
 
         public async Task<string> ContainsVmNameAsync(string vmName)
         {
-            string str = (string)null;
+            string str = null;
             foreach (IVimVm vmsAndProperty in GetVmsAndProperties(await GetManagedObjectAndPropertiesAsync(ManagedObject, "vm", "VirtualMachine", Vm.VCProperties)))
             {
                 if (string.Compare(vmsAndProperty.Name, vmName, true, CultureInfo.InvariantCulture) == 0)
@@ -599,7 +593,7 @@ namespace PlatformWorker.VMware
         {
             HostVirtualSwitch[] property1 = (HostVirtualSwitch[])(await GetPropertiesAsync(new string[1] { "config.network.vswitch" }))["config.network.vswitch"];
             PhysicalNic[] property2 = (PhysicalNic[])(await GetPropertiesAsync(new string[1] { "config.network.pnic" }))["config.network.pnic"];
-            Dictionary<string, string[]> dictionary = new Dictionary<string, string[]>((IEqualityComparer<string>)StringComparer.CurrentCultureIgnoreCase);
+            Dictionary<string, string[]> dictionary = new Dictionary<string, string[]>(StringComparer.CurrentCultureIgnoreCase);
             List<string> stringList = new List<string>();
             foreach (HostVirtualSwitch hostVirtualSwitch in property1)
             {
@@ -633,7 +627,7 @@ namespace PlatformWorker.VMware
 
         public async Task<IVimVm> GetVmAsync(string name)
         {
-            IVimVm vimVm = (IVimVm)null;
+            IVimVm vimVm = null;
             foreach (IVimVm vmsAndProperty in await GetVmsAndPropertiesAsync())
             {
                 if (string.Compare(vmsAndProperty.VMProperties.Name, name, true, CultureInfo.InvariantCulture) == 0)
@@ -647,7 +641,7 @@ namespace PlatformWorker.VMware
 
         public async Task<IVimVm> GetVmByUuidAsync(string uuid)
         {
-            IVimVm vimVm = (IVimVm)null;
+            IVimVm vimVm = null;
             foreach (IVimVm vmsAndProperty in await GetVmsAndPropertiesAsync())
             {
                 if (string.Compare(vmsAndProperty.VMProperties.Uuid, uuid, true, CultureInfo.InvariantCulture) == 0)
@@ -724,7 +718,7 @@ namespace PlatformWorker.VMware
         // Set up Clone Spec.
         public async Task<IVimVm> CreateVmWithNetworkMappingAsync(VirtualMachineConfigSpec configSpec, Dictionary<string, string> networkMap, VimClientlContext ctx)
         {
-            Dictionary<string, IVimNetwork> networksDict = new Dictionary<string, IVimNetwork>((IEqualityComparer<string>)StringComparer.CurrentCultureIgnoreCase);
+            Dictionary<string, IVimNetwork> networksDict = new Dictionary<string, IVimNetwork>(StringComparer.CurrentCultureIgnoreCase);
             ((IEnumerable<IVimNetwork>)GetNetworksAsync()).ToList().ForEach(network =>
             {
                 if (networksDict.ContainsKey(network.Name))
@@ -732,18 +726,18 @@ namespace PlatformWorker.VMware
                 networksDict.Add(network.Name, network);
             });
             Dictionary<string, string> dvPortgroupUuids = await GetDistributedVirtualSwitchUuidsAsync();
-            ((IEnumerable<VirtualDeviceConfigSpec>)configSpec.deviceChange).Where(vdcs => vdcs.device is VirtualEthernetCard).ToList().ForEach(vdcs =>
+            configSpec.deviceChange.Where(vdcs => vdcs.device is VirtualEthernetCard).ToList().ForEach(vdcs =>
             {
                 string key;
                 IVimNetwork vimNetwork;
                 if (!networkMap.TryGetValue(vdcs.device.deviceInfo.summary, out key) || !networksDict.TryGetValue(key, out vimNetwork))
-                    throw new Exception(string.Format("Don't know how to map the network connection \"{0}\"", (object)vdcs.device.deviceInfo.summary));
+                    throw new Exception(string.Format("Don't know how to map the network connection \"{0}\"", vdcs.device.deviceInfo.summary));
                 if (vimNetwork.IsDistributed)
                 {
                     string str;
                     if (!dvPortgroupUuids.TryGetValue(vimNetwork.PortgroupKey, out str))
                         return;
-                    vdcs.device.backing = (VirtualDeviceBackingInfo)new VirtualEthernetCardDistributedVirtualPortBackingInfo();
+                    vdcs.device.backing = new VirtualEthernetCardDistributedVirtualPortBackingInfo();
                     ((VirtualEthernetCardDistributedVirtualPortBackingInfo)vdcs.device.backing).port = new DistributedVirtualSwitchPortConnection()
                     {
                         switchUuid = str,
@@ -752,7 +746,7 @@ namespace PlatformWorker.VMware
                 }
                 else
                 {
-                    vdcs.device.backing = (VirtualDeviceBackingInfo)new VirtualEthernetCardNetworkBackingInfo();
+                    vdcs.device.backing = new VirtualEthernetCardNetworkBackingInfo();
                     ((VirtualEthernetCardNetworkBackingInfo)vdcs.device.backing).network = networksDict[key].ManagedObject;
                     ((VirtualDeviceDeviceBackingInfo)vdcs.device.backing).deviceName = networksDict[key].Name;
                 }
@@ -783,7 +777,7 @@ namespace PlatformWorker.VMware
             if (num2 == 12)
             {
                 if (dictionary.ContainsKey("info.state"))
-                    throw new Exception("Vm creation timed out. Status returned by CreateVM_Task: (TaskInfoState) " + (object)(TaskInfoState)dictionary["info.state"]);
+                    throw new Exception("Vm creation timed out. Status returned by CreateVM_Task: (TaskInfoState) " + (TaskInfoState)dictionary["info.state"]);
                 throw new Exception("Vm creation timed out. ESX async task issue. Check host performance.");
             }
             if (!dictionary.ContainsKey("info.result"))
@@ -798,7 +792,7 @@ namespace PlatformWorker.VMware
             }
             if (taskInfoState != TaskInfoState.success)
                 throw new Exception("Task State was never set to Success");
-            IVimVm vimVm = (IVimVm)new Vm(VcService, (ManagedObjectReference)dictionary["info.result"]);
+            IVimVm vimVm = new Vm(VcService, (ManagedObjectReference)dictionary["info.result"]);
             for (int index = 0; index < 60; ++index)
             {
                 if (!string.IsNullOrEmpty(vimVm.Uuid))
@@ -810,7 +804,7 @@ namespace PlatformWorker.VMware
 
         private async Task<VirtualDevice[]> getDefaultDevicesAsync(ManagedObjectReference computeResource)
         {
-            VirtualMachineConfigOption machineConfigOption = await VcService.Service.QueryConfigOptionAsync((await GetManagedObjectsAsync(computeResource, new string[1] { "environmentBrowser" }))[0], (string)null, ManagedObject);
+            VirtualMachineConfigOption machineConfigOption = await VcService.Service.QueryConfigOptionAsync((await GetManagedObjectsAsync(computeResource, new string[1] { "environmentBrowser" }))[0], null, ManagedObject);
             VirtualDevice[] virtualDeviceArray = null;
             if (machineConfigOption != null)
                 virtualDeviceArray = machineConfigOption.defaultDevice;
@@ -837,9 +831,9 @@ namespace PlatformWorker.VMware
             virtualDisk.controllerKeySpecified = true;
             virtualDisk.unitNumber = diskInfo.UnitNumber;
             virtualDisk.unitNumberSpecified = true;
-            virtualDisk.backing = (VirtualDeviceBackingInfo)flatVer2BackingInfo;
+            virtualDisk.backing = flatVer2BackingInfo;
             virtualDisk.capacityInKB = diskInfo.SizeMB * 1024L;
-            return new VirtualDeviceConfigSpec() { fileOperation = VirtualDeviceConfigSpecFileOperation.create, fileOperationSpecified = true, operation = VirtualDeviceConfigSpecOperation.add, operationSpecified = true, device = (VirtualDevice)virtualDisk };
+            return new VirtualDeviceConfigSpec() { fileOperation = VirtualDeviceConfigSpecFileOperation.create, fileOperationSpecified = true, operation = VirtualDeviceConfigSpecOperation.add, operationSpecified = true, device = virtualDisk };
         }
 
         private VirtualDeviceConfigSpec addVirtualDiskConfigSpec(VmDiskInfo diskInfo)
@@ -848,13 +842,13 @@ namespace PlatformWorker.VMware
             flatVer2BackingInfo.fileName = diskInfo.File;
             flatVer2BackingInfo.diskMode = diskInfo.Mode;
             VirtualDisk virtualDisk = new VirtualDisk();
-            virtualDisk.backing = (VirtualDeviceBackingInfo)flatVer2BackingInfo;
+            virtualDisk.backing = flatVer2BackingInfo;
             virtualDisk.key = -1;
             virtualDisk.controllerKey = diskInfo.CtrlKey;
             virtualDisk.controllerKeySpecified = true;
             virtualDisk.unitNumber = diskInfo.UnitNumber;
             virtualDisk.unitNumberSpecified = true;
-            return new VirtualDeviceConfigSpec() { operation = VirtualDeviceConfigSpecOperation.add, operationSpecified = true, device = (VirtualDevice)virtualDisk };
+            return new VirtualDeviceConfigSpec() { operation = VirtualDeviceConfigSpecOperation.add, operationSpecified = true, device = virtualDisk };
         }
 
         private async Task<VirtualMachineConfigSpec> createVmConfigSpecAsync(VmCreationInfo vmCreationInfo)
@@ -869,14 +863,14 @@ namespace PlatformWorker.VMware
                 vmPathName = volumeName
             };
             int num = 1;
-            VirtualSCSIController virtualScsiController = vmCreationInfo.ScsiControllerType != ScsiControllerType.LsiLogicSAS ? (vmCreationInfo.ScsiControllerType != ScsiControllerType.LsiLogicParallel ? (VirtualSCSIController)new VirtualBusLogicController() : (VirtualSCSIController)new VirtualLsiLogicController()) : (VirtualSCSIController)new VirtualLsiLogicSASController();
+            VirtualSCSIController virtualScsiController = vmCreationInfo.ScsiControllerType != ScsiControllerType.LsiLogicSAS ? (vmCreationInfo.ScsiControllerType != ScsiControllerType.LsiLogicParallel ? new VirtualBusLogicController() : new VirtualLsiLogicController()) : new VirtualLsiLogicSASController();
             virtualScsiController.busNumber = 0;
             virtualScsiController.key = num;
             virtualScsiController.sharedBus = VirtualSCSISharing.noSharing;
             VirtualDeviceConfigSpec deviceConfigSpec1 = new VirtualDeviceConfigSpec();
             deviceConfigSpec1.operation = VirtualDeviceConfigSpecOperation.add;
             deviceConfigSpec1.operationSpecified = true;
-            deviceConfigSpec1.device = (VirtualDevice)virtualScsiController;
+            deviceConfigSpec1.device = virtualScsiController;
             List<VirtualDeviceConfigSpec> deviceConfigSpecList1 = new List<VirtualDeviceConfigSpec>();
             if (vmCreationInfo.Disks != null)
             {
@@ -887,7 +881,7 @@ namespace PlatformWorker.VMware
                         deviceConfigSpecList1.Add(deviceConfigSpec2);
                 }
             }
-            VirtualDevice virtualDevice = (VirtualDevice)null;
+            VirtualDevice virtualDevice = null;
             for (int index = 0; index < defaultDevices.Length; ++index)
             {
                 if (defaultDevices[index] is VirtualIDEController)
@@ -896,14 +890,14 @@ namespace PlatformWorker.VMware
                     break;
                 }
             }
-            VirtualDeviceConfigSpec deviceConfigSpec3 = (VirtualDeviceConfigSpec)null;
+            VirtualDeviceConfigSpec deviceConfigSpec3 = null;
             if (virtualDevice != null)
             {
                 VirtualCdromRemotePassthroughBackingInfo passthroughBackingInfo = new VirtualCdromRemotePassthroughBackingInfo();
                 passthroughBackingInfo.exclusive = false;
                 passthroughBackingInfo.deviceName = "";
                 VirtualCdrom virtualCdrom = new VirtualCdrom();
-                virtualCdrom.backing = (VirtualDeviceBackingInfo)passthroughBackingInfo;
+                virtualCdrom.backing = passthroughBackingInfo;
                 virtualCdrom.key = -1;
                 virtualCdrom.controllerKey = virtualDevice.key;
                 virtualCdrom.controllerKeySpecified = true;
@@ -912,10 +906,10 @@ namespace PlatformWorker.VMware
                 deviceConfigSpec3 = new VirtualDeviceConfigSpec();
                 deviceConfigSpec3.operation = VirtualDeviceConfigSpecOperation.add;
                 deviceConfigSpec3.operationSpecified = true;
-                deviceConfigSpec3.device = (VirtualDevice)virtualCdrom;
+                deviceConfigSpec3.device = virtualCdrom;
             }
             IVimNetwork[] networks = await GetNetworksAsync();
-            Dictionary<string, Network> dictionary = new Dictionary<string, Network>((IEqualityComparer<string>)StringComparer.CurrentCultureIgnoreCase);
+            Dictionary<string, Network> dictionary = new Dictionary<string, Network>(StringComparer.CurrentCultureIgnoreCase);
             foreach (Network network in networks)
             {
                 if (!dictionary.ContainsKey(network.Name))
@@ -923,7 +917,7 @@ namespace PlatformWorker.VMware
             }
             Dictionary<string, string> virtualSwitchUuids = await GetDistributedVirtualSwitchUuidsAsync();
             List<VirtualDeviceConfigSpec> deviceConfigSpecList2 = new List<VirtualDeviceConfigSpec>();
-            VirtualDeviceBackingInfo deviceBackingInfo = (VirtualDeviceBackingInfo)null;
+            VirtualDeviceBackingInfo deviceBackingInfo = null;
             foreach (string key in vmCreationInfo.NICMapping)
             {
                 if (!("---Discard---" == key))
@@ -935,7 +929,7 @@ namespace PlatformWorker.VMware
                         {
                             if (virtualSwitchUuids.ContainsKey(network.PortgroupKey))
                             {
-                                deviceBackingInfo = (VirtualDeviceBackingInfo)new VirtualEthernetCardDistributedVirtualPortBackingInfo();
+                                deviceBackingInfo = new VirtualEthernetCardDistributedVirtualPortBackingInfo();
                                 ((VirtualEthernetCardDistributedVirtualPortBackingInfo)deviceBackingInfo).port = new DistributedVirtualSwitchPortConnection()
                                 {
                                     switchUuid = virtualSwitchUuids[network.PortgroupKey],
@@ -945,14 +939,14 @@ namespace PlatformWorker.VMware
                         }
                         else
                         {
-                            deviceBackingInfo = (VirtualDeviceBackingInfo)new VirtualEthernetCardNetworkBackingInfo();
+                            deviceBackingInfo = new VirtualEthernetCardNetworkBackingInfo();
                             ((VirtualEthernetCardNetworkBackingInfo)deviceBackingInfo).network = dictionary[key].ManagedObject;
                             ((VirtualDeviceDeviceBackingInfo)deviceBackingInfo).deviceName = dictionary[key].Name;
                         }
                     }
                     else
-                        deviceBackingInfo = (VirtualDeviceBackingInfo)new VirtualEthernetCardNetworkBackingInfo();
-                    VirtualEthernetCard virtualEthernetCard = vmCreationInfo.NicType != VirtualNicType.Vmxnet3 ? (vmCreationInfo.NicType != VirtualNicType.Vmxnet ? (vmCreationInfo.NicType != VirtualNicType.E1000 ? new VirtualPCNet32() : (VirtualEthernetCard)new VirtualE1000()) : new VirtualVmxnet()) : new VirtualVmxnet3();
+                        deviceBackingInfo = new VirtualEthernetCardNetworkBackingInfo();
+                    VirtualEthernetCard virtualEthernetCard = vmCreationInfo.NicType != VirtualNicType.Vmxnet3 ? (vmCreationInfo.NicType != VirtualNicType.Vmxnet ? (vmCreationInfo.NicType != VirtualNicType.E1000 ? new VirtualPCNet32() : new VirtualE1000()) : new VirtualVmxnet()) : new VirtualVmxnet3();
                     virtualEthernetCard.addressType = "generated";
                     virtualEthernetCard.backing = deviceBackingInfo;
                     virtualEthernetCard.key = -1;
@@ -960,7 +954,7 @@ namespace PlatformWorker.VMware
                     {
                         operation = VirtualDeviceConfigSpecOperation.add,
                         operationSpecified = true,
-                        device = (VirtualDevice)virtualEthernetCard
+                        device = virtualEthernetCard
                     });
                 }
             }
@@ -982,7 +976,7 @@ namespace PlatformWorker.VMware
             List<IVimVm> vimVmList = new List<IVimVm>();
             foreach (ManagedObjectAndProperties objectAndProperties2 in objectAndProperties1)
             {
-                IVimVm vimVm = (IVimVm)new Vm(VcService, objectAndProperties2.ManagedObject);
+                IVimVm vimVm = new Vm(VcService, objectAndProperties2.ManagedObject);
                 vimVm.GetCommonProperties(objectAndProperties2.Properties);
                 if (vimVm.VMProperties.IsTemplate)
                     vimVmList.Add(vimVm);
@@ -1013,7 +1007,7 @@ namespace PlatformWorker.VMware
             ManagedObjectReference[] managedObjects = await GetManagedObjectsAsync(task, new string[1] { "entity" });
             IVimVm? vimVm = null;
             if (managedObjects.Length != 0)
-                vimVm = (IVimVm)new Vm(VcService, managedObjects[0]);
+                vimVm = new Vm(VcService, managedObjects[0]);
             return vimVm;
         }
 
@@ -1079,17 +1073,17 @@ namespace PlatformWorker.VMware
             objectSpec.skip = false;
             objectSpec.selectSet = new SelectionSpec[3]
             {
-        (SelectionSpec) new TraversalSpec()
+         new TraversalSpec()
         {
           type = "HostSystem",
           path = "vm"
         },
-        (SelectionSpec) new TraversalSpec()
+         new TraversalSpec()
         {
           type = "HostSystem",
           path = "datastore"
         },
-        (SelectionSpec) new TraversalSpec()
+         new TraversalSpec()
         {
           type = "HostSystem",
           path = "network"

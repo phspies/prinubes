@@ -1,8 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Prinubes.Common.DatabaseModels;
 using Prinubes.Common.DatabaseModels.ManyToMany;
-using System.Reflection;
 
 namespace Prinubes.Common.DatabaseModels.EntityTypes
 {

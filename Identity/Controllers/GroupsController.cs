@@ -1,16 +1,12 @@
-﻿using System.Text.Json;
-using AutoMapper;
-using Prinubes.Identity.Datamodels;
-using Prinubes.Identity.Helpers;
+﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-using System.Net;
 using Prinubes.Common.DatabaseModels;
-using Prinubes.Common.Kafka.Producer;
 using Prinubes.Common.Datamodels;
-using Microsoft.AspNetCore.Identity;
-using Prinubes.Common.Models;
+using Prinubes.Identity.Datamodels;
+using Prinubes.Identity.Helpers;
+using System.Net;
+using System.Text.Json;
 
 namespace Prinubes.Identity.Controllers
 {
@@ -40,7 +36,7 @@ namespace Prinubes.Identity.Controllers
             {
                 try
                 {
-                    if (! await db.GroupNameExistsAsync(group.Group))
+                    if (!await db.GroupNameExistsAsync(group.Group))
                     {
                         return Ok(mapper.Map<GroupDisplayDataModel>(await db.CreateAsync(group)));
                     }

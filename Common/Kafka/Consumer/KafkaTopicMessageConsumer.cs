@@ -1,9 +1,9 @@
-using System.Text;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Prinubes.Common.Models;
+using System.Text;
 
 namespace Prinubes.Common.Kafka.Consumer
 {

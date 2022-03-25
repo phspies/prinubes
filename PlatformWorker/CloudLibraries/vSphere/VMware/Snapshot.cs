@@ -1,6 +1,5 @@
 ﻿using PlatformWorker.VMware.Interfaces;
 using Prinubes.vCenterSDK;
-using System.Threading.Tasks;
 
 namespace PlatformWorker.VMware
 {

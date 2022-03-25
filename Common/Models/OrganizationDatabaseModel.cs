@@ -1,5 +1,5 @@
-﻿using Prinubes.Common.Kafka;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
+using Prinubes.Common.Kafka;
 
 namespace Prinubes.Common.DatabaseModels
 {

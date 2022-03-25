@@ -2,11 +2,11 @@
 using MediatR;
 using Microsoft.Extensions.Caching.Distributed;
 using Prinubes.Common.DatabaseModels;
-using Prinubes.Common.Kafka;
 using Prinubes.Common.Helpers;
+using Prinubes.Common.Kafka;
 using Prinubes.Platforms.Datamodels;
-using System.Collections;
 using Prinubes.PlatformWorkers.Helpers;
+using System.Collections;
 
 namespace Prinubes.LoadBalancerPlatform.Kafka
 {
@@ -39,7 +39,7 @@ namespace Prinubes.LoadBalancerPlatform.Kafka
                         if (!DBContext.LoadBalancerPlatforms.Any(x => x.Id == loadbalancerplatformKafkaMessage.LoadBalancerPlatformID))
                         {
                             var loadbalancerplatform = new LoadBalancerPlatformDatabaseModel();
-                            PropertyCopier.Populate(loadbalancerplatformKafkaMessage.LoadBalancerPlatform, loadbalancerplatform, new string[] {"Organization", "Credential" });
+                            PropertyCopier.Populate(loadbalancerplatformKafkaMessage.LoadBalancerPlatform, loadbalancerplatform, new string[] { "Organization", "Credential" });
                             DBContext.LoadBalancerPlatforms.Add(loadbalancerplatform);
                             DBContext.SaveChanges();
                             distributedCaching.SetCaching(loadbalancerplatform, loadbalancerplatform.Id.ToString());

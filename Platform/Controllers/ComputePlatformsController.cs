@@ -1,14 +1,13 @@
-﻿using System.Text.Json;
+﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Net;
-using Prinubes.Common.Helpers;
-using Prinubes.Platforms.Datamodels;
 using Prinubes.Common.DatabaseModels;
 using Prinubes.Common.Datamodels;
-using AutoMapper;
+using Prinubes.Common.Helpers;
+using Prinubes.Platforms.Datamodels;
 using Prinubes.Platforms.Helpers;
-using Prinubes.Common.Kafka.Consumer;
+using System.Net;
+using System.Text.Json;
 
 namespace Prinubes.Platforms.Controllers
 {
@@ -26,7 +25,7 @@ namespace Prinubes.Platforms.Controllers
             serviceProvider = _serviceProvider;
             logger = serviceProvider.GetRequiredService<ILogger<ComputePlatformController>>();
             mapper = serviceProvider.GetRequiredService<IMapper>();
-            
+
         }
         [PrinubesAuthorize]
         [PrinubesDescription("Test computeplatform credentials in organization")]

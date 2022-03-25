@@ -1,7 +1,5 @@
-﻿using Prinubes.Common.Kafka;
-using Newtonsoft.Json;
-using Prinubes.Common.DatabaseModels.ManyToMany;
-using Prinubes.Common.DatabaseModels.PlatformEnums;
+﻿using Newtonsoft.Json;
+using Prinubes.Common.Kafka;
 
 namespace Prinubes.Common.DatabaseModels
 {
@@ -39,7 +37,7 @@ namespace Prinubes.Common.DatabaseModels
         public string EncryptedPassword { get; set; }
         [JsonProperty("encrypted_key")]
         public string EncryptedKey { get; set; }
-        
+
     }
     public class CredentialKafkaDataModel : FoundationDatabaseModel
     {

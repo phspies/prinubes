@@ -1,5 +1,4 @@
 ﻿using PlatformWorker.VMware.Interfaces;
-using System;
 
 namespace PlatformWorker.VMware
 {

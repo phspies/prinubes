@@ -1,12 +1,9 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc.Abstractions;
+﻿using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.EntityFrameworkCore;
 using Prinubes.Common.DatabaseModels;
-using Prinubes.Common.Kafka;
-using Prinubes.Common.Kafka.Producer;
 using Prinubes.Common.Helpers;
-using Prinubes.Platforms.Datamodels;
+using Prinubes.Common.Kafka.Producer;
 
 namespace Prinubes.Platforms.Datamodels.Domain
 {
@@ -95,7 +92,7 @@ namespace Prinubes.Platforms.Datamodels.Domain
 
         public void Dispose()
         {
-           // ((IDisposable)dbContext).Dispose();
+            // ((IDisposable)dbContext).Dispose();
         }
     }
 }

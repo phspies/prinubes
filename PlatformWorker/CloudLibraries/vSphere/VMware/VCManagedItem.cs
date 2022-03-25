@@ -1,11 +1,7 @@
 ﻿using PlatformWorker.VMware.Interfaces;
-using System;
-using System.Collections.Generic;
+using Prinubes.vCenterSDK;
 using System.Diagnostics;
 using System.Net;
-using System.Threading;
-using Prinubes.vCenterSDK;
-using System.Threading.Tasks;
 using ObjectContent = Prinubes.vCenterSDK.ObjectContent;
 
 namespace PlatformWorker.VMware
@@ -66,7 +62,7 @@ namespace PlatformWorker.VMware
 
         public async Task<object> GetPropertyAsync(string property)
         {
-            object obj = (object)null;
+            object obj = null;
             for (int index = 0; index < 3; ++index)
             {
                 Dictionary<ManagedObjectReference, Dictionary<string, object>> properties = await VcService.GetPropertiesAsync(new ManagedObjectReference[1] { _managedObject }, new string[1] { property });
@@ -150,13 +146,13 @@ namespace PlatformWorker.VMware
             };
             spec.propSet[0].pathSet = filterProps;
             spec.propSet[0].type = _managedObject.type;
-            spec.objectSet[0].selectSet = (SelectionSpec[])null;
+            spec.objectSet[0].selectSet = null;
             spec.objectSet[0].skip = false;
             spec.objectSet[0].skipSpecified = true;
             ManagedObjectReference filter1 = await VcService.Service.CreateFilterAsync(VcService.PropertyCollector, spec, true);
             bool flag = false;
-            ObjectUpdate objectUpdate1 = (ObjectUpdate)null;
-            PropertyChange[] propertyChangeArray = (PropertyChange[])null;
+            ObjectUpdate objectUpdate1 = null;
+            PropertyChange[] propertyChangeArray = null;
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
             long elapsedMilliseconds = stopwatch.ElapsedMilliseconds;
@@ -166,7 +162,7 @@ namespace PlatformWorker.VMware
             {
                 if (rstate.IsVimClientStopping())
                     throw new Exception();
-                if (stopwatch.ElapsedMilliseconds > (long)(rstate.TimeoutSec * 1000))
+                if (stopwatch.ElapsedMilliseconds > rstate.TimeoutSec * 1000)
                     throw new Exception("WaitForValues: Operation timed out");
                 UpdateSet updateSet;
                 try
@@ -188,8 +184,8 @@ namespace PlatformWorker.VMware
                         ObjectUpdate[] objectSet = filter2.objectSet;
                         if (objectSet != null)
                         {
-                            objectUpdate1 = (ObjectUpdate)null;
-                            propertyChangeArray = (PropertyChange[])null;
+                            objectUpdate1 = null;
+                            propertyChangeArray = null;
                             for (int index = 0; index < objectSet.Length; ++index)
                             {
                                 ObjectUpdate objectUpdate2 = objectSet[index];
@@ -247,7 +243,7 @@ namespace PlatformWorker.VMware
             for (int index = 0; index < props.Length; ++index)
             {
                 if (propchg.name.LastIndexOf(props[index]) >= 0)
-                    vals[index] = propchg.op != PropertyChangeOp.remove ? propchg.val : (object)"";
+                    vals[index] = propchg.op != PropertyChangeOp.remove ? propchg.val : "";
             }
         }
 
@@ -272,7 +268,7 @@ namespace PlatformWorker.VMware
             objectSpec.skip = false;
             objectSpec.selectSet = new SelectionSpec[1]
             {
-        (SelectionSpec) new TraversalSpec()
+         new TraversalSpec()
         {
           type = managedObject.type,
           path = path

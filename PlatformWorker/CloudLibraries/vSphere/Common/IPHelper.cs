@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
@@ -71,7 +69,7 @@ public class IPHelper
         if (networkInterfaces != null)
         {
             foreach (NetworkInterface networkInterface in networkInterfaces)
-                stringList.AddRange((IEnumerable<string>)IPHelper.GetIPAddresses(networkInterface.GetIPProperties()));
+                stringList.AddRange(IPHelper.GetIPAddresses(networkInterface.GetIPProperties()));
         }
         return stringList;
     }
@@ -79,7 +77,7 @@ public class IPHelper
     public static string GetFastestAddress(string[] ips, int port, int timeoutSeconds)
     {
         if (ips == null || ips.Length == 0)
-            return (string)null;
+            return null;
         if (ips.Length == 1)
             return ips[0];
         return new Connector(ips, port).FindFastestAddress(timeoutSeconds);
@@ -101,7 +99,7 @@ public class IPHelper
 
     public static string GetWNetServerString(string server)
     {
-        IPAddress address = (IPAddress)null;
+        IPAddress address = null;
         string str;
         if (IPAddress.TryParse(server, out address))
         {
@@ -133,7 +131,7 @@ public class IPHelper
         IPAddress address1;
         if (IPAddress.TryParse(address, out address1))
         {
-            if (address1.Equals((object)IPAddress.IPv6Loopback) || address1.Equals((object)IPAddress.Loopback))
+            if (address1.Equals(IPAddress.IPv6Loopback) || address1.Equals(IPAddress.Loopback))
                 flag = true;
         }
         else if (string.Compare(address, "localhost", true, CultureInfo.InvariantCulture) == 0)
@@ -170,7 +168,7 @@ public class IPHelper
     {
         IPEndPoint ipEndPoint = new IPEndPoint(IPAddress.Parse(remoteAddress), port);
         Socket socket = new Socket(ipEndPoint.Address.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-        socket.Connect((EndPoint)ipEndPoint);
+        socket.Connect(ipEndPoint);
         string str = ((IPEndPoint)socket.LocalEndPoint).Address.ToString();
         socket.Close();
         return str;
@@ -181,7 +179,7 @@ public class IPHelper
         List<string> stringList = new List<string>();
         foreach (string ipAddress in ipAddresses)
         {
-            IPAddress address = (IPAddress)null;
+            IPAddress address = null;
             IPAddress.TryParse(ipAddress, out address);
             if (address != null && address.AddressFamily == AddressFamily.InterNetwork)
                 stringList.Add(ipAddress);
@@ -194,7 +192,7 @@ public class IPHelper
         List<string> stringList = new List<string>();
         foreach (string ipAddress in ipAddresses)
         {
-            IPAddress address = (IPAddress)null;
+            IPAddress address = null;
             IPAddress.TryParse(ipAddress, out address);
             if (address != null && address.AddressFamily == AddressFamily.InterNetworkV6)
                 stringList.Add(ipAddress);

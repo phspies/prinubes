@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc.ApplicationModels;
-using Microsoft.AspNetCore.Mvc.Filters;
-
-namespace Prinubes.Common.Helpers
+﻿namespace Prinubes.Common.Helpers
 {
     public class PrinubesDescriptionAttribute : Attribute
     {

@@ -1,12 +1,8 @@
-﻿using Prinubes.Common.Kafka;
-using Newtonsoft.Json;
-using Prinubes.Common.DatabaseModels.ManyToMany;
+﻿using Newtonsoft.Json;
 using Prinubes.Common.DatabaseModels.PlatformEnums;
-using Prinubes.Common.Datamodels;
-using Prinubes.Common.Models.Interfaces;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Reflection;
+using Prinubes.Common.Kafka;
 using shortid;
+using System.Reflection;
 
 namespace Prinubes.Common.DatabaseModels
 {
@@ -103,7 +99,7 @@ namespace Prinubes.Common.DatabaseModels
         public string UrlEndpoint { get; set; }
         [JsonProperty("verify_ssl_cert")]
         public bool VertifySSLCert { get; set; }
-        
+
         [JsonProperty("tags")]
         public List<TaggingModel> Tags { get; set; }
     }

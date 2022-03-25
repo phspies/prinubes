@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Prinubes.vCenterSDK;
+﻿using Prinubes.vCenterSDK;
 
 namespace PlatformWorker.VMware
 {
@@ -26,7 +25,7 @@ namespace PlatformWorker.VMware
             machineConfigSpec.ftInfo = srcVmCfgInfo.ftInfo;
             machineConfigSpec.guestId = srcVmCfgInfo.guestId;
             machineConfigSpec.memoryAffinity = srcVmCfgInfo.memoryAffinity;
-            machineConfigSpec.memoryMB = (long)srcVmCfgInfo.hardware.memoryMB;
+            machineConfigSpec.memoryMB = srcVmCfgInfo.hardware.memoryMB;
             machineConfigSpec.memoryMBSpecified = true;
             machineConfigSpec.name = replicaDisplayName;
             machineConfigSpec.networkShaper = srcVmCfgInfo.networkShaper;
@@ -74,14 +73,14 @@ namespace PlatformWorker.VMware
                     {
                         VirtualFloppyRemoteDeviceBackingInfo deviceBackingInfo = new VirtualFloppyRemoteDeviceBackingInfo();
                         deviceBackingInfo.deviceName = "";
-                        virtualDevice.backing = (VirtualDeviceBackingInfo)deviceBackingInfo;
+                        virtualDevice.backing = deviceBackingInfo;
                     }
                     else if (virtualDevice is VirtualCdrom)
                     {
                         VirtualCdromRemotePassthroughBackingInfo passthroughBackingInfo = new VirtualCdromRemotePassthroughBackingInfo();
                         passthroughBackingInfo.deviceName = "";
                         passthroughBackingInfo.exclusive = false;
-                        virtualDevice.backing = (VirtualDeviceBackingInfo)passthroughBackingInfo;
+                        virtualDevice.backing = passthroughBackingInfo;
                     }
                     deviceConfigSpecList.Add(new VirtualDeviceConfigSpec()
                     {
@@ -108,7 +107,7 @@ namespace PlatformWorker.VMware
         private static VirtualMachineCpuIdInfoSpec[] GetCpuFeatureMask(HostCpuIdInfo[] srcCpuFeatureMask)
         {
             if (srcCpuFeatureMask == null)
-                return (VirtualMachineCpuIdInfoSpec[])null;
+                return null;
             VirtualMachineCpuIdInfoSpec[] machineCpuIdInfoSpecArray = new VirtualMachineCpuIdInfoSpec[srcCpuFeatureMask.Length];
             for (int index = 0; index < srcCpuFeatureMask.Length; ++index)
             {
@@ -121,7 +120,7 @@ namespace PlatformWorker.VMware
         private static VmConfigSpec VmConfigInfoToVmConfigSpec(VmConfigInfo vmConfigInfo)
         {
             if (vmConfigInfo == null)
-                return (VmConfigSpec)null;
+                return null;
             VmConfigSpec vmConfigSpec = new VmConfigSpec();
             vmConfigSpec.eula = vmConfigInfo.eula;
             vmConfigSpec.installBootRequired = vmConfigInfo.installBootRequired;

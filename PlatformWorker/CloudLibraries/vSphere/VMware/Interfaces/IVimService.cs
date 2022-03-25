@@ -1,8 +1,4 @@
 ﻿using Prinubes.vCenterSDK;
-using System;
-using System.Collections.Generic;
-using Prinubes.vCenterSDK;
-using System.Threading.Tasks;
 using ObjectContent = Prinubes.vCenterSDK.ObjectContent;
 
 namespace PlatformWorker.VMware.Interfaces

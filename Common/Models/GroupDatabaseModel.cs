@@ -1,6 +1,6 @@
-﻿using Prinubes.Common.Kafka;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Prinubes.Common.DatabaseModels.ManyToMany;
+using Prinubes.Common.Kafka;
 
 namespace Prinubes.Common.DatabaseModels
 {
@@ -17,7 +17,7 @@ namespace Prinubes.Common.DatabaseModels
         [JsonProperty("group_data_model")]
         public GroupKafkaDataModel Group { get; set; }
         [JsonProperty("user_id")]
-        public Guid UserID{ get; set; }
+        public Guid UserID { get; set; }
 
     }
     [JsonObject(MemberSerialization.OptIn)]

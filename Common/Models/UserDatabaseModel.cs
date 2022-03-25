@@ -13,7 +13,7 @@ namespace Prinubes.Common.DatabaseModels
         [JsonProperty("action")]
         public ActionEnum Action { get; set; }
         [JsonProperty("id")]
-        public Guid UserID{ get; set; }
+        public Guid UserID { get; set; }
         [JsonProperty("user_data_model")]
         public UserDatabaseModel User { get; set; }
         [JsonProperty("row_version")]

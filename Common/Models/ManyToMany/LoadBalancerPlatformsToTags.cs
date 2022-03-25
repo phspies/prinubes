@@ -7,7 +7,7 @@
         public Guid LoadBalancerID { get; set; }
         public LoadBalancerPlatformDatabaseModel LoadBalancerPlatform { get; set; }
 
-        public Guid TagID{ get; set; }
+        public Guid TagID { get; set; }
         public TaggingModel Tag { get; set; }
     }
 }

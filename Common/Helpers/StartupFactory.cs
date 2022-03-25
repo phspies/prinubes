@@ -32,6 +32,6 @@ namespace Prinubes.Common.Helpers
                 });
             });
         }
-     
+
     }
 }

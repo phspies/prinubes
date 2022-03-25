@@ -7,7 +7,7 @@
         public Guid GroupID { get; set; }
         public GroupDatabaseModel Group { get; set; }
 
-        public Guid UserID{ get; set; }
+        public Guid UserID { get; set; }
         public UserDatabaseModel User { get; set; }
     }
 }

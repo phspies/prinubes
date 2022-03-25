@@ -1,12 +1,12 @@
-﻿using System.Text.Json;
-using AutoMapper;
-using Prinubes.Identity.Datamodels;
-using Prinubes.Identity.Helpers;
+﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Net;
 using Prinubes.Common.DatabaseModels;
 using Prinubes.Common.Datamodels;
+using Prinubes.Identity.Datamodels;
+using Prinubes.Identity.Helpers;
+using System.Net;
+using System.Text.Json;
 
 namespace Prinubes.Identity.Controllers
 {
@@ -111,7 +111,7 @@ namespace Prinubes.Identity.Controllers
                 {
                     try
                     {
-                        if (! await db.CredentialExistsAsync(id))
+                        if (!await db.CredentialExistsAsync(id))
                         {
                             return BadRequest(new ErrorReturnType(HttpStatusCode.NotFound, $"Credential {id} not found"));
                         }
@@ -144,7 +144,7 @@ namespace Prinubes.Identity.Controllers
 
                     try
                     {
-                        if (! await db.CredentialExistsAsync(id))
+                        if (!await db.CredentialExistsAsync(id))
                         {
                             return BadRequest(new ErrorReturnType(HttpStatusCode.NotFound, $"Credential {id} not found"));
                         }

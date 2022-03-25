@@ -1,9 +1,7 @@
 ﻿using AutoMapper;
-using Prinubes.Common.Kafka;
-using Prinubes.Common.Kafka.Producer;
 using Microsoft.EntityFrameworkCore;
 using Prinubes.Common.DatabaseModels;
-using Prinubes.Platforms.Datamodels;
+using Prinubes.Common.Kafka.Producer;
 
 namespace Prinubes.Platforms.Datamodels.Slave
 {
@@ -201,7 +199,7 @@ namespace Prinubes.Platforms.Datamodels.Slave
         }
 
         public async Task<bool> GroupExistsAsync(Guid id) => await dbContext.Groups.AnyAsync(e => e.Id == id && e.OrganizationID == organizationId);
-        public async Task<bool> GroupUserExistsAsync(Guid groupId, Guid userUid) => await dbContext.Groups.Where(e => e.Id == groupId &&  e.OrganizationID == organizationId).AnyAsync(x => x.Users.Any(y => y.Id == userUid));
+        public async Task<bool> GroupUserExistsAsync(Guid groupId, Guid userUid) => await dbContext.Groups.Where(e => e.Id == groupId && e.OrganizationID == organizationId).AnyAsync(x => x.Users.Any(y => y.Id == userUid));
 
     }
 }

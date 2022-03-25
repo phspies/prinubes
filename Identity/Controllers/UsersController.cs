@@ -1,17 +1,17 @@
-﻿using System.Text;
-using System.Text.Json;
-using AutoMapper;
-using Prinubes.Identity.Datamodels;
-using Prinubes.Identity.Helpers;
+﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
-using System.Security.Claims;
-using System.Net;
 using Prinubes.Common.DatabaseModels;
 using Prinubes.Common.Datamodels;
 using Prinubes.Common.Models;
+using Prinubes.Identity.Datamodels;
+using Prinubes.Identity.Helpers;
+using System.IdentityModel.Tokens.Jwt;
+using System.Net;
+using System.Security.Claims;
+using System.Text;
+using System.Text.Json;
 
 namespace Prinubes.Identity.Controllers
 {
@@ -145,13 +145,13 @@ namespace Prinubes.Identity.Controllers
                     userControllerlogger.LogInformation($"Delete user API: {id}");
                     if (id != System.Guid.Empty)
                     {
-                        if (!await db.UserIdExistsAsync((System.Guid)id))
+                        if (!await db.UserIdExistsAsync(id))
                         {
                             return base.NotFound();
                         }
                         try
                         {
-                            return base.Ok(db.DeleteAsync((System.Guid)id));
+                            return base.Ok(db.DeleteAsync(id));
                         }
                         catch (Exception ex)
                         {

@@ -1,7 +1,5 @@
 ﻿using PlatformWorker.VMware.Interfaces;
-using System;
 using Prinubes.vCenterSDK;
-using System.Threading.Tasks;
 
 namespace PlatformWorker.VMware
 {
@@ -60,8 +58,8 @@ namespace PlatformWorker.VMware
 
         public async Task WaitForResultAsync(string op, VimClientlContext rstate)
         {
-            object[] objArray = await WaitForValues(rstate, new string[3] { "info.state", "info.error", "info.progress" }, new string[1] { "state" }, new object[1][] { new object[2] { (object)TaskInfoState.success, (object)TaskInfoState.error } });
-            if (objArray[0].Equals((object)TaskInfoState.success))
+            object[] objArray = await WaitForValues(rstate, new string[3] { "info.state", "info.error", "info.progress" }, new string[1] { "state" }, new object[1][] { new object[2] { TaskInfoState.success, TaskInfoState.error } });
+            if (objArray[0].Equals(TaskInfoState.success))
             {
             }
             else
@@ -70,7 +68,7 @@ namespace PlatformWorker.VMware
                 {
                     throw new Exception(((LocalizedMethodFault)objArray[1]).localizedMessage);
                 }
-                   throw new Exception("WaitForResult: Unknown error returned by Vim");
+                throw new Exception("WaitForResult: Unknown error returned by Vim");
             }
         }
 

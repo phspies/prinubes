@@ -1,9 +1,5 @@
 ﻿using PlatformWorker.VMware.Interfaces;
 using Prinubes.vCenterSDK;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Prinubes.vCenterSDK;
 
 namespace PlatformWorker.VMware
 {
@@ -51,10 +47,10 @@ namespace PlatformWorker.VMware
         public override async Task<IVimManagedItem[]> GetChildrenAsync()
         {
             ManagedObjectAndProperties[] objectAndProperties1 = await GetManagedObjectAndPropertiesAsync(ManagedObject, "hostFolder", "Folder", new string[1] { "name" });
-            IVimManagedItem[] vimManagedItemArray = (IVimManagedItem[])null;
+            IVimManagedItem[] vimManagedItemArray = null;
             foreach (ManagedObjectAndProperties objectAndProperties2 in objectAndProperties1)
             {
-                IVimFolderInsideDC vimFolderInsideDc = (IVimFolderInsideDC)new FolderInsideDC(VcService, objectAndProperties2.ManagedObject);
+                IVimFolderInsideDC vimFolderInsideDc = new FolderInsideDC(VcService, objectAndProperties2.ManagedObject);
                 vimFolderInsideDc.Name = (string)objectAndProperties2.Properties["name"];
                 if (vimFolderInsideDc.Name == "host")
                     vimManagedItemArray = await vimFolderInsideDc.GetChildrenAsync();
@@ -83,7 +79,7 @@ namespace PlatformWorker.VMware
             {
                 if (objectsAndProperty.ManagedObject.type == "VirtualMachine")
                 {
-                    IVimVm vimVm = (IVimVm)new Vm(VcService, objectsAndProperty.ManagedObject);
+                    IVimVm vimVm = new Vm(VcService, objectsAndProperty.ManagedObject);
                     vimVm.GetCommonProperties(objectsAndProperty.Properties);
                     if (!vimVm.VMProperties.IsTemplate)
                         vimVmList.Add(vimVm);
@@ -115,7 +111,7 @@ namespace PlatformWorker.VMware
                         datastoreList.Add(datastore);
                 }
             }
-            return (IVimDatastore[])datastoreList.ToArray();
+            return datastoreList.ToArray();
         }
 
         public async Task<IVimNetwork[]> GetNetworksAsync()
@@ -138,21 +134,21 @@ namespace PlatformWorker.VMware
                         networkList.Add(network);
                 }
             }
-            return (IVimNetwork[])networkList.ToArray();
+            return networkList.ToArray();
         }
 
         public async Task<Dictionary<string, string>> GetDistributedVirtualPortgroupsAsync()
         {
-            Dictionary<string, string> dictionary = new Dictionary<string, string>((IEqualityComparer<string>)StringComparer.CurrentCultureIgnoreCase);
+            Dictionary<string, string> dictionary = new Dictionary<string, string>(StringComparer.CurrentCultureIgnoreCase);
             try
             {
-                DVSManagerDvsConfigTarget managerDvsConfigTarget = await _vimService.Service.QueryDvsConfigTargetAsync(((VCService)_vimService).DVSManager, ManagedObject, (ManagedObjectReference)null);
+                DVSManagerDvsConfigTarget managerDvsConfigTarget = await _vimService.Service.QueryDvsConfigTargetAsync(((VCService)_vimService).DVSManager, ManagedObject, null);
                 if (managerDvsConfigTarget.distributedVirtualPortgroup != null)
                 {
                     foreach (DistributedVirtualPortgroupInfo virtualPortgroupInfo in managerDvsConfigTarget.distributedVirtualPortgroup)
                     {
                         if (!virtualPortgroupInfo.uplinkPortgroup)
-                            Utils.AddOrReplace<string, string>((IDictionary<string, string>)dictionary, virtualPortgroupInfo.portgroupKey, virtualPortgroupInfo.portgroupName + " (" + virtualPortgroupInfo.switchName + ")");
+                            Utils.AddOrReplace<string, string>(dictionary, virtualPortgroupInfo.portgroupKey, virtualPortgroupInfo.portgroupName + " (" + virtualPortgroupInfo.switchName + ")");
                     }
                 }
             }
@@ -164,16 +160,16 @@ namespace PlatformWorker.VMware
 
         public async Task<Dictionary<string, string>> GetDistributedVirtualSwitchUuidsAsync()
         {
-            Dictionary<string, string> dictionary = new Dictionary<string, string>((IEqualityComparer<string>)StringComparer.CurrentCultureIgnoreCase);
+            Dictionary<string, string> dictionary = new Dictionary<string, string>(StringComparer.CurrentCultureIgnoreCase);
             try
             {
-                DVSManagerDvsConfigTarget managerDvsConfigTarget = await _vimService.Service.QueryDvsConfigTargetAsync(((VCService)_vimService).DVSManager, ManagedObject, (ManagedObjectReference)null);
+                DVSManagerDvsConfigTarget managerDvsConfigTarget = await _vimService.Service.QueryDvsConfigTargetAsync(((VCService)_vimService).DVSManager, ManagedObject, null);
                 if (managerDvsConfigTarget.distributedVirtualPortgroup != null)
                 {
                     foreach (DistributedVirtualPortgroupInfo virtualPortgroupInfo in managerDvsConfigTarget.distributedVirtualPortgroup)
                     {
                         if (!virtualPortgroupInfo.uplinkPortgroup)
-                            Utils.AddOrReplace<string, string>((IDictionary<string, string>)dictionary, virtualPortgroupInfo.portgroupKey, virtualPortgroupInfo.switchUuid);
+                            Utils.AddOrReplace<string, string>(dictionary, virtualPortgroupInfo.portgroupKey, virtualPortgroupInfo.switchUuid);
                     }
                 }
             }

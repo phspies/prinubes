@@ -1,13 +1,12 @@
 ﻿using Confluent.Kafka;
 using Microsoft.EntityFrameworkCore;
-using Prinubes.Common.Kafka;
 using Prinubes.Common.Models;
 using StackExchange.Redis;
 using System;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Reflection;
+using System.Net.Http.Json;
 using System.Threading.Tasks;
 using Xunit;
 

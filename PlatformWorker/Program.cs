@@ -1,15 +1,13 @@
 using AutoMapper;
 using Confluent.Kafka;
-using PlatformWorker.VMware;
+using Microsoft.EntityFrameworkCore;
 using Prinubes.Common.Helpers;
-using Prinubes.Common.Models;
 using Prinubes.Common.Kafka;
 using Prinubes.Common.Kafka.Consumer;
-using Prinubes.PlatformWorker.Kafka;
-using Prinubes.PlatformWorker;
 using Prinubes.Common.Kafka.Producer;
+using Prinubes.Common.Models;
 using Prinubes.Platforms.Datamodels;
-using Microsoft.EntityFrameworkCore;
+using Prinubes.PlatformWorker;
 using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -69,7 +67,7 @@ if (!args.Any(x => x.ToLower().Contains("testing")))
     });
 
     //perform migrations
-    builder.Services.BuildServiceProvider().GetRequiredService<PrinubesPlatformWorkerDBContext>().MigrateIfRequired();;
+    builder.Services.BuildServiceProvider().GetRequiredService<PrinubesPlatformWorkerDBContext>().MigrateIfRequired(); ;
 
 }
 //redis caching

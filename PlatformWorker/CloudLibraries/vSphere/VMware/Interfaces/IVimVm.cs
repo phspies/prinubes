@@ -1,11 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using Prinubes.vCenterSDK;
+﻿using Prinubes.vCenterSDK;
 
 namespace PlatformWorker.VMware.Interfaces
 {
-  public interface IVimVm : IVimManagedItem
-  {
+    public interface IVimVm : IVimManagedItem
+    {
         string GuestOS { get; }
         VirtualMachinePowerState PowerState { get; }
         string ResourcePoolName { get; }
@@ -42,7 +40,7 @@ namespace PlatformWorker.VMware.Interfaces
         Task<IVimNetwork[]> GetNetworksAndPropertiesAsync();
         IVimNetwork[] GetNetworksAndProperties(ManagedObjectAndProperties[] managedObjectsAndProperties);
         Task<int> GetNumOfPCIDevicesAsync();
-        Task<IVimDatastore> GetPrimaryDatastoreAsync();
+        IVimDatastore GetPrimaryDatastore();
         IVimDatastore GetPrimaryDatastore(IVimDatastore[] datastores, string rawVmxPath);
         Task<string> GetRawVmxPathAsync();
         Task<IVimTask[]> GetRecentTasksAsync();

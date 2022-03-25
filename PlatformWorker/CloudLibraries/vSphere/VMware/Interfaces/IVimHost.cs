@@ -1,11 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using Prinubes.vCenterSDK;
+﻿using Prinubes.vCenterSDK;
 
 namespace PlatformWorker.VMware.Interfaces
 {
-  public interface IVimHost : IVimManagedItem
-  {
+    public interface IVimHost : IVimManagedItem
+    {
         ServerProperties Properties { get; set; }
         Task<string> ContainsVmNameAsync(string vmName);
         Task<IVimVm> CreateVmAsync(VirtualMachineConfigSpec configSpec, VimClientlContext ctx);

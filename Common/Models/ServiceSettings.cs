@@ -6,16 +6,16 @@ namespace Prinubes.Common.Models
     {
         public MySqlConnectionStringBuilder GetMysqlConnection()
         {
-           return new MySqlConnectionStringBuilder()
+            return new MySqlConnectionStringBuilder()
             {
                 Server = MYSQL_SERVER,
-                Port = MYSQL_PORT,
+                Port = MYSQL_PORT ?? 0,
                 Database = MYSQL_DATABASE,
                 UserID = MYSQL_USER,
                 Password = MYSQL_PASSWORD,
             };
         }
-        public ServiceSettings(string _KAFKA_CONSUMER_GROUP_ID = null, string _MYSQL_DATABASE = null)
+        public ServiceSettings(string? _KAFKA_CONSUMER_GROUP_ID = null, string? _MYSQL_DATABASE = null)
         {
             if (Environment.GetEnvironmentVariable("MYSQL_DATABASE") == null)
             {
@@ -43,7 +43,7 @@ namespace Prinubes.Common.Models
                 {
                     if (prop.Name == "KAFKA_CONSUMER_GROUP_ID")
                     {
-                        prop.SetValue(this, Convert.ToString(_KAFKA_CONSUMER_GROUP_ID ?? System.Reflection.Assembly.GetEntryAssembly().GetName().Name));
+                        prop.SetValue(this, Convert.ToString(_KAFKA_CONSUMER_GROUP_ID ?? System.Reflection.Assembly.GetEntryAssembly()?.GetName().Name));
                     }
                     else
                     {
@@ -78,22 +78,22 @@ namespace Prinubes.Common.Models
                 }
             }
         }
-        public string JWT_SECRET { get; set; }
-        public double JWT_EXPIRE_TIME { get; set; }
-        public int KAFKA_RETRIES { get; set; }
-        public string MYSQL_SERVER { get; set; }
-        public uint MYSQL_PORT { get; set; }
-        public string MYSQL_DATABASE { get; set; }
-        public string MYSQL_USER { get; set; }
-        public string MYSQL_PASSWORD { get; set; }
-        public bool REDIS_CACHE_USE { get; set; }
-        public string REDIS_CACHE_HOST { get; set; }
-        public int REDIS_CACHE_PORT { get; set; }
-        public string REDIS_CACHE_PASSWORD { get; set; }
-        public int REDIS_TTL { get; set; }
-        public string KAFKA_BOOTSTRAP { get; set; }
-        public bool KAFKA_IDEMPOTENCE { get; set; }
-        public string KAFKA_CONSUMER_GROUP_ID { get { return MYSQL_DATABASE; } set { } }
-        public bool KAFKA_ENABLE_AUTO_COMMIT {  get; set; }
+        public string? JWT_SECRET { get; set; }
+        public double? JWT_EXPIRE_TIME { get; set; }
+        public int? KAFKA_RETRIES { get; set; }
+        public string? MYSQL_SERVER { get; set; }
+        public uint? MYSQL_PORT { get; set; }
+        public string? MYSQL_DATABASE { get; set; }
+        public string? MYSQL_USER { get; set; }
+        public string? MYSQL_PASSWORD { get; set; }
+        public bool? REDIS_CACHE_USE { get; set; }
+        public string? REDIS_CACHE_HOST { get; set; }
+        public int? REDIS_CACHE_PORT { get; set; }
+        public string? REDIS_CACHE_PASSWORD { get; set; }
+        public int? REDIS_TTL { get; set; }
+        public string? KAFKA_BOOTSTRAP { get; set; }
+        public bool? KAFKA_IDEMPOTENCE { get; set; }
+        public string? KAFKA_CONSUMER_GROUP_ID { get { return MYSQL_DATABASE; } set { } }
+        public bool? KAFKA_ENABLE_AUTO_COMMIT { get; set; }
     }
 }

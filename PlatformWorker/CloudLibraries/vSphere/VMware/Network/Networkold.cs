@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Prinubes.vCenterSDK;
+﻿using Prinubes.vCenterSDK;
 using ObjectContent = Prinubes.vCenterSDK.ObjectContent;
 
 namespace PlatformWorker.VMware
 {
     internal class Networkold
-    { 
+    {
         public static async Task<ObjectContent[]> GetAllAsync(ManagedObjectReference dcMoRef, ServiceContent _sic, VimPortType _service)
         {
             // PropertySpec specifies what properties to
@@ -19,7 +14,7 @@ namespace PlatformWorker.VMware
             networkPropSpec.type = "Network";
             networkPropSpec.pathSet = new String[] { "name" };
             // This spec selects HostSystem information
-    
+
             TraversalSpec network2host = new TraversalSpec();
             network2host.type = "Network";
             network2host.path = "host";

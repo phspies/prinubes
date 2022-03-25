@@ -1,18 +1,18 @@
 ﻿using AutoMapper;
 using MediatR;
 using Prinubes.Common.DatabaseModels;
-using Prinubes.Common.Kafka;
 using Prinubes.Common.DatabaseModels.PlatformEnums;
+using Prinubes.Common.Kafka;
 using Prinubes.Common.Kafka.Producer;
-using Prinubes.PlatformWorkers.Helpers;
 using Prinubes.Platforms.Datamodels;
+using Prinubes.PlatformWorkers.Helpers;
 
 namespace Prinubes.PlatformWorker.Kafka
 {
     public class ComputePlatformTestingRequestKafkaHandler : INotificationHandler<MessageNotification<ComputePlatformTestingRequestKafkaMessage>>
     {
         private ILogger logger;
-        private IMapper mapper; 
+        private IMapper mapper;
         private IMessageProducer kafkaProducer;
         private PrinubesPlatformWorkerDBContext DBContext;
 
@@ -41,8 +41,8 @@ namespace Prinubes.PlatformWorker.Kafka
                                 KafkaMessage.SubmitKafkaMessageAync(
                                 new ComputePlatformTestingResponseModel()
                                 {
-                                     Message = "Sucess!!",
-                                     Success = true,
+                                    Message = "Sucess!!",
+                                    Success = true,
                                 }, logger, kafkaProducer, topic: computePlatformKafkaMessage.ReturnTopic);
                                 logger.LogInformation($"ComputePlatform test message sent to topic: {computePlatformKafkaMessage.ReturnTopic}");
 

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using Prinubes.vCenterSDK;
+﻿using Prinubes.vCenterSDK;
 
 namespace PlatformWorker.VMware.Interfaces
 {

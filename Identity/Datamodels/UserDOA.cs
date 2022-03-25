@@ -3,9 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
 using Prinubes.Common.DatabaseModels;
-using Prinubes.Common.Kafka.Producer;
 using Prinubes.Common.Helpers;
-using Prinubes.Common.Models;
+using Prinubes.Common.Kafka.Producer;
 
 namespace Prinubes.Identity.Datamodels
 {
@@ -106,7 +105,7 @@ namespace Prinubes.Identity.Datamodels
         }
         public async Task<List<UserDatabaseModel>> GetListAsync()
         {
-            
+
             List<UserDatabaseModel> userList;
             try
             {
@@ -171,7 +170,7 @@ namespace Prinubes.Identity.Datamodels
                 var cachedUser = await distributedCaching.GetStringAsync(cachingKey);
                 if (cachedUser == null)
                 {
-                    user = await userDBContext.Users.SingleAsync(x => x.EmailAddress == emailAddress); 
+                    user = await userDBContext.Users.SingleAsync(x => x.EmailAddress == emailAddress);
                     await distributedCaching.SetCachingAsync(user, cachingKey);
                 }
                 else

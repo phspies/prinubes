@@ -1,17 +1,16 @@
-using Confluent.Kafka;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
-using MySqlConnector;
-using Prinubes.Identity.Datamodels;
 using AutoMapper;
-using System.Text;
+using Confluent.Kafka;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using Prinubes.Common.Helpers;
 using Prinubes.Common.Kafka.Producer;
 using Prinubes.Common.Models;
-using Prinubes.Common.Helpers;
+using Prinubes.Identity.Datamodels;
 using StackExchange.Redis;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 

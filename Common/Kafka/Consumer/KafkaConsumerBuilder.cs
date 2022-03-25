@@ -1,7 +1,4 @@
-using System;
 using Confluent.Kafka;
-using Prinubes.Common.Kafka;
-using Microsoft.Extensions.Options;
 
 namespace Prinubes.Common.Kafka.Consumer
 {

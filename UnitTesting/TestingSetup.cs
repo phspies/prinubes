@@ -1,13 +1,9 @@
 ﻿using Confluent.Kafka;
-using Confluent.Kafka.Admin;
-using Prinubes.Common.Kafka;
 using Prinubes.Common.Models;
 using StackExchange.Redis;
 using System;
-using System.Reflection;
 using UnitTesting;
 using Xunit;
-using Xunit.Abstractions;
 
 [assembly: CollectionBehavior(DisableTestParallelization = true)]
 [assembly: TestCollectionOrderer(CustomTestCollectionOrderer.TypeName, CustomTestCollectionOrderer.AssembyName)]

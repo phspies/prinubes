@@ -1,13 +1,9 @@
-﻿using Prinubes.Common.Kafka;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Prinubes.Common.DatabaseModels.PlatformEnums;
-using System.ComponentModel.DataAnnotations;
-using Prinubes.Common.DatabaseModels.ManyToMany;
-using Prinubes.Common.Datamodels;
-using Prinubes.Common.Models.Interfaces;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Reflection;
+using Prinubes.Common.Kafka;
 using shortid;
+using System.ComponentModel.DataAnnotations;
+using System.Reflection;
 
 namespace Prinubes.Common.DatabaseModels
 {
@@ -41,7 +37,7 @@ namespace Prinubes.Common.DatabaseModels
         [JsonProperty("compute_platform_model")]
         public ComputePlatformDatabaseModel ComputePlatform { get; set; }
         public string ReturnTopic => $"{typeof(ComputePlatformTestingResponseModel).GetCustomAttribute<MessageTopicAttribute>().Topic}-{RequestID}";
-        
+
 
     }
     [JsonObject(MemberSerialization.OptIn, Title = "ComputePlatformTestingResponseKafkaMessage")]

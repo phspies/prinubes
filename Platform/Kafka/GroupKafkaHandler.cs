@@ -1,11 +1,11 @@
 ﻿using AutoMapper;
 using MediatR;
-using Prinubes.Common.DatabaseModels;
-using Prinubes.Common.Kafka;
-using Prinubes.Common.Helpers;
-using Prinubes.Platforms.Datamodels;
-using Prinubes.Platform.Helpers;
 using Microsoft.EntityFrameworkCore;
+using Prinubes.Common.DatabaseModels;
+using Prinubes.Common.Helpers;
+using Prinubes.Common.Kafka;
+using Prinubes.Platform.Helpers;
+using Prinubes.Platforms.Datamodels;
 
 namespace Prinubes.ComputePlatform.Kafka
 {

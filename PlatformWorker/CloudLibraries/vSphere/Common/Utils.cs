@@ -1,19 +1,12 @@
 ﻿using PlatformWorker.Common;
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
-using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Security.Cryptography;
-using System.Security.Principal;
-using System.ServiceProcess;
 using System.Text;
-using System.Threading;
 
 
 public static class Utils
@@ -54,7 +47,7 @@ public static class Utils
 
     public static string[] GetLocalAvailableDriveLetters()
     {
-        return ((IEnumerable<string>)new string[24] { "C:\\", "D:\\", "E:\\", "F:\\", "G:\\", "H:\\", "I:\\", "J:\\", "K:\\", "L:\\", "M:\\", "N:\\", "O:\\", "P:\\", "Q:\\", "R:\\", "S:\\", "T:\\", "U:\\", "V:\\", "W:\\", "X:\\", "Y:\\", "Z:\\" }).Except<string>((IEnumerable<string>)Environment.GetLogicalDrives()).ToArray<string>();
+        return (new string[24] { "C:\\", "D:\\", "E:\\", "F:\\", "G:\\", "H:\\", "I:\\", "J:\\", "K:\\", "L:\\", "M:\\", "N:\\", "O:\\", "P:\\", "Q:\\", "R:\\", "S:\\", "T:\\", "U:\\", "V:\\", "W:\\", "X:\\", "Y:\\", "Z:\\" }).Except<string>(Environment.GetLogicalDrives()).ToArray<string>();
     }
 
     public static T[] CollectionToArray<T>(ICollection<T> c)
@@ -89,15 +82,9 @@ public static class Utils
         data.Add(value);
     }
 
-    public static bool IsInteractive()
-    {
-        Thread.GetDomain().SetPrincipalPolicy(PrincipalPolicy.WindowsPrincipal);
-        return (Thread.CurrentPrincipal as WindowsPrincipal).IsInRole(new SecurityIdentifier(WellKnownSidType.InteractiveSid, (SecurityIdentifier)null));
-    }
-
     public static string GetGuestOS(OperatingSystemInfo osInfo)
     {
-        string str = (string)null;
+        string str = null;
         if (5 == osInfo.Version.Major)
             str = osInfo.Version.Minor != 0 ? (1 != osInfo.Version.Minor ? ((osInfo.ProductSuite & 2) != 2 ? (osInfo.Architecture != OperatingSystemArchitecture.x86 ? (osInfo.Architecture != OperatingSystemArchitecture.x64 ? "NotSupported" : "winNetStandard64Guest") : "winNetStandardGuest") : (osInfo.Architecture != OperatingSystemArchitecture.x86 ? (osInfo.Architecture != OperatingSystemArchitecture.x64 ? "NotSupported" : "winNetEnterprise64Guest") : "winNetEnterpriseGuest")) : (osInfo.Architecture != OperatingSystemArchitecture.x86 ? (osInfo.Architecture != OperatingSystemArchitecture.x64 ? "NotSupported" : "winXPPro64Guest") : "winXPProGuest")) : ((osInfo.ProductSuite & 2) != 2 ? "win2000ServGuest" : "win2000AdvServGuest");
         else if (6 == osInfo.Version.Major)
@@ -108,7 +95,7 @@ public static class Utils
     public static OperatingSystemInfo GetOsInfoFromGuestId(string guestOS)
     {
         if (string.IsNullOrEmpty(guestOS))
-            return (OperatingSystemInfo)null;
+            return null;
         OperatingSystemInfo operatingSystemInfo = new OperatingSystemInfo();
         operatingSystemInfo.ServicePack = string.Empty;
         if (string.Compare(guestOS, "win2000AdvServGuest", true, CultureInfo.InvariantCulture) == 0)
@@ -268,7 +255,7 @@ public static class Utils
         return operatingSystemInfo;
     }
 
-   
+
     public static void GetShareInfoFromUnc(string sharePath, out string serverName, out string shareName)
     {
         serverName = string.Empty;
@@ -276,7 +263,7 @@ public static class Utils
         if (!Utils.IsUnc(sharePath))
             return;
         string[] strArray = sharePath.Substring(2).Split('\\');
-        if (((IEnumerable<string>)strArray).Count<string>() < 3)
+        if (strArray.Count<string>() < 3)
             return;
         serverName = strArray[0];
         shareName = strArray[1];
@@ -289,7 +276,7 @@ public static class Utils
         Utils.GetShareInfoFromUnc(fullPath, out serverName, out shareName);
         if (string.IsNullOrEmpty(serverName) || string.IsNullOrEmpty(shareName))
             return string.Empty;
-        return string.Format("\\\\{0}\\{1}", (object)serverName, (object)shareName);
+        return string.Format("\\\\{0}\\{1}", serverName, shareName);
     }
 
     public static bool IsUnc(string path)
@@ -389,7 +376,7 @@ public static class Utils
                 goto label_6;
         }
         return;
-        label_6:
+    label_6:
         throw new Exception("Timeout occurred while waiting for server " + serverName + " to reboot");
     }
 
@@ -443,7 +430,7 @@ public static class Utils
     public static string CombinServerNameAndPort(string server, int port)
     {
         IPAddress address;
-        server = !IPAddress.TryParse(server, out address) ? server + ":" + (object)port : IPHelper.IpBracketed(address.ToString()) + ":" + (object)port;
+        server = !IPAddress.TryParse(server, out address) ? server + ":" + port : IPHelper.IpBracketed(address.ToString()) + ":" + port;
         return server;
     }
 
@@ -530,7 +517,7 @@ public static class Utils
 
     public static int RunShellCmd(string cmd, string args, int maxwait, out string stdout, out string stderr)
     {
-        if (!((IEnumerable<string>)new string[3] { "zh", "ja", "ko" }).Contains<string>(CultureInfo.CurrentCulture.TwoLetterISOLanguageName))
+        if (!(new string[3] { "zh", "ja", "ko" }).Contains<string>(CultureInfo.CurrentCulture.TwoLetterISOLanguageName))
             return Utils.RunShellCmdStdOut(cmd, args, maxwait, out stdout, out stderr);
         int num = Utils.RunShellCmdTimeout(cmd, args, maxwait);
         stdout = "";
@@ -554,24 +541,24 @@ public static class Utils
                 try
                 {
                     lock (stdOutMutex)
-                        tmpStdOut.WriteLine("Executing:  {0} {1}", (object)cmd, (object)args);
+                        tmpStdOut.WriteLine("Executing:  {0} {1}", cmd, args);
                     process1.StartInfo.RedirectStandardOutput = true;
-                    DataReceivedEventHandler receivedEventHandler1 = (DataReceivedEventHandler)((sendingProcess, outLine) =>
+                    DataReceivedEventHandler receivedEventHandler1 = (sendingProcess, outLine) =>
                    {
                        if (string.IsNullOrEmpty(outLine.Data))
                            return;
                        try
                        {
                            lock (stdOutMutex)
-                               tmpStdOut.WriteLine("StdOut({0}): {1}", (object)cmd, (object)outLine.Data);
+                               tmpStdOut.WriteLine("StdOut({0}): {1}", cmd, outLine.Data);
                        }
                        catch (Exception ex)
                        {
                        }
-                   });
+                   };
                     process1.OutputDataReceived += receivedEventHandler1;
                     process1.StartInfo.RedirectStandardError = true;
-                    DataReceivedEventHandler receivedEventHandler2 = (DataReceivedEventHandler)((sendingProcess, outLine) =>
+                    DataReceivedEventHandler receivedEventHandler2 = (sendingProcess, outLine) =>
                    {
                        if (string.IsNullOrEmpty(outLine.Data))
                            return;
@@ -583,12 +570,12 @@ public static class Utils
                        try
                        {
                            lock (stdErrMutex)
-                               tmpStdErr.WriteLine("StdErr({0}): {1}", (object)cmd, (object)outLine.Data);
+                               tmpStdErr.WriteLine("StdErr({0}): {1}", cmd, outLine.Data);
                        }
                        catch (Exception ex)
                        {
                        }
-                   });
+                   };
                     process1.ErrorDataReceived += receivedEventHandler2;
                     try
                     {
@@ -639,14 +626,14 @@ public static class Utils
             process1.StartInfo.FileName = cmd;
             process1.StartInfo.Arguments = args;
             process1.StartInfo.RedirectStandardOutput = true;
-            DataReceivedEventHandler receivedEventHandler1 = (DataReceivedEventHandler)((sendingProcess, outLine) =>
+            DataReceivedEventHandler receivedEventHandler1 = (sendingProcess, outLine) =>
            {
                if (string.IsNullOrEmpty(outLine.Data))
                    return;
-           });
+           };
             process1.OutputDataReceived += receivedEventHandler1;
             process1.StartInfo.RedirectStandardError = true;
-            DataReceivedEventHandler receivedEventHandler2 = (DataReceivedEventHandler)((sendingProcess, outLine) =>
+            DataReceivedEventHandler receivedEventHandler2 = (sendingProcess, outLine) =>
            {
                if (string.IsNullOrEmpty(outLine.Data))
                    return;
@@ -655,7 +642,7 @@ public static class Utils
                {
                    string fileName = process.StartInfo.FileName;
                }
-           });
+           };
             process1.ErrorDataReceived += receivedEventHandler2;
             try
             {
@@ -800,7 +787,7 @@ public static class Utils
 
     public static void Retry(int attempts, int Wait, Utils.Workload work, Utils.Workload reset)
     {
-        Exception exception = (Exception)null;
+        Exception exception = null;
         for (int index = 0; index < attempts; ++index)
         {
             try
@@ -821,7 +808,7 @@ public static class Utils
 
     public static void Retry(int attempts, int Wait, Utils.Workload work)
     {
-        Exception exception = (Exception)null;
+        Exception exception = null;
         for (int index = 0; index < attempts; ++index)
         {
             try
@@ -841,7 +828,7 @@ public static class Utils
 
     public static void RetryIf(int attempts, int Wait, Utils.Workload work, Func<Exception, bool> cond)
     {
-        Exception exception = (Exception)null;
+        Exception exception = null;
         bool flag = true;
         int num = 0;
         while (flag)
@@ -870,7 +857,7 @@ public static class Utils
 
     public static T Retry<T>(int attempts, int Wait, Func<T> work, Utils.Workload reset)
     {
-        Exception exception = (Exception)null;
+        Exception exception = null;
         for (int index = 0; index < attempts; ++index)
         {
             try
@@ -890,7 +877,7 @@ public static class Utils
 
     public static T Retry<T>(int attempts, int Wait, Func<T> work)
     {
-        Exception exception = (Exception)null;
+        Exception exception = null;
         for (int index = 0; index < attempts; ++index)
         {
             try
@@ -909,7 +896,7 @@ public static class Utils
 
     public static T RetryIf<T>(int attempts, int Wait, Func<T> work, Func<Exception, bool> cond)
     {
-        Exception exception = (Exception)null;
+        Exception exception = null;
         bool flag = true;
         int num = 0;
         while (flag)
@@ -936,14 +923,14 @@ public static class Utils
 
     public static bool WaitForResult(int attempts, int Wait, Func<bool> work)
     {
-        Exception exception = (Exception)null;
+        Exception exception = null;
         for (int index = 0; index < attempts; ++index)
         {
             try
             {
                 if (work())
                     return true;
-                exception = (Exception)null;
+                exception = null;
             }
             catch (Exception ex)
             {
@@ -979,7 +966,7 @@ public static class Utils
         return "";
     }
 
-  
+
     public static bool ContainsDigit(string value)
     {
         if (string.IsNullOrEmpty(value))
@@ -1026,15 +1013,15 @@ public static class Utils
 
     public static string GetMD5(string fileName)
     {
-        FileStream fileStream = (FileStream)null;
-        MD5CryptoServiceProvider cryptoServiceProvider = (MD5CryptoServiceProvider)null;
+        FileStream fileStream = null;
+        MD5CryptoServiceProvider cryptoServiceProvider = null;
         try
         {
             if (!System.IO.File.Exists(fileName))
                 throw new FileNotFoundException("File not found", fileName);
             fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read);
             cryptoServiceProvider = new MD5CryptoServiceProvider();
-            cryptoServiceProvider.ComputeHash((Stream)fileStream);
+            cryptoServiceProvider.ComputeHash(fileStream);
             return Utils.BytesToStr(cryptoServiceProvider.Hash);
         }
         finally
@@ -1050,7 +1037,7 @@ public static class Utils
     {
         StringBuilder stringBuilder = new StringBuilder();
         for (int index = 0; index < bytes.Length; ++index)
-            stringBuilder.AppendFormat("{0:X2}", (object)bytes[index]);
+            stringBuilder.AppendFormat("{0:X2}", bytes[index]);
         return stringBuilder.ToString();
     }
 
@@ -1066,9 +1053,9 @@ public static class Utils
         string[] strArray1 = new string[1] { "" };
         string[] strArray2 = System.IO.File.ReadAllLines(filename);
         string DefaultLocation = "";
-        DefaultLocation = ((IEnumerable<string>)strArray2).Single<string>((Func<string, bool>)(x => x.Contains("default")));
+        DefaultLocation = strArray2.Single<string>(x => x.Contains("default"));
         DefaultLocation = DefaultLocation.Substring(DefaultLocation.IndexOf("=") + 1);
-        string str1 = ((IEnumerable<string>)strArray2).First<string>((Func<string, bool>)(x => x.StartsWith(DefaultLocation)));
+        string str1 = strArray2.First<string>(x => x.StartsWith(DefaultLocation));
         string str2 = "=";
         int startIndex = str1.IndexOf(str2) + 1;
         return str1.Substring(startIndex);
@@ -1101,24 +1088,11 @@ public static class Utils
         return false;
     }
 
-    public static bool IsW2K8R2SupportedOnEsx(string esxVersion, string buildNum)
-    {
-        bool flag = true;
-        ulong uint64 = Convert.ToUInt64(buildNum);
-        if (Utils.CompareVersions("3.5.0", esxVersion) == 0)
-        {
-            if (uint64 < 207095UL)
-                flag = false;
-        }
-        else if (Utils.CompareVersions("4.0.0", esxVersion) == 0 && uint64 < 208167UL)
-            flag = false;
-        return flag;
-    }
 
     public static string GetVimUuidFromBiosUuid(string vmUuid)
     {
         if (string.IsNullOrEmpty(vmUuid))
-            return (string)null;
+            return null;
         string[] strArray = vmUuid.Split("-".ToCharArray());
         for (int index1 = 0; index1 < 3; ++index1)
         {
@@ -1145,89 +1119,10 @@ public static class Utils
     public static string GetVimUuidFromBiosUuid(Guid uuid)
     {
         if (uuid == Guid.Empty)
-            return (string)null;
+            return null;
         return Utils.GetVimUuidFromBiosUuid(uuid.ToString());
     }
 
-    public static bool DiskPart(string script, object diskPartLock, int timeoutMilliseconds)
-    {
-        lock (diskPartLock)
-        {
-            string local_2 = Path.GetTempFileName();
-            using (StreamWriter resource_0 = new StreamWriter(local_2))
-                resource_0.WriteLine(script);
-            using (StreamReader resource_1 = new StreamReader(local_2))
-            {
-                while (resource_1.Peek() >= 0)
-                {
-
-                }
-            }
-            string local_3 = string.Format("/s \"{0}\"", (object)local_2);
-            string local_4 = string.Empty;
-            string local_5 = string.Empty;
-            try
-            {
-                int local_8 = 999;
-                for (int local_9 = 0; local_8 != 0 && local_9 < 3; ++local_9)
-                {
-
-                    local_8 = Utils.RunShellCmdLog("diskpart", local_3, timeoutMilliseconds);
-                    Thread.Sleep(15000);
-                    if (local_8 == 4)
-                    {
-                        ServiceController local_10 = ((IEnumerable<ServiceController>)ServiceController.GetServices()).First<ServiceController>((Func<ServiceController, bool>)(sc => string.Compare(sc.ServiceName, "vds", true) == 0));
-                        if (local_10 == null)
-                            throw new Exception("Virtual Disk Service not found");
-                        if (local_10.Status != ServiceControllerStatus.Running)
-                        {
-                            local_10.Start();
-                        }
-                    }
-                }
-                return local_8 == 0;
-            }
-            catch (System.TimeoutException exception_0)
-            {
-                return false;
-            }
-            catch (Exception exception_1)
-            {
-                return false;
-            }
-            finally
-            {
-                for (int local_13 = 0; local_13 < 3; ++local_13)
-                {
-                    try
-                    {
-                        System.IO.File.Delete(local_2);
-                        break;
-                    }
-                    catch (Exception exception_2)
-                    {
-                        Thread.Sleep(5000);
-                    }
-                }
-            }
-        }
-    }
-
-
-    public static void GetUsernameAndDomain(string username, string domain, out string usernamePart, out string domainPart)
-    {
-        usernamePart = string.Empty;
-        domainPart = string.Empty;
-        if (string.IsNullOrEmpty(domain))
-        {
-            Utils.SplitUsernameAndDomain(username, out usernamePart, out domainPart);
-        }
-        else
-        {
-            usernamePart = username;
-            domainPart = domain;
-        }
-    }
 
     public delegate void Workload();
 }

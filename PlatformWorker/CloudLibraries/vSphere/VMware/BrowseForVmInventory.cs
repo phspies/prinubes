@@ -1,8 +1,5 @@
 ﻿using PlatformWorker.VMware.Interfaces;
-using System;
-using System.Collections.Generic;
 using Prinubes.vCenterSDK;
-using System.Threading.Tasks;
 
 namespace PlatformWorker.VMware
 {
@@ -31,7 +28,7 @@ namespace PlatformWorker.VMware
                     }
                 }
             }
-            Dictionary<string, InventoryNode> dictionary = new Dictionary<string, InventoryNode>((IEqualityComparer<string>)StringComparer.CurrentCultureIgnoreCase);
+            Dictionary<string, InventoryNode> dictionary = new Dictionary<string, InventoryNode>(StringComparer.CurrentCultureIgnoreCase);
             foreach (InventoryNode inventoryNode in this._vcInventoryNodes.Values)
             {
                 if (!(inventoryNode.Name == "vm"))
@@ -61,7 +58,7 @@ namespace PlatformWorker.VMware
             traversalSpec2.selectSet = new SelectionSpec[2]
             {
         new SelectionSpec(),
-        (SelectionSpec) traversalSpec1
+         traversalSpec1
             };
             traversalSpec2.selectSet[0].name = "folderTraversalSpec";
             PropertySpec[] propertySpecArray = new PropertySpec[1] { new PropertySpec() };

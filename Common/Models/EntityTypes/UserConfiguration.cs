@@ -17,8 +17,8 @@ namespace Prinubes.Common.DatabaseModels.EntityTypes
             builder.Property(ug => ug.EmailAddress).HasColumnType("nvarchar(50)").IsRequired();
             builder.Property(ug => ug.Firstname).HasColumnType("nvarchar(30)").IsRequired();
             builder.Property(ug => ug.Lastname).HasColumnType("nvarchar(30)").IsRequired();
-            
-            
+
+
             if (assembly == "Identity")
             {
                 builder.Property(ug => ug.RowVersion).IsRowVersion();

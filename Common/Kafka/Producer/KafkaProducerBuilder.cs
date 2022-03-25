@@ -1,6 +1,4 @@
-using System;
 using Confluent.Kafka;
-using Microsoft.Extensions.Options;
 
 namespace Prinubes.Common.Kafka.Producer
 {

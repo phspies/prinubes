@@ -18,7 +18,7 @@ namespace Prinubes.Common.DatabaseModels
     }
     [JsonObject(MemberSerialization.OptIn)]
     [ApiExplorerSettings(IgnoreApi = true)]
-    public class RoutePathDatabaseModel 
+    public class RoutePathDatabaseModel
     {
         [JsonRequired]
         [JsonProperty("id")]

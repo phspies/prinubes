@@ -1,6 +1,4 @@
 ﻿using PlatformWorker.VMware.Contracts;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace PlatformWorker.VMware.Interfaces
 {

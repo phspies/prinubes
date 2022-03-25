@@ -1,13 +1,10 @@
 ﻿using AutoMapper;
-using Prinubes.Common.Kafka;
-using Prinubes.Common.Kafka.Producer;
 using Microsoft.EntityFrameworkCore;
-using Prinubes.Common.DatabaseModels;
-using Prinubes.Identity.Helpers;
-using Prinubes.Common.Helpers;
-using Prinubes.Common.Models;
 using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
+using Prinubes.Common.DatabaseModels;
+using Prinubes.Common.Helpers;
+using Prinubes.Common.Kafka.Producer;
 
 namespace Prinubes.Identity.Datamodels
 {
@@ -53,7 +50,7 @@ namespace Prinubes.Identity.Datamodels
 
                         },
                         logger,
-                        kafkaProducer); 
+                        kafkaProducer);
                     await transaction.CommitAsync();
                 }
                 await distributedCaching.SetCachingAsync(updatedCredential, updatedCredential.Id.ToString());
@@ -216,7 +213,7 @@ namespace Prinubes.Identity.Datamodels
 
         public void Dispose()
         {
-           // ((IDisposable)dbContext).Dispose();
+            // ((IDisposable)dbContext).Dispose();
         }
 
         public async Task<bool> CredentialExistsAsync(System.Guid id) => await dbContext.Credentials.AnyAsync(e => e.Id == id && e.OrganizationID == organizationId);

@@ -1,10 +1,4 @@
-﻿using PlatformWorker.VMware;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Prinubes.vCenterSDK;
+﻿using Prinubes.vCenterSDK;
 using ObjectContent = Prinubes.vCenterSDK.ObjectContent;
 
 namespace PlatformWorker.VMware
@@ -15,7 +9,7 @@ namespace PlatformWorker.VMware
         public static async Task<ObjectContent[]> GetAllAsync(ManagedObjectReference dcMoRef, ServiceContent _sic, VimPortType _service)
         {
             PropertySpec pSpec = new PropertySpec();
-            pSpec.type  = "HostSystem";
+            pSpec.type = "HostSystem";
             pSpec.pathSet = new String[] { "network", "name",
                 "summary.hardware", "runtime.connectionState",
                 "summary.overallStatus", "summary.quickStats" };
@@ -86,7 +80,7 @@ namespace PlatformWorker.VMware
             //PropertyFilterSpec pfSpec = new PropertyFilterSpec();
             //pfSpec.propSet = new PropertySpec[] { pSpec };
             //pfSpec.objectSet = new ObjectSpec[] { oSpec };
- 
+
         }
     }
 }

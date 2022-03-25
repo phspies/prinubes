@@ -2,11 +2,11 @@
 using MediatR;
 using Microsoft.Extensions.Caching.Distributed;
 using Prinubes.Common.DatabaseModels;
-using Prinubes.Common.Kafka;
 using Prinubes.Common.Helpers;
+using Prinubes.Common.Kafka;
+using Prinubes.Platform.Helpers;
 using Prinubes.Platforms.Datamodels;
 using System.Collections;
-using Prinubes.Platform.Helpers;
 
 namespace Prinubes.ComputePlatform.Kafka
 {

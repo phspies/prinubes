@@ -1,7 +1,4 @@
 ﻿using PlatformWorker.VMware.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Runtime.Serialization;
 
 namespace PlatformWorker.VMware
@@ -94,7 +91,7 @@ namespace PlatformWorker.VMware
             string str = name;
             while (vmdkBaseNames.Contains(str))
             {
-                str = name + "_" + (object)num;
+                str = name + "_" + num;
                 ++num;
             }
             vmdkBaseNames.Add(str);

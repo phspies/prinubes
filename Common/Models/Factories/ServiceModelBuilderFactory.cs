@@ -1,7 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Prinubes.Common.DatabaseModels;
 using Prinubes.Common.DatabaseModels.EntityTypes;
-using Prinubes.Common.DatabaseModels.ManyToMany;
 using System.Reflection;
 
 namespace Prinubes.Common.DatabaseModels.Factories

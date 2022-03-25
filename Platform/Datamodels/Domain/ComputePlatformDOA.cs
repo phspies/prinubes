@@ -2,14 +2,11 @@
 using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
 using Prinubes.Common.DatabaseModels;
-using Prinubes.Common.Kafka.Producer;
 using Prinubes.Common.Helpers;
-using Prinubes.Common.Kafka.Consumer;
-using System.Text;
 using Prinubes.Common.Kafka;
-using Confluent.Kafka;
+using Prinubes.Common.Kafka.Consumer;
+using Prinubes.Common.Kafka.Producer;
 using Prinubes.Common.Models;
-using Confluent.Kafka.Admin;
 
 namespace Prinubes.Platforms.Datamodels
 {

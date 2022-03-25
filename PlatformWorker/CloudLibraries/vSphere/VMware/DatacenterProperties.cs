@@ -1,5 +1,4 @@
-﻿using System;
-using Prinubes.vCenterSDK;
+﻿using Prinubes.vCenterSDK;
 
 namespace PlatformWorker.VMware
 {

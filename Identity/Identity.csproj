@@ -19,9 +19,6 @@
 		<PackageReference Include="Confluent.Kafka" Version="1.8.2" />
 		<PackageReference Include="EasyCaching.Redis" Version="1.5.1" />
 		<PackageReference Include="EFCoreSecondLevelCacheInterceptor" Version="3.3.0" />
-		<PackageReference Include="Microsoft.AspNet.WebApi" Version="5.2.7" />
-		<PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.2.7" />
-		<PackageReference Include="Microsoft.AspNet.WebApi.WebHost" Version="5.2.7" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.3" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="6.0.3" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.3">

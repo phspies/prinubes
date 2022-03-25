@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-
-namespace PlatformWorker.VMware.Interfaces
+﻿namespace PlatformWorker.VMware.Interfaces
 {
     public interface IVimNetwork : IVimManagedItem
     {

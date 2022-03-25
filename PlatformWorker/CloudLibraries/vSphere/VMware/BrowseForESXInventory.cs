@@ -1,8 +1,5 @@
 ﻿using PlatformWorker.VMware.Interfaces;
-using System;
-using System.Collections.Generic;
 using Prinubes.vCenterSDK;
-using System.Threading.Tasks;
 using ObjectContent = Prinubes.vCenterSDK.ObjectContent;
 
 namespace PlatformWorker.VMware
@@ -32,7 +29,7 @@ namespace PlatformWorker.VMware
                     }
                 }
             }
-            Dictionary<string, InventoryNode> dictionary = new Dictionary<string, InventoryNode>((IEqualityComparer<string>)StringComparer.CurrentCultureIgnoreCase);
+            Dictionary<string, InventoryNode> dictionary = new Dictionary<string, InventoryNode>(StringComparer.CurrentCultureIgnoreCase);
             foreach (InventoryNode inventoryNode in this._vcInventoryNodes.Values)
             {
                 if (!(inventoryNode.Name == "host") && !(inventoryNode.ManagedObject.type == "ComputeResource") && !(inventoryNode.ManagedObject.type == "ClusterComputeResource"))
@@ -67,8 +64,8 @@ namespace PlatformWorker.VMware
             traversalSpec3.selectSet = new SelectionSpec[3]
             {
         new SelectionSpec(),
-        (SelectionSpec) traversalSpec2,
-        (SelectionSpec) traversalSpec1
+         traversalSpec2,
+         traversalSpec1
             };
             traversalSpec3.selectSet[0].name = "folderTraversalSpec";
             PropertySpec[] propertySpecArray = new PropertySpec[1] { new PropertySpec() };
@@ -89,9 +86,9 @@ namespace PlatformWorker.VMware
             propertyFilterSpec.objectSet[0].skip = false;
             propertyFilterSpec.objectSet[0].selectSet = new SelectionSpec[1]
             {
-        (SelectionSpec) traversalSpec3
+         traversalSpec3
             };
-            ObjectContent[] contents = await _vimService.RetrievePropertiesAsync(new PropertyFilterSpec[1] { propertyFilterSpec });  
+            ObjectContent[] contents = await _vimService.RetrievePropertiesAsync(new PropertyFilterSpec[1] { propertyFilterSpec });
             this.BuildInventoryNodesDictionary(contents);
             this.BuildInventoryNodesDictionary(contents);
             this.SetInventoryNodeChilds();

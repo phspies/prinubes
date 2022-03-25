@@ -1,5 +1,4 @@
-﻿using System;
-namespace Prinubes.Common.Kafka
+﻿namespace Prinubes.Common.Kafka
 {
     [Serializable]
     public class KafkaMessageException : Exception

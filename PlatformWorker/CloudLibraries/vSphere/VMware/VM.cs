@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Prinubes.vCenterSDK;
+﻿using Prinubes.vCenterSDK;
 using ObjectContent = Prinubes.vCenterSDK.ObjectContent;
 
 namespace PlatformWorker.VMware
@@ -28,8 +23,8 @@ namespace PlatformWorker.VMware
               "runtime.powerState",
               "summary.quickStats.overallCpuUsage",
               "summary.quickStats.hostMemoryUsage",
-              "summary.quickStats.guestMemoryUsage", }; 
-            
+              "summary.quickStats.guestMemoryUsage", };
+
             SelectionSpec recurseFolders = new SelectionSpec();
             recurseFolders.name = "folder2childEntity";
             TraversalSpec folder2childEntity = new TraversalSpec();

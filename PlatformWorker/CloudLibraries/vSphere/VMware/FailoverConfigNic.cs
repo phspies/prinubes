@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace PlatformWorker.VMware
+﻿namespace PlatformWorker.VMware
 {
     [Serializable]
     public class FailoverConfigNic

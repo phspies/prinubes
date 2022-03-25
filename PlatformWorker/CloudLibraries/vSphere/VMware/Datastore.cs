@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
-using PlatformWorker.VMware.Contracts;
+﻿using PlatformWorker.VMware.Contracts;
 using PlatformWorker.VMware.Interfaces;
 using Prinubes.vCenterSDK;
+using System.Text.RegularExpressions;
 
 namespace PlatformWorker.VMware
 {
@@ -81,7 +74,7 @@ namespace PlatformWorker.VMware
 
                 if (properties.Count != Datastore.VCProperties.Length)
                 {
-                    IEnumerable<string> strings = ((IEnumerable<string>)Datastore.VCProperties).Where<string>((Func<string, bool>)(p => !properties.ContainsKey(p)));
+                    IEnumerable<string> strings = VCProperties.Where<string>(p => !properties.ContainsKey(p));
                     if (strings != null)
                     {
                         if (strings.Count<string>() == 1 && strings.Contains<string>("summary.uncommitted"))
@@ -148,7 +141,7 @@ namespace PlatformWorker.VMware
                 {
                     try
                     {
-                        IVimHost vimHost = (IVimHost)new Host(this.VcService, datastoreHostMount.key);
+                        IVimHost vimHost = new Host(this.VcService, datastoreHostMount.key);
                         vimHost.GetCommonProperties();
                         vimHostList.Add(vimHost);
                     }
@@ -171,7 +164,7 @@ namespace PlatformWorker.VMware
                     {
                         Host host = new Host(this.VcService, datastoreHostMount.key);
                         host.GetCommonProperties();
-                        return (IVimHost)host;
+                        return host;
                     }
                     catch (Exception ex)
                     {
@@ -184,7 +177,7 @@ namespace PlatformWorker.VMware
         public static string GetRemoteId(string url)
         {
             if (string.IsNullOrEmpty(url))
-                return (string)null;
+                return null;
             string str;
             if (url.StartsWith("sanfs"))
                 str = url.Split(':')[2].TrimEnd('/');
@@ -200,7 +193,7 @@ namespace PlatformWorker.VMware
             fullName = fullName.Replace("\\", "/");
             string str1 = fullName.Substring(0, fullName.LastIndexOf("/"));
             string fileName = Path.GetFileName(fullName);
-            Dictionary<string, VmdkFileInfo> dictionary = new Dictionary<string, VmdkFileInfo>((IEqualityComparer<string>)StringComparer.InvariantCultureIgnoreCase);
+            Dictionary<string, VmdkFileInfo> dictionary = new Dictionary<string, VmdkFileInfo>(StringComparer.InvariantCultureIgnoreCase);
             try
             {
                 string str2 = VCService.GetVolumeName(this.Name) + str1;
@@ -239,7 +232,7 @@ namespace PlatformWorker.VMware
         {
             if (this.snapshotDiskPattern == null)
                 this.snapshotDiskPattern = new Regex("w*-[0-9][0-9][0-9][0-9][0-9][0-9]w*");
-            Dictionary<string, VimDatastoreItem[]> dictionary = new Dictionary<string, VimDatastoreItem[]>((IEqualityComparer<string>)StringComparer.CurrentCultureIgnoreCase);
+            Dictionary<string, VimDatastoreItem[]> dictionary = new Dictionary<string, VimDatastoreItem[]>(StringComparer.CurrentCultureIgnoreCase);
             HostDatastoreBrowserSearchResults[] datastoreSearchResults = await GetDatastoreSearchResultsAsync(ctx);
             int length = VCService.GetVolumeName(this.Name).Length;
             if (datastoreSearchResults != null && datastoreSearchResults.Length != 0)
@@ -296,7 +289,7 @@ namespace PlatformWorker.VMware
 
         public async Task<Dictionary<string, List<VmdkFileInfo>>> GetAllFoldersAndFilesInfoAsync(VimClientlContext ctx)
         {
-            Dictionary<string, List<VmdkFileInfo>> dictionary = new Dictionary<string, List<VmdkFileInfo>>((IEqualityComparer<string>)StringComparer.InvariantCultureIgnoreCase);
+            Dictionary<string, List<VmdkFileInfo>> dictionary = new Dictionary<string, List<VmdkFileInfo>>(StringComparer.InvariantCultureIgnoreCase);
             string volumeName = VimUtils.GetVolumeName(this.Name);
             HostDatastoreBrowserSearchResults[] browserSearchResults1 = await GetBrowserSearchResultsAsync(volumeName, ctx);
             if (browserSearchResults1 != null && browserSearchResults1.Length != 0)
@@ -396,8 +389,8 @@ namespace PlatformWorker.VMware
             searchSpec.details.fileOwnerSpecified = true;
             searchSpec.query = new FileQuery[2]
             {
-        (FileQuery) new FolderFileQuery(),
-        (FileQuery) vmDiskFileQuery
+         new FolderFileQuery(),
+         vmDiskFileQuery
             };
             VCTask task = new VCTask(this.VcService, await VcService.Service.SearchDatastore_TaskAsync(managedObjects[0], datastorePath, searchSpec));
             string op = "Search Datastore";
@@ -429,8 +422,8 @@ namespace PlatformWorker.VMware
             searchSpec.details.fileOwnerSpecified = true;
             searchSpec.query = new FileQuery[3]
             {
-        (FileQuery) new FolderFileQuery(),
-        (FileQuery) new VmDiskFileQuery(),
+         new FolderFileQuery(),
+         new VmDiskFileQuery(),
         new FileQuery()
             };
             VCTask task = new VCTask(VcService, await VcService.Service.SearchDatastoreSubFolders_TaskAsync(managedObjects[0], volumeName, searchSpec));
@@ -448,17 +441,17 @@ namespace PlatformWorker.VMware
         {
             if (!await this.IsFolderOnRootExistAsync(targetFolderName, ctx))
                 await this.CreateDirectoryAsync(targetFolderName);
-            await new VCTask(this.VcService, await VcService.Service.MoveDatastoreFile_TaskAsync(this._vimService.FileManager, source, (await this.GetDatacenterAndPropertiesAsync()).ManagedObject, target, (ManagedObjectReference)null, force)).WaitForResultAsync("MoveFile", ctx);
+            await new VCTask(this.VcService, await VcService.Service.MoveDatastoreFile_TaskAsync(this._vimService.FileManager, source, (await this.GetDatacenterAndPropertiesAsync()).ManagedObject, target, null, force)).WaitForResultAsync("MoveFile", ctx);
         }
 
         public async Task MoveFilesByNameAsync(string srcFolder, string srcFile, string tgtFolder, bool force, VimClientlContext ctx)
         {
-            await new VCTask(VcService, await VcService.Service.MoveDatastoreFile_TaskAsync(this._vimService.FileManager, this.GetVolumeName(this.Name) + srcFolder + "/" + srcFile, (await GetDatacenterAndPropertiesAsync()).ManagedObject, this.GetVolumeName(this.Name) + tgtFolder + "/" + srcFile, (ManagedObjectReference)null, force)).WaitForResultAsync("MoveFile", ctx);
+            await new VCTask(VcService, await VcService.Service.MoveDatastoreFile_TaskAsync(this._vimService.FileManager, this.GetVolumeName(this.Name) + srcFolder + "/" + srcFile, (await GetDatacenterAndPropertiesAsync()).ManagedObject, this.GetVolumeName(this.Name) + tgtFolder + "/" + srcFile, null, force)).WaitForResultAsync("MoveFile", ctx);
         }
 
         public async Task<Dictionary<string, bool>> GetVirtualDisksTypesAsync(string folderName, VimClientlContext ctx)
         {
-            Dictionary<string, bool> dictionary = new Dictionary<string, bool>((IEqualityComparer<string>)StringComparer.CurrentCultureIgnoreCase);
+            Dictionary<string, bool> dictionary = new Dictionary<string, bool>(StringComparer.CurrentCultureIgnoreCase);
             try
             {
                 string datastorePath = VCService.GetVolumeName(this.Name) + folderName;
@@ -484,7 +477,7 @@ namespace PlatformWorker.VMware
                 FileQuery fileQuery = new FileQuery();
                 searchSpec.query = new FileQuery[1]
                 {
-          (FileQuery) vmDiskFileQuery
+           vmDiskFileQuery
                 };
                 VCTask task = new VCTask(this._vimService, await _vimService.Service.SearchDatastoreSubFolders_TaskAsync(managedObjects[0], datastorePath, searchSpec));
                 string op = "Browse Datastore";
@@ -562,7 +555,7 @@ namespace PlatformWorker.VMware
         public async Task<bool> DirectoryExistAsync(string dir, VimClientlContext ctx)
         {
             dir = dir.Replace("\\", "/");
-            HostDatastoreBrowserSearchResults[] browserSearchResultsArray = (HostDatastoreBrowserSearchResults[])null;
+            HostDatastoreBrowserSearchResults[] browserSearchResultsArray = null;
             VCTask task = new VCTask(VcService, await VcService.Service.SearchDatastoreSubFolders_TaskAsync((await GetManagedObjectsAsync(new string[1] { "browser" }))[0], this.GetVolumeName(this.Name), new HostDatastoreBrowserSearchSpec() { matchPattern = new string[1] { dir }, searchCaseInsensitive = true, searchCaseInsensitiveSpecified = true, sortFoldersFirst = true, sortFoldersFirstSpecified = true }));
             string op = "Browse Datastore";
             VimClientlContext rstate = ctx;

@@ -1,5 +1,4 @@
-﻿using Prinubes.Common.DatabaseModels;
-using Prinubes.Platforms.Datamodels;
+﻿using Prinubes.Platforms.Datamodels;
 
 namespace Prinubes.PlatformWorkers.Helpers
 {

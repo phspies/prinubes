@@ -1,10 +1,5 @@
 using Prinubes.vCenterSDK;
-using System;
-using System.Collections.Generic;
 using System.Net;
-using System.Threading;
-using System.Threading.Tasks;
-using Prinubes.vCenterSDK;
 
 namespace PlatformWorker
 {

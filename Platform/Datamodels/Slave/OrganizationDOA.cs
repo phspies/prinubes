@@ -1,7 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Prinubes.Common.DatabaseModels;
 using Prinubes.Common.Helpers;
-using Prinubes.Platforms.Datamodels;
 
 namespace Prinubes.Platforms.Datamodels
 {

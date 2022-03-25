@@ -1,7 +1,5 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
 using System.Net.Sockets;
-using System.Threading;
 
 internal class Connector
 {
@@ -27,10 +25,10 @@ internal class Connector
 
     public string FindFastestAddress(int timeoutSeconds)
     {
-        string str = (string)null;
+        string str = null;
         this.FindFastestAddressEvent = new AutoResetEvent(false);
         foreach (string ip in this.Ips)
-            new Thread(new ParameterizedThreadStart(this.ConnectionThreadFunc)).Start((object)new IPEndPoint(IPAddress.Parse(ip), this.Port));
+            new Thread(new ParameterizedThreadStart(this.ConnectionThreadFunc)).Start(new IPEndPoint(IPAddress.Parse(ip), this.Port));
         if (this.FindFastestAddressEvent.WaitOne(timeoutSeconds * 1000, false))
             str = this.FastestConnectedAddress;
         this.FindFastestAddressEvent.Close();
@@ -40,11 +38,11 @@ internal class Connector
     private void ConnectionThreadFunc(object data)
     {
         IPEndPoint ipEndPoint = (IPEndPoint)data;
-        Socket socket = (Socket)null;
+        Socket socket = null;
         try
         {
             socket = new Socket(ipEndPoint.Address.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-            socket.Connect((EndPoint)ipEndPoint);
+            socket.Connect(ipEndPoint);
         }
         catch (Exception ex)
         {

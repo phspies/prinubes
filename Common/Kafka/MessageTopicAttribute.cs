@@ -1,5 +1,3 @@
-using System;
-
 namespace Prinubes.Common.Kafka
 {
     [AttributeUsage(AttributeTargets.Class)]

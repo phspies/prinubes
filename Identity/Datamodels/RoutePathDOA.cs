@@ -1,11 +1,9 @@
-﻿using AutoMapper;
-using Prinubes.Identity.Helpers;
-using Microsoft.AspNetCore.Mvc.Abstractions;
+﻿using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.EntityFrameworkCore;
 using Prinubes.Common.DatabaseModels;
-using Prinubes.Common.Kafka;
 using Prinubes.Common.Kafka.Producer;
+using Prinubes.Identity.Helpers;
 
 namespace Prinubes.Identity.Datamodels
 {
@@ -51,7 +49,7 @@ namespace Prinubes.Identity.Datamodels
                     routePath.Controller = route.ControllerName;
                     routePath.MethodName = route.ActionName;
                     routePath.RouteTemplate = route.AttributeRouteInfo.Template;
-                   
+
 
                     if (!newRoute)
                     {

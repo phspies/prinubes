@@ -1,19 +1,19 @@
-using Confluent.Kafka;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
 using AutoMapper;
-using System.Text;
+using Confluent.Kafka;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Prinubes.Common.Kafka.Producer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Prinubes.Common.Helpers;
-using Prinubes.Platforms.Datamodels;
-using Prinubes.Common.Models;
 using Prinubes.Common.Kafka;
 using Prinubes.Common.Kafka.Consumer;
+using Prinubes.Common.Kafka.Producer;
+using Prinubes.Common.Models;
+using Prinubes.Platforms.Datamodels;
 using Prinubes.Platforms.Datamodels.Domain;
 using StackExchange.Redis;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.WebHost.UseKestrel(options =>
@@ -65,7 +65,7 @@ if (!args.Any(x => x.ToLower().Contains("testing")))
     });
 
     //perform migrations
-    builder.Services.BuildServiceProvider().GetRequiredService<PrinubesPlatformDBContext>().MigrateIfRequired();;
+    builder.Services.BuildServiceProvider().GetRequiredService<PrinubesPlatformDBContext>().MigrateIfRequired(); ;
 
 }
 //redis caching

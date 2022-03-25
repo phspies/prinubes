@@ -1,7 +1,3 @@
-
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Prinubes.vCenterSDK;
 
 namespace PlatformWorker
@@ -268,7 +264,7 @@ namespace PlatformWorker
             }
             return hostmor;
         }
-        public VirtualDeviceConfigSpec createVirtualDisk(String volName, int diskCtlrKey,  ManagedObjectReference datastoreRef, int diskSizeMB)
+        public VirtualDeviceConfigSpec createVirtualDisk(String volName, int diskCtlrKey, ManagedObjectReference datastoreRef, int diskSizeMB)
         {
             String volumeName = getVolumeName(volName);
             VirtualDeviceConfigSpec diskSpec = new VirtualDeviceConfigSpec();

@@ -4,13 +4,13 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Prinubes.Common.Kafka.Producer;
 using Prinubes.Common.Models;
+using Prinubes.Identity;
+using Prinubes.Identity.Datamodels;
 using System;
 using System.Linq;
 using System.Net.Http;
-using Prinubes.Identity;
-using Prinubes.Identity.Datamodels;
-using Prinubes.Common.Kafka.Producer;
 
 namespace UnitTesting
 {
@@ -62,7 +62,7 @@ namespace UnitTesting
                 KafkaProducer = services.BuildServiceProvider().GetRequiredService<IMessageProducer>();
             });
             builder.UseTestServer(options => { options.BaseAddress = new Uri("http://localhost:9000"); });
-            
+
         }
     }
 }

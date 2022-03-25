@@ -1,7 +1,5 @@
 ﻿using PlatformWorker.VMware.Interfaces;
-using System.Collections.Generic;
 using Prinubes.vCenterSDK;
-using System.Threading.Tasks;
 
 namespace PlatformWorker.VMware
 {
@@ -39,7 +37,7 @@ namespace PlatformWorker.VMware
                     return string.Empty;
                 if (string.IsNullOrEmpty(_properties.PortgroupKey))
                 {
-                   GetCommonPropertiesAsync(GetPropertiesAsync(VCPortgroupProperties).Result).Wait();
+                    GetCommonPropertiesAsync(GetPropertiesAsync(VCPortgroupProperties).Result).Wait();
                 }
                 return _properties.PortgroupKey;
             }

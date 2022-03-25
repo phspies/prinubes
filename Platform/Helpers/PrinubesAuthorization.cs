@@ -1,12 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Prinubes.Common.DatabaseModels;
-using Prinubes.Common.Datamodels;
 using Prinubes.Common.Helpers;
 using Prinubes.Platforms.Datamodels;
-using System.Net;
 
 namespace Prinubes.Platforms.Helpers
 {

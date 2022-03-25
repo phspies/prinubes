@@ -1,5 +1,3 @@
-using System.Threading;
-
 namespace Prinubes.Common.Kafka.Consumer
 {
     public interface IKafkaTopicMessageConsumer

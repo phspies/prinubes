@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Prinubes.Common.DatabaseModels;
 using Prinubes.Common.Datamodels;
@@ -11,17 +10,16 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using System.Threading.Tasks;
-using UnitTesting.Helpers;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace UnitTesting
 {
     [Order(10)]
-    public class Identity 
+    public class Identity
     {
-  
+
 
 
         static UserCRUDDataModel userObject = new UserCRUDDataModel()
@@ -31,12 +29,18 @@ namespace UnitTesting
             EmailAddress = "test@pninubes.com",
             Password = "password"
         };
- 
-    
+
+
         [Fact, Order(1)]
         public async Task RegisterTestUser1()
         {
-            HttpResponseMessage registerResponse = await GlobalVariables.identityFactory.Client.PostAsJsonAsync("/identity/users/register", userObject);
+            ArgumentNullException.ThrowIfNull(GlobalVariables.identityFactory?.Client);
+            ArgumentNullException.ThrowIfNull(GlobalVariables.platformFactory?.Client);
+            ArgumentNullException.ThrowIfNull(userObject.Password);
+            ArgumentNullException.ThrowIfNull(userObject.EmailAddress);
+            ArgumentNullException.ThrowIfNull(GlobalVariables.SessionToken?.token);
+            
+           HttpResponseMessage registerResponse = await GlobalVariables.identityFactory.Client.PostAsJsonAsync("/identity/users/register", userObject);
             Assert.Equal(HttpStatusCode.OK, registerResponse.StatusCode);
             var authenticateObject = new AuthenticateModel()
             {
@@ -140,7 +144,7 @@ namespace UnitTesting
                 if (!GlobalVariables.platformFactory.DBContext.Credentials.AsNoTracking().Any(x => x.Id == GlobalVariables.SessionvCenterCredentials.Id))
                 {
                     Task.Delay(1000).Wait();
-                    
+
                 }
                 else
                 {
@@ -387,6 +391,6 @@ namespace UnitTesting
                 }
             }
         }
-  
+
     }
 }

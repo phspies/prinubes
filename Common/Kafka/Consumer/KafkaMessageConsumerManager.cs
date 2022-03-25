@@ -19,7 +19,7 @@ namespace Prinubes.Common.Kafka.Consumer
             foreach (var topic in topicsWithNotificationHandlers)
             {
                 var kafkaTopicMessageConsumer = serviceProvider.GetRequiredService<IKafkaTopicMessageConsumer>();
-                Thread _thread  = new Thread(() => kafkaTopicMessageConsumer.StartConsuming(topic, _cancellationToken));
+                Thread _thread = new Thread(() => kafkaTopicMessageConsumer.StartConsuming(topic, _cancellationToken));
                 _thread.Name = $"Kafka thread for topic {topic}";
                 _thread.Start();
             }

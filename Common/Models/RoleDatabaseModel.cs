@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using Prinubes.Common.DatabaseModels;
 using Prinubes.Common.DatabaseModels.ManyToMany;
 using Prinubes.Common.Kafka;
 
@@ -40,6 +39,6 @@ namespace Prinubes.Common.DatabaseModels
         [JsonProperty("organization_id")]
         public string OrganizationID { get; set; }
     }
-  
+
 
 }

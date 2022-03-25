@@ -3,7 +3,6 @@ using Confluent.Kafka.Admin;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Prinubes.Common.Kafka.Consumer;
-using Prinubes.Common.Kafka.Producer;
 using Prinubes.Common.Models;
 using System.Text;
 

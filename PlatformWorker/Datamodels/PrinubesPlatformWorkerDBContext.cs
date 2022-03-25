@@ -37,7 +37,7 @@ namespace Prinubes.Platforms.Datamodels
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            ServiceModelBuilderFactory.BuildOnModelCreating(ref modelBuilder); 
+            ServiceModelBuilderFactory.BuildOnModelCreating(ref modelBuilder);
         }
     }
 }

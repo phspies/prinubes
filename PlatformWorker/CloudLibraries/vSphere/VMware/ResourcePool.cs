@@ -1,5 +1,4 @@
 ﻿using PlatformWorker.VMware.Interfaces;
-using System.Collections.Generic;
 using Prinubes.vCenterSDK;
 
 namespace PlatformWorker.VMware

@@ -1,9 +1,6 @@
-﻿using Prinubes.Common.Kafka;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Prinubes.Common.DatabaseModels.PlatformEnums;
-using Prinubes.Common.DatabaseModels.ManyToMany;
-using Prinubes.Common.Models.Interfaces;
-using System.ComponentModel.DataAnnotations.Schema;
+using Prinubes.Common.Kafka;
 using shortid;
 using System.Reflection;
 
@@ -105,7 +102,7 @@ namespace Prinubes.Common.DatabaseModels
         [JsonProperty("credentials")]
         public CredentialDatabaseModel Credential { get; set; }
         [JsonProperty("tags")]
-        
+
 
         public List<TaggingModel> Tags { get; set; }
         [JsonProperty("cloudplatform_moid")]

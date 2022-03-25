@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace PlatformWorker.VMware
+﻿namespace PlatformWorker.VMware
 {
     public class SnapshotsSummary
     {
