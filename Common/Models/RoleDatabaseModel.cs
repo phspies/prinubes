@@ -1,4 +1,4 @@
-﻿using System.Web.Http.Description;
+﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Prinubes.Common.DatabaseModels;
 using Prinubes.Common.DatabaseModels.ManyToMany;
