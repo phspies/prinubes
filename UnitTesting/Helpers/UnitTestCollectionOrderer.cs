@@ -4,17 +4,17 @@ using System.Linq;
 using System.Reflection;
 using Xunit;
 using Xunit.Abstractions;
+using Xunit.Sdk;
 
 namespace UnitTesting
 {
-    public class CustomTestCollectionOrderer : ITestCollectionOrderer
+    public class UnitTestCollectionOrderer : ITestCollectionOrderer
     {
-        public const string TypeName = "UnitTesting.CustomTestCollectionOrderer";
+        public const string TypeName = "UnitTesting.UnitTestCollectionOrderer";
 
         public const string AssembyName = "UnitTesting";
 
-        public IEnumerable<ITestCollection> OrderTestCollections(
-            IEnumerable<ITestCollection> testCollections)
+        public IEnumerable<ITestCollection> OrderTestCollections(IEnumerable<ITestCollection> testCollections)
         {
             return testCollections.OrderBy(GetOrder);
         }
@@ -36,8 +36,9 @@ namespace UnitTesting
             if (type == null)
                 return 0;
 
-            var attr = type.GetCustomAttribute<OrderAttribute>();
-            return attr?.I ?? 0;
+            var attr = type.GetCustomAttribute<CollectionPriorityAttribute>();
+            return attr?.Priority ?? 0;
+
         }
     }
 }

@@ -27,7 +27,7 @@ namespace Prinubes.Common.Helpers
             }
 
             // you can also use registered services
-            var DBService = context.HttpContext.RequestServices.GetRequiredService<IPrinubesDBContext>();
+            var DBService = (IPrinubesDBContext)context.HttpContext.RequestServices.GetRequiredService<T>();
             ControllerActionDescriptor descriptor = (ControllerActionDescriptor)context.ActionDescriptor;
             ArgumentNullException.ThrowIfNull(descriptor?.AttributeRouteInfo?.Template);
             string routePathUnique = $"{descriptor.ActionName.ToLower()}:{descriptor.AttributeRouteInfo.Template}";

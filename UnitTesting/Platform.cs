@@ -13,7 +13,7 @@ using Xunit;
 
 namespace UnitTesting
 {
-    [Order(11)]
+    [CollectionPriority(11)]
     public class Platform
     {
         static NetworkPlatformCRUDDataModel networkObject = new NetworkPlatformCRUDDataModel()
@@ -44,7 +44,7 @@ namespace UnitTesting
             UrlEndpoint = "https://nsxtalb.lab.local",
             Tags = new List<TaggingModel>() { new TaggingModel() { Key = "Organization", Value = "Test Organization" }, new TaggingModel() { Key = "Cost Center", Value = "Testing" } }
         };
-        [Fact, Order(1)]
+        [Fact, TestPriority(1)]
         public async Task CreateNetworkPlatform()
         {
             HttpResponseMessage createResponse = await GlobalVariables.platformFactory.Client.PostAsJsonAsync($"/platform/{GlobalVariables.SessionOrganization.Id}/networkplatforms", networkObject);
@@ -59,7 +59,7 @@ namespace UnitTesting
             }
 
         }
-        [Fact, Order(2)]
+        [Fact, TestPriority(2)]
         public async Task UpdateNetworkPlatform()
         {
             HttpResponseMessage retrieveResponse = await GlobalVariables.platformFactory.Client.GetAsync($"/platform/{GlobalVariables.SessionOrganization.Id}/networkplatforms/{GlobalVariables.SessionNetworkObject.Id}");
@@ -75,7 +75,7 @@ namespace UnitTesting
             Assert.Equal(HttpStatusCode.OK, updateResponse.StatusCode);
             GlobalVariables.SessionNetworkObject = JsonConvert.DeserializeObject<NetworkPlatformDisplayDataModel>(updateResponseContent);
         }
-        [Fact, Order(3)]
+        [Fact, TestPriority(3)]
         public async Task GetListNetworkPlatform()
         {
             var test = new object();
@@ -85,7 +85,7 @@ namespace UnitTesting
             var networkList = JsonConvert.DeserializeObject<List<NetworkPlatformDisplayDataModel>>(retrieveResponseContent);
             Assert.NotEmpty(networkList);
         }
-        [Fact, Order(10)]
+        [Fact, TestPriority(10)]
         public async Task CreateComputePlatform()
         {
             HttpResponseMessage createResponse = await GlobalVariables.platformFactory.Client.PostAsJsonAsync($"/platform/{GlobalVariables.SessionOrganization.Id}/computeplatforms", computeObject);
@@ -100,7 +100,7 @@ namespace UnitTesting
             }
 
         }
-        [Fact, Order(11)]
+        [Fact, TestPriority(11)]
         public async Task UpdateComputePlatform()
         {
             HttpResponseMessage retrieveResponse = await GlobalVariables.platformFactory.Client.GetAsync($"/platform/{GlobalVariables.SessionOrganization.Id}/computeplatforms/{GlobalVariables.SessionComputeObject.Id}");
@@ -117,7 +117,7 @@ namespace UnitTesting
             GlobalVariables.SessionComputeObject = JsonConvert.DeserializeObject<ComputePlatformDisplayDataModel>(updateResponseContent);
             Assert.NotNull(GlobalVariables.SessionComputeObject);
         }
-        [Fact, Order(12)]
+        [Fact, TestPriority(12)]
         public async Task GetListComputekPlatform()
         {
             HttpResponseMessage retrieveResponse = await GlobalVariables.platformFactory.Client.GetAsync($"/platform/{GlobalVariables.SessionOrganization.Id}/computeplatforms");
@@ -126,7 +126,7 @@ namespace UnitTesting
             var computeList = JsonConvert.DeserializeObject<List<ComputePlatformDisplayDataModel>>(retrieveResponseContent);
             Assert.NotEmpty(computeList);
         }
-        [Fact, Order(13)]
+        [Fact, TestPriority(13)]
         public async Task CreateLoadBalancerPlatform()
         {
             HttpResponseMessage createResponse = await GlobalVariables.platformFactory.Client.PostAsJsonAsync($"/platform/{GlobalVariables.SessionOrganization.Id}/loadbalancerplatforms", loadbalancerObject);
@@ -140,7 +140,7 @@ namespace UnitTesting
                 Task.Delay(1000).Wait();
             }
         }
-        [Fact, Order(14)]
+        [Fact, TestPriority(14)]
         public async Task UpdateLoadBalancerPlatform()
         {
             HttpResponseMessage retrieveResponse = await GlobalVariables.platformFactory.Client.GetAsync($"/platform/{GlobalVariables.SessionOrganization.Id}/loadbalancerplatforms/{GlobalVariables.SessionLoadBalancerObject.Id}");
@@ -157,7 +157,7 @@ namespace UnitTesting
             GlobalVariables.SessionLoadBalancerObject = JsonConvert.DeserializeObject<LoadBalancerPlatformDisplayDataModel>(updateResponseContent);
             Assert.NotNull(GlobalVariables.SessionLoadBalancerObject);
         }
-        [Fact, Order(15)]
+        [Fact, TestPriority(15)]
         public async Task UpdateLoadBalancerWithoutTagsPlatform()
         {
             HttpResponseMessage retrieveResponse = await GlobalVariables.platformFactory.Client.GetAsync($"/platform/{GlobalVariables.SessionOrganization.Id}/loadbalancerplatforms/{GlobalVariables.SessionLoadBalancerObject.Id}");
@@ -173,7 +173,7 @@ namespace UnitTesting
             GlobalVariables.SessionLoadBalancerObject = JsonConvert.DeserializeObject<LoadBalancerPlatformDisplayDataModel>(updateResponseContent);
             Assert.NotNull(GlobalVariables.SessionLoadBalancerObject);
         }
-        [Fact, Order(16)]
+        [Fact, TestPriority(16)]
         public async Task GetListLoadBalancerPlatform()
         {
             HttpResponseMessage retrieveResponse = await GlobalVariables.platformFactory.Client.GetAsync($"/platform/{GlobalVariables.SessionOrganization.Id}/loadbalancerplatforms");
@@ -186,7 +186,7 @@ namespace UnitTesting
             Assert.NotEmpty(tagQuery2);
             Assert.NotEmpty(loadbalancerList);
         }
-        [Fact, Order(50)]
+        [Fact, TestPriority(50)]
         public async Task TestComputePlatformCredentials()
         {
             var testPlatform = new ComputePlatformCRUDDataModel()
@@ -204,7 +204,7 @@ namespace UnitTesting
 
             Assert.NotNull(credentialTestResponse);
         }
-        [Fact, Order(51)]
+        [Fact, TestPriority(51)]
         public async Task TestNetworkPlatformCredentials()
         {
             var testPlatform = new NetworkPlatformCRUDDataModel()
@@ -222,7 +222,7 @@ namespace UnitTesting
 
             Assert.NotNull(testResponse);
         }
-        [Fact, Order(52)]
+        [Fact, TestPriority(52)]
         public async Task TestLoadBalancerPlatformCredentials()
         {
             var testPlatform = new LoadBalancerPlatformCRUDDataModel()

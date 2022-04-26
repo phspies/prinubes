@@ -12,15 +12,15 @@ using Xunit;
 
 namespace UnitTesting
 {
-    [Order(99)]
+    [CollectionPriority(99)]
     public class TestingCleanup
     {
-        [Fact, Order(0)]
+        [Fact, TestPriority(1)]
         public async Task WaitForChannels()
         {
             await Task.Delay(10000);
         }
-        [Fact, Order(47)]
+        [Fact, TestPriority(47)]
         public async Task DeleteALBPlatform()
         {
             HttpResponseMessage retrieveResponse = await GlobalVariables.platformFactory.Client.DeleteAsync($"/platform/{GlobalVariables.SessionOrganization.Id}/loadbalancerplatforms/{GlobalVariables.SessionLoadBalancerObject.Id}");
@@ -30,7 +30,7 @@ namespace UnitTesting
                 Task.Delay(1000).Wait();
             }
         }
-        [Fact, Order(48)]
+        [Fact, TestPriority(48)]
         public async Task DeleteComputePlatform()
         {
             HttpResponseMessage retrieveResponse = await GlobalVariables.platformFactory.Client.DeleteAsync($"/platform/{GlobalVariables.SessionOrganization.Id}/computeplatforms/{GlobalVariables.SessionComputeObject.Id}");
@@ -40,7 +40,7 @@ namespace UnitTesting
                 Task.Delay(1000).Wait();
             }
         }
-        [Fact, Order(49)]
+        [Fact, TestPriority(49)]
         public async Task DeleteNetworkPlatform()
         {
             HttpResponseMessage retrieveResponse = await GlobalVariables.platformFactory.Client.DeleteAsync($"/platform/{GlobalVariables.SessionOrganization.Id}/networkplatforms/{GlobalVariables.SessionNetworkObject.Id}");
@@ -50,7 +50,7 @@ namespace UnitTesting
                 Task.Delay(1000).Wait();
             }
         }
-        [Fact, Order(50)]
+        [Fact, TestPriority(50)]
         public async Task DeleteNSXALBCredentials()
         {
             HttpResponseMessage getResponse = await GlobalVariables.identityFactory.Client.DeleteAsync($"/identity/{GlobalVariables.SessionOrganization.Id}/credentials/{GlobalVariables.SessionNSXALBCredentials.Id}");
@@ -60,7 +60,7 @@ namespace UnitTesting
                 Task.Delay(1000).Wait();
             }
         }
-        [Fact, Order(51)]
+        [Fact, TestPriority(51)]
         public async Task DeleteNSXTCredentials()
         {
             HttpResponseMessage getResponse = await GlobalVariables.identityFactory.Client.DeleteAsync($"/identity/{GlobalVariables.SessionOrganization.Id}/credentials/{GlobalVariables.SessionNSXTCredentials.Id}");
@@ -70,7 +70,7 @@ namespace UnitTesting
                 Task.Delay(1000).Wait();
             }
         }
-        [Fact, Order(52)]
+        [Fact, TestPriority(52)]
         public async Task DeletevCenterCredentials()
         {
             HttpResponseMessage getResponse = await GlobalVariables.identityFactory.Client.DeleteAsync($"/identity/{GlobalVariables.SessionOrganization.Id}/credentials/{GlobalVariables.SessionvCenterCredentials.Id}");
@@ -80,7 +80,7 @@ namespace UnitTesting
                 Task.Delay(1000).Wait();
             }
         }
-        [Fact, Order(53)]
+        [Fact, TestPriority(53)]
         public async Task DetachTestFromGroup()
         {
             HttpResponseMessage groupAttachResponse = await GlobalVariables.identityFactory.Client.PutAsJsonAsync($"/identity/{GlobalVariables.SessionOrganization.Id}/groups/{GlobalVariables.SessionGroup.Id}/detachUser/{GlobalVariables.SessionToken.id}", new Object());
@@ -90,7 +90,7 @@ namespace UnitTesting
                 Task.Delay(1000).Wait();
             }
         }
-        [Fact, Order(54)]
+        [Fact, TestPriority(54)]
         public async Task DeleteTestGroup()
         {
             HttpResponseMessage groupAttachResponse = await GlobalVariables.identityFactory.Client.DeleteAsync($"/identity/{GlobalVariables.SessionOrganization.Id}/groups/{GlobalVariables.SessionGroup.Id}");
@@ -100,7 +100,7 @@ namespace UnitTesting
                 Task.Delay(1000).Wait();
             }
         }
-        [Fact, Order(55)]
+        [Fact, TestPriority(55)]
         public async Task DeleteTestOrganization()
         {
             HttpResponseMessage groupAttachResponse = await GlobalVariables.identityFactory.Client.DeleteAsync($"/identity/organizations/{GlobalVariables.SessionOrganization.Id}");
@@ -110,9 +110,14 @@ namespace UnitTesting
                 Task.Delay(1000).Wait();
             }
         }
-        [Fact, Order(999)]
+        [Fact, TestPriority(999)]
         public void Cleanup()
         {
+            //flush redis cache
+            //ConnectionMultiplexer redis = ConnectionMultiplexer.Connect(new ConfigurationOptions { EndPoints = { $"{new ServiceSettings().REDIS_CACHE_HOST}:{new ServiceSettings().REDIS_CACHE_PORT}" } });
+            //redis.GetDatabase().Execute("FLUSHALL;");
+
+
             GlobalVariables.identityFactory.WebHost.StopAsync().Wait();
             GlobalVariables.platformFactory.WebHost.StopAsync().Wait();
             GlobalVariables.platformWorkerFactory.WebHost.StopAsync().Wait();
@@ -133,10 +138,7 @@ namespace UnitTesting
                     }
                 }
             }
-            //flush redis cache
-            ConnectionMultiplexer redis = ConnectionMultiplexer.Connect($"{new ServiceSettings().REDIS_CACHE_HOST},allowAdmin=true");
-            var server = redis.GetServer(new ServiceSettings().REDIS_CACHE_HOST, new ServiceSettings().REDIS_CACHE_PORT);
-            server.FlushDatabase();
+
         }
     }
 }

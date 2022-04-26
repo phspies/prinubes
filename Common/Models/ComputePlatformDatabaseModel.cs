@@ -2,6 +2,7 @@
 using Prinubes.Common.DatabaseModels.PlatformEnums;
 using Prinubes.Common.Kafka;
 using shortid;
+using shortid.Configuration;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 
@@ -27,7 +28,7 @@ namespace Prinubes.Common.DatabaseModels
     {
         public ComputePlatformTestingRequestKafkaMessage()
         {
-            RequestID = ShortId.Generate(true, true, 15);
+            RequestID = ShortId.Generate(new GenerationOptions(true, true, 15));
             Action = ActionEnum.test;
         }
         [JsonProperty("request_id")]

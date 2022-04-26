@@ -6,16 +6,16 @@ using UnitTesting;
 using Xunit;
 
 [assembly: CollectionBehavior(DisableTestParallelization = true)]
-[assembly: TestCollectionOrderer(CustomTestCollectionOrderer.TypeName, CustomTestCollectionOrderer.AssembyName)]
-[assembly: TestCaseOrderer(CustomTestCaseOrderer.TypeName, CustomTestCaseOrderer.AssembyName)]
+[assembly: TestCollectionOrderer(UnitTestCollectionOrderer.TypeName, UnitTestCollectionOrderer.AssembyName)]
+[assembly: TestCaseOrderer(UnitTestCaseOrderer.TypeName, UnitTestCaseOrderer.AssembyName)]
 
 namespace UnitTesting
 {
-    [Order(1)]
+    [CollectionPriority(1)]
     public class TestingSetup
     {
-        [Fact, Order(0)]
-        public void SetupPlatform()
+        [Fact, TestPriority(1)]
+        public void Setup()
         {
             GlobalVariables.identityFactory = new IdentityApplicationFactory(new ServiceSettings(_MYSQL_DATABASE: "prinubes_identity_test"));
             GlobalVariables.platformFactory = new PlatformApplicationFactory(new ServiceSettings(_MYSQL_DATABASE: "prinubes_platform_test"));

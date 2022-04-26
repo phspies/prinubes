@@ -17,7 +17,7 @@ namespace Prinubes.Common.Helpers
             try
             {
 
-                IPrinubesDBContext userService = context.HttpContext.RequestServices.GetRequiredService<IPrinubesDBContext>();
+                IPrinubesDBContext userService = (IPrinubesDBContext)context.HttpContext.RequestServices.GetRequiredService<T>();
                 ArgumentNullException.ThrowIfNull(context.Principal?.Identity?.Name);
                 UserID = Guid.Parse(context.Principal.Identity.Name);
                 var user = userService.Users.Find(UserID);

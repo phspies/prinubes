@@ -1,10 +1,10 @@
+using Confluent.Kafka;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Prinubes.Common.DatabaseModels;
 using Prinubes.Common.Datamodels;
 using Prinubes.Common.Helpers;
 using Prinubes.Common.Models;
-using StackExchange.Redis;
 using System;
 using System.Linq;
 using System.Net;
@@ -13,15 +13,13 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 using Xunit;
+using Xunit.Extensions.Ordering;
 
 namespace UnitTesting
 {
-    [Order(10)]
+    [CollectionPriority(10)]
     public class Identity
     {
-
-
-
         static UserCRUDDataModel userObject = new UserCRUDDataModel()
         {
             Firstname = "Test",
@@ -30,17 +28,16 @@ namespace UnitTesting
             Password = "password"
         };
 
-
         [Fact, Order(1)]
-        public async Task RegisterTestUser1()
+        public async Task RegisterTestUser()
         {
             ArgumentNullException.ThrowIfNull(GlobalVariables.identityFactory?.Client);
             ArgumentNullException.ThrowIfNull(GlobalVariables.platformFactory?.Client);
             ArgumentNullException.ThrowIfNull(userObject.Password);
             ArgumentNullException.ThrowIfNull(userObject.EmailAddress);
-            ArgumentNullException.ThrowIfNull(GlobalVariables.SessionToken?.token);
-            
-           HttpResponseMessage registerResponse = await GlobalVariables.identityFactory.Client.PostAsJsonAsync("/identity/users/register", userObject);
+
+            HttpResponseMessage registerResponse = await GlobalVariables.identityFactory.Client.PostAsJsonAsync("/identity/users/register", userObject);
+            var returnContent = await registerResponse.Content.ReadAsStringAsync();
             Assert.Equal(HttpStatusCode.OK, registerResponse.StatusCode);
             var authenticateObject = new AuthenticateModel()
             {
@@ -55,7 +52,7 @@ namespace UnitTesting
             GlobalVariables.identityFactory.Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", GlobalVariables.SessionToken.token);
             GlobalVariables.platformFactory.Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", GlobalVariables.SessionToken.token);
         }
-        [Fact, Order(2)]
+        [Fact, TestPriority(2)]
         public async Task CreateTestOrganization()
         {
             OrganizationCRUDDataModel organizationDataModel = new OrganizationCRUDDataModel()
@@ -79,7 +76,7 @@ namespace UnitTesting
                 }
             }
         }
-        [Fact, Order(3)]
+        [Fact, TestPriority(3)]
         public async Task CreateTestGroup()
         {
             //create test group
@@ -87,6 +84,8 @@ namespace UnitTesting
             {
                 Group = "testgroup01"
             };
+            Assert.NotNull(GlobalVariables.SessionOrganization);
+
             HttpResponseMessage groupResponse = await GlobalVariables.identityFactory.Client.PostAsJsonAsync($"/identity/{GlobalVariables.SessionOrganization.Id}/groups", groupObject);
             var groupContents = await groupResponse.Content.ReadAsStringAsync();
             Assert.Equal(HttpStatusCode.OK, groupResponse.StatusCode);
@@ -104,10 +103,10 @@ namespace UnitTesting
                 }
             }
         }
-        [Fact, Order(4)]
+        [Fact, TestPriority(4)]
         public async Task AttachTestToGroup()
         {
-
+            Assert.NotNull(GlobalVariables.SessionGroup);
             HttpResponseMessage groupAttachResponse = await GlobalVariables.identityFactory.Client.PutAsJsonAsync($"/identity/{GlobalVariables.SessionOrganization.Id}/groups/{GlobalVariables.SessionGroup.Id}/attachUser/{GlobalVariables.SessionToken.id}", new Object());
             var groupAttachContents = await groupAttachResponse.Content.ReadAsStringAsync();
             Assert.Equal(HttpStatusCode.OK, groupAttachResponse.StatusCode);
@@ -123,7 +122,7 @@ namespace UnitTesting
                 }
             }
         }
-        [Fact, Order(5)]
+        [Fact, TestPriority(5)]
         public async Task CreatevCenterCredentials()
         {
 
@@ -133,6 +132,8 @@ namespace UnitTesting
                 Username = "administrator@vsphere.local",
                 Password = "c0mp2q",
             };
+            Assert.NotNull(GlobalVariables.SessionOrganization);
+
             HttpResponseMessage vcenterCredentialsResponse = await GlobalVariables.identityFactory.Client.PostAsJsonAsync($"/identity/{GlobalVariables.SessionOrganization.Id}/credentials", vCenterCredentialsObject);
             Assert.Equal(HttpStatusCode.OK, vcenterCredentialsResponse.StatusCode);
 
@@ -152,7 +153,7 @@ namespace UnitTesting
                 }
             }
         }
-        [Fact, Order(6)]
+        [Fact, TestPriority(6)]
         public async Task CreateNSXTCredentials5()
         {
             CredentialCRUDDataModel vNSXTCredentialsObject = new CredentialCRUDDataModel()
@@ -161,6 +162,8 @@ namespace UnitTesting
                 Username = "admin",
                 Password = "c0mp2q",
             };
+            Assert.NotNull(GlobalVariables.SessionOrganization);
+
             HttpResponseMessage vnsxtCredentialsResponse = await GlobalVariables.identityFactory.Client.PostAsJsonAsync($"/identity/{GlobalVariables.SessionOrganization.Id}/credentials", vNSXTCredentialsObject);
             Assert.Equal(HttpStatusCode.OK, vnsxtCredentialsResponse.StatusCode);
 
@@ -179,7 +182,7 @@ namespace UnitTesting
                 }
             }
         }
-        [Fact, Order(7)]
+        [Fact, TestPriority(7)]
         public async Task CreateNSXALBCredentials6()
         {
             CredentialCRUDDataModel vNSXALBCredentialsObject = new CredentialCRUDDataModel()
@@ -206,7 +209,7 @@ namespace UnitTesting
                 }
             }
         }
-        [Fact, Order(8)]
+        [Fact, TestPriority(8)]
         public async Task UpdateTestUser()
         {
             userObject.Firstname = userObject.Firstname + "UpdatedTest";
@@ -224,6 +227,7 @@ namespace UnitTesting
             crudUser.Password = "Password-test";
 
             HttpResponseMessage updatePutResponse = await GlobalVariables.identityFactory.Client.PutAsJsonAsync($"/identity/users/{user.Id}", crudUser);
+            var updateContents = await updatePutResponse.Content.ReadAsStringAsync();
             Assert.Equal(HttpStatusCode.OK, updatePutResponse.StatusCode);
             while (true)
             {
@@ -237,7 +241,7 @@ namespace UnitTesting
                 }
             }
         }
-        [Fact, Order(9)]
+        [Fact, TestPriority(9)]
         public async Task UpdateOrganization()
         {
             HttpResponseMessage getResponse = await GlobalVariables.identityFactory.Client.GetAsync($"/identity/organizations/{GlobalVariables.SessionOrganization.Id}");
@@ -262,7 +266,7 @@ namespace UnitTesting
                 }
             }
         }
-        [Fact, Order(9)]
+        [Fact, TestPriority(9)]
         public async Task UpdateGroup()
         {
             HttpResponseMessage getResponse = await GlobalVariables.identityFactory.Client.GetAsync($"/identity/{GlobalVariables.SessionOrganization.Id}/groups/{GlobalVariables.SessionGroup.Id}");
@@ -294,7 +298,7 @@ namespace UnitTesting
                 }
             }
         }
-        [Fact, Order(9)]
+        [Fact, TestPriority(9)]
         public async Task UpdatevCenterCredentials()
         {
             HttpResponseMessage getResponse = await GlobalVariables.identityFactory.Client.GetAsync($"/identity/{GlobalVariables.SessionOrganization.Id}/credentials/{GlobalVariables.SessionvCenterCredentials.Id}");
@@ -327,7 +331,7 @@ namespace UnitTesting
             }
         }
 
-        [Fact, Order(10)]
+        [Fact, TestPriority(10)]
         public async Task UpdateNSXTCredentials()
         {
             HttpResponseMessage getResponse = await GlobalVariables.identityFactory.Client.GetAsync($"/identity/{GlobalVariables.SessionOrganization.Id}/credentials/{GlobalVariables.SessionNSXTCredentials.Id}");
@@ -359,7 +363,7 @@ namespace UnitTesting
                 }
             }
         }
-        [Fact, Order(11)]
+        [Fact, TestPriority(11)]
         public async Task UpdateNSXALBCredentials()
         {
             HttpResponseMessage getResponse = await GlobalVariables.identityFactory.Client.GetAsync($"/identity/{GlobalVariables.SessionOrganization.Id}/credentials/{GlobalVariables.SessionNSXALBCredentials.Id}");
