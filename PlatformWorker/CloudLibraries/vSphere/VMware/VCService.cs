@@ -6,7 +6,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
 using System.Text;
-using ObjectContent = Prinubes.vCenterSDK.ObjectContent;
+//using ObjectContent = Prinubes.vCenterSDK.ObjectContent;
 
 namespace Prinubes.PlatformWorker.CloudLibraries.vSphere.VMware
 {
@@ -36,7 +36,7 @@ namespace Prinubes.PlatformWorker.CloudLibraries.vSphere.VMware
         }
         public delegate void ConnectionEventHandler(object sender, ConnectionEventArgs e);
 
-        public void Logon(string url, string userName, string password)
+        public void Logon(string host, string userName, string password)
         {
             if (_Service != null)
             {
@@ -50,7 +50,7 @@ namespace Prinubes.PlatformWorker.CloudLibraries.vSphere.VMware
             {
                 Disconnect();
             }
-            _Service = GetVimService(url, userName, password);
+            _Service = GetVimService(host, userName, password);
             _ServiceContent = _Service.RetrieveServiceContentAsync(_SvcRef).Result;
             _RootFolder = GetFolderOutsideDC(_ServiceContent.rootFolder);
             if (_ServiceContent.sessionManager != null)
@@ -63,9 +63,16 @@ namespace Prinubes.PlatformWorker.CloudLibraries.vSphere.VMware
                 AfterConnect(this, new ConnectionEventArgs());
             }
         }
-        private static VimPortType GetVimService(string url, string username = null, string password = null)
+        private static VimPortType GetVimService(string host, string username = null, string password = null)
         {
-            var factory = new ChannelFactory<VimPortType>(GetBinding(), new EndpointAddress(url));
+            var uriBuilder = new UriBuilder(host)
+            {
+                Scheme = Uri.UriSchemeHttps,
+                Port = -1,
+                Path = "/sdk"
+          
+            };
+            var factory = new ChannelFactory<VimPortType>(GetBinding(), new EndpointAddress(uriBuilder.ToString()));
             factory.Credentials.ServiceCertificate.SslCertificateAuthentication = new System.ServiceModel.Security.X509ServiceCertificateAuthentication()
             {
                 CertificateValidationMode = System.ServiceModel.Security.X509CertificateValidationMode.None,

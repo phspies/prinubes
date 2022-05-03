@@ -9,22 +9,6 @@ using Prinubes.Common.Models;
 using Prinubes.Platforms.Datamodels;
 using Prinubes.PlatformWorker.CloudLibraries.vSphere.VMware;
 
-//var VapiAuthHelper = new VapiAuthenticationHelper();
-//StubConfiguration SessionStubConfiguration = VapiAuthHelper.LoginByUsernameAndPassword("vc01.lab.local", "administrator@vsphere.local", "VMware1!");
-
-//var vmService = VapiAuthHelper.StubFactory.CreateStub<vmware.vcenter.VM>(SessionStubConfiguration);
-//List<VMTypes.Summary> vmList = vmService.List(new VMTypes.FilterSpec());
-
-
-
-
-VCService vcService = new VCService();
-vcService.Logon("https://10.0.100.16/sdk", "administrator@vsphere.local", "VMware1!");
-var version = vcService.ApiVersion;
-var dc = await vcService.GetVmInventoryAsync();
-
-
-
 var builder = WebApplication.CreateBuilder(args);
 
 

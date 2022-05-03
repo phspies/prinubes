@@ -9,8 +9,6 @@ namespace Prinubes.PlatformWorker.CloudLibraries.vSphere.VMware
         public static string[] VCProperties = new string[3] { "name", "effectiveRole", "vmFolder" };
         private DatacenterProperties _dcProperties;
         private IVimService _vimService;
-        private IVimService vimService;
-        private ManagedObjectReference managedObject;
 
         public DatacenterProperties DatacenterProperties
         {

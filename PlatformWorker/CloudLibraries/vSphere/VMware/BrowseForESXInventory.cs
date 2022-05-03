@@ -88,7 +88,7 @@ namespace Prinubes.PlatformWorker.CloudLibraries.vSphere.VMware
             {
          traversalSpec3
             };
-            ObjectContent[] contents = await _vimService.RetrievePropertiesAsync(new PropertyFilterSpec[1] { propertyFilterSpec });
+            ObjectContent[] contents = await _vimService.RetrievePropertiesAsync(new PropertyFilterSpec[1] { propertyFilterSpec }).ConfigureAwait(false);
             this.BuildInventoryNodesDictionary(contents);
             this.BuildInventoryNodesDictionary(contents);
             this.SetInventoryNodeChilds();

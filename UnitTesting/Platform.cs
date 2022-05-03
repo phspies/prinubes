@@ -32,7 +32,7 @@ namespace UnitTesting
             CredentialID = GlobalVariables.SessionvCenterCredentials.Id,
             PlatformType = ComputePlatformType.vSphere,
             AvailabilityZone = AvailabilityZoneType.AZ1,
-            UrlEndpoint = "https://vcenter.lab.local",
+            UrlEndpoint = "vcenter.lab.local",
             Tags = new List<TaggingModel>() { new TaggingModel() { Key = "Organization", Value = "Test Organization" }, new TaggingModel() { Key = "Cost Center", Value = "Testing" } }
         };
         static LoadBalancerPlatformCRUDDataModel loadbalancerObject = new LoadBalancerPlatformCRUDDataModel()
