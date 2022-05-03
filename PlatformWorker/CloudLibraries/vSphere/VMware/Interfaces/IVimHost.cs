@@ -1,6 +1,6 @@
 ﻿using Prinubes.vCenterSDK;
 
-namespace PlatformWorker.VMware.Interfaces
+namespace Prinubes.PlatformWorker.CloudLibraries.vSphere.VMware.Interfaces
 {
     public interface IVimHost : IVimManagedItem
     {

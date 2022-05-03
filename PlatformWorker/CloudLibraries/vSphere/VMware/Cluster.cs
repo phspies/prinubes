@@ -1,7 +1,7 @@
-﻿using PlatformWorker.VMware.Interfaces;
+﻿using Prinubes.PlatformWorker.CloudLibraries.vSphere.VMware.Interfaces;
 using Prinubes.vCenterSDK;
 
-namespace PlatformWorker.VMware
+namespace Prinubes.PlatformWorker.CloudLibraries.vSphere.VMware
 {
     internal class Cluster : VCManagedItem, IVimCluster, IVimManagedItem
     {

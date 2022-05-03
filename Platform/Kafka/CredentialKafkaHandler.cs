@@ -20,10 +20,11 @@ namespace Prinubes.ComputePlatform.Kafka
 
         public CredentialKafkaHandler(IServiceProvider _serviceProvider)
         {
-            DBContext = _serviceProvider.GetRequiredService<PrinubesPlatformDBContext>();
-            logger = _serviceProvider.GetRequiredService<ILogger<CredentialKafkaHandler>>();
+            var scope = _serviceProvider.CreateScope();
+            logger = scope.ServiceProvider.GetRequiredService<ILogger<CredentialKafkaHandler>>();
             mapper = _serviceProvider.GetRequiredService<IMapper>();
-            distributedCaching = _serviceProvider.GetRequiredService<IDistributedCache>();
+            DBContext = scope.ServiceProvider.GetRequiredService<PrinubesPlatformDBContext>();
+            distributedCaching = scope.ServiceProvider.GetRequiredService<IDistributedCache>();
         }
 
         public async Task Handle(MessageNotification<CredentialKafkaMessage> notification, CancellationToken cancellationToken)

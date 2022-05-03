@@ -1,10 +1,11 @@
-﻿using PlatformWorker.VMware.Interfaces;
-using Prinubes.vCenterSDK;
+﻿using Prinubes.vCenterSDK;
 using System.Globalization;
 using System.Net;
 using ObjectContent = Prinubes.vCenterSDK.ObjectContent;
+using PlatformWorker.VMware;
+using Prinubes.PlatformWorker.CloudLibraries.vSphere.VMware.Interfaces;
 
-namespace PlatformWorker.VMware
+namespace Prinubes.PlatformWorker.CloudLibraries.vSphere.VMware.VirtualMachine
 {
 
 
@@ -812,7 +813,7 @@ namespace PlatformWorker.VMware
                 if (virtualDevice is VirtualDisk)
                 {
                     string fileName = ((VirtualDeviceFileBackingInfo)virtualDevice.backing).fileName;
-                    if (names.Contains<string>(fileName, new Vm.VMWareFilenameEqualityComparer()))
+                    if (names.Contains<string>(fileName, new VMWareFilenameEqualityComparer()))
                         virtualDiskList.Add((VirtualDisk)virtualDevice);
                 }
             }
@@ -1455,7 +1456,7 @@ namespace PlatformWorker.VMware
                 str = null;
                 foreach (VmDiskInfo diskInfo in diskInfos)
                 {
-                    if (!array.Contains<string>(diskInfo.File, new Vm.VMWareFilenameEqualityComparer()))
+                    if (!array.Contains<string>(diskInfo.File, new VMWareFilenameEqualityComparer()))
                     {
                         str = diskInfo.File;
                         logger.LogDebug("We were looking for the file " + str + ".");
@@ -2243,7 +2244,7 @@ namespace PlatformWorker.VMware
             List<VirtualDeviceConfigSpec> deviceConfigSpecList = new List<VirtualDeviceConfigSpec>();
             for (int index = 0; index < busNumbers.Length; ++index)
             {
-                VirtualSCSIController virtualScsiController = scsiControllerType != ScsiControllerType.LsiLogicSAS ? (scsiControllerType != ScsiControllerType.LsiLogicParallel ? new VirtualBusLogicController() : new VirtualLsiLogicController()) : new VirtualLsiLogicSASController();
+                VirtualSCSIController virtualScsiController = scsiControllerType != ScsiControllerType.LsiLogicSAS ? (scsiControllerType != Prinubes.PlatformWorker.CloudLibraries.vSphere.VMware.ScsiControllerType.LsiLogicParallel ? new VirtualBusLogicController() : new VirtualLsiLogicController()) : new VirtualLsiLogicSASController();
                 virtualScsiController.busNumber = busNumbers[index];
                 virtualScsiController.key = num;
                 virtualScsiController.sharedBus = VirtualSCSISharing.noSharing;

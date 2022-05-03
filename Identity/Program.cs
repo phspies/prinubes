@@ -107,6 +107,15 @@ builder.Services.AddAuthentication(x =>
     };
 }).AddCookie(options => options.LoginPath = "/identity/users/authenticate");
 
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(
+        builder =>
+        {
+            builder.SetIsOriginAllowed(origin => true).AllowAnyMethod().AllowAnyHeader().AllowCredentials();
+        });
+});
+
 var app = builder.Build();
 //update routemap information for this service and publish to service bus
 using (var scope = app.Services.CreateScope())
@@ -121,16 +130,13 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+app.UseCors();
+
+
+
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
-app.UseCors(x => x
-             .AllowAnyMethod()
-             .AllowAnyHeader()
-             .SetIsOriginAllowed(origin => true) // allow any origin
-             .AllowCredentials()); // allow credentials
 
 app.Run();

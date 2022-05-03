@@ -1,10 +1,10 @@
-﻿using PlatformWorker.VMware.Interfaces;
+﻿using Prinubes.PlatformWorker.CloudLibraries.vSphere.VMware.Interfaces;
 using Prinubes.vCenterSDK;
 using System.Diagnostics;
 using System.Net;
 using ObjectContent = Prinubes.vCenterSDK.ObjectContent;
 
-namespace PlatformWorker.VMware
+namespace Prinubes.PlatformWorker.CloudLibraries.vSphere.VMware
 {
     public abstract class VCManagedItem : IVimManagedItem
     {

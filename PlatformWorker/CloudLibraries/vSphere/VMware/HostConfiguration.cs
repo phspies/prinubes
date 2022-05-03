@@ -1,6 +1,6 @@
-﻿using PlatformWorker.VMware.Interfaces;
+﻿using Prinubes.PlatformWorker.CloudLibraries.vSphere.VMware.Interfaces;
 
-namespace PlatformWorker.VMware
+namespace Prinubes.PlatformWorker.CloudLibraries.vSphere.VMware
 {
     [Serializable]
     public struct HostConfiguration

@@ -1,6 +1,6 @@
-﻿namespace PlatformWorker.VMware.Interfaces
+﻿namespace Prinubes.PlatformWorker.CloudLibraries.vSphere.VMware.Interfaces
 {
-    public interface IVimFolderOutsideDC : IVimManagedItem
+    public interface VimFolderOutsideDC : IVimManagedItem
     {
     }
 }

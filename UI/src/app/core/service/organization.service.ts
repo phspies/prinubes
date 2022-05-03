@@ -32,10 +32,13 @@ export class OrganizationService {
         this.organizationList = orgs as OrganizationDatabaseModel[];
         localStorage.setItem('currentOrganization', JSON.stringify(this.organizationList[0]));
       });
-      
     }
-    var org = JSON.parse(localStorage.getItem('currentOrganization')) as OrganizationDatabaseModel;
-    return this.http.get<any>(`${this.serviceURL}/${org.id}` , { headers: this.contentHeaders} )
+    else
+    {
+      var org = JSON.parse(localStorage.getItem('currentOrganization')) as OrganizationDatabaseModel;
+      console.log(org);
+      return this.http.get<any>(`${this.serviceURL}/${org.id}` , { headers: this.contentHeaders} )
+    }
   }
   getCurrentOrgID(): string {
     if (localStorage.getItem('currentOrganization') === null)
@@ -54,7 +57,7 @@ export class OrganizationService {
       .pipe(
         map((organizations) => {
           localStorage.setItem('availableOrganizations', JSON.stringify(organizations));
-          this.currentOrganizationSubject.next(organizations);
+          this.currentOrganizationSubject.next(organizations[0]);
           return organizations;
         }),
           catchError((err) => {

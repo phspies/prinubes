@@ -8,13 +8,14 @@ namespace Prinubes.ComputePlatform.Kafka
 {
     public class OrganizationKafkaHandler : INotificationHandler<MessageNotification<OrganizationKafkaMessage>>
     {
-        private readonly ILogger<OrganizationKafkaHandler> _logger;
+        private readonly ILogger<OrganizationKafkaHandler> logger;
         private readonly PrinubesPlatformDBContext DBContext;
 
-        public OrganizationKafkaHandler(ILogger<OrganizationKafkaHandler> logger, PrinubesPlatformDBContext _DBContext)
+        public OrganizationKafkaHandler(IServiceProvider _serviceProvider)
         {
-            _logger = logger;
-            DBContext = _DBContext;
+            var scope = _serviceProvider.CreateScope();
+            logger = scope.ServiceProvider.GetRequiredService<ILogger<OrganizationKafkaHandler>>();
+            DBContext = scope.ServiceProvider.GetRequiredService<PrinubesPlatformDBContext>();
         }
 
         public Task Handle(MessageNotification<OrganizationKafkaMessage> notification, CancellationToken cancellationToken)
@@ -22,7 +23,7 @@ namespace Prinubes.ComputePlatform.Kafka
             OrganizationKafkaMessage organizationKafkaMessage = notification.Message;
             if (organizationKafkaMessage != null)
             {
-                _logger.LogInformation($"Organization message received with key: {organizationKafkaMessage.OrganizationID} and action: {organizationKafkaMessage.Action}");
+                logger.LogInformation($"Organization message received with key: {organizationKafkaMessage.OrganizationID} and action: {organizationKafkaMessage.Action}");
                 switch (organizationKafkaMessage.Action)
                 {
                     case ActionEnum.create:
@@ -33,7 +34,7 @@ namespace Prinubes.ComputePlatform.Kafka
                         }
                         else
                         {
-                            _logger.LogDebug($"Organization message, organization already exists: {organizationKafkaMessage.OrganizationID} with row version: {organizationKafkaMessage.Organization.RowVersion}");
+                            logger.LogDebug($"Organization message, organization already exists: {organizationKafkaMessage.OrganizationID} with row version: {organizationKafkaMessage.Organization.RowVersion}");
                         }
                         break;
                     case ActionEnum.update:
@@ -47,12 +48,12 @@ namespace Prinubes.ComputePlatform.Kafka
                             }
                             else
                             {
-                                _logger.LogDebug($"Organization message out of order, organization not found: {organizationKafkaMessage.OrganizationID} and row version: {organizationKafkaMessage.Organization.RowVersion}");
+                                logger.LogDebug($"Organization message out of order, organization not found: {organizationKafkaMessage.OrganizationID} and row version: {organizationKafkaMessage.Organization.RowVersion}");
                             }
                         }
                         else
                         {
-                            _logger.LogDebug($"Organization message out of order, organization not found: {organizationKafkaMessage.OrganizationID} and row version: {organizationKafkaMessage.Organization.RowVersion}");
+                            logger.LogDebug($"Organization message out of order, organization not found: {organizationKafkaMessage.OrganizationID} and row version: {organizationKafkaMessage.Organization.RowVersion}");
                         }
                         break;
                     case ActionEnum.delete:
@@ -66,22 +67,22 @@ namespace Prinubes.ComputePlatform.Kafka
                             }
                             else
                             {
-                                _logger.LogDebug($"Organization message out of order, organization not found: {organizationKafkaMessage.OrganizationID} and row version: {organizationKafkaMessage.Organization.RowVersion}");
+                                logger.LogDebug($"Organization message out of order, organization not found: {organizationKafkaMessage.OrganizationID} and row version: {organizationKafkaMessage.Organization.RowVersion}");
                             }
                         }
                         else
                         {
-                            _logger.LogDebug($"Organization message out of order, organization not found: {organizationKafkaMessage.OrganizationID} and row version: {organizationKafkaMessage.Organization.RowVersion}");
+                            logger.LogDebug($"Organization message out of order, organization not found: {organizationKafkaMessage.OrganizationID} and row version: {organizationKafkaMessage.Organization.RowVersion}");
                         }
                         break;
                     default:
-                        _logger.LogError($"Organization message action not implemented {organizationKafkaMessage.Action}");
+                        logger.LogError($"Organization message action not implemented {organizationKafkaMessage.Action}");
                         break;
                 }
             }
             else
             {
-                _logger.LogError($"Organization message received null value");
+                logger.LogError($"Organization message received null value");
             }
             return Task.CompletedTask;
         }

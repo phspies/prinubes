@@ -1,6 +1,6 @@
-﻿using PlatformWorker.VMware.Contracts;
+﻿using Prinubes.PlatformWorker.CloudLibraries.vSphere.VMware.Contracts;
 
-namespace PlatformWorker.VMware.Interfaces
+namespace Prinubes.PlatformWorker.CloudLibraries.vSphere.VMware.Interfaces
 {
     public interface IVimDatastore : IVimManagedItem
     {

@@ -130,7 +130,7 @@ namespace UnitTesting
             {
                 Credential = "vCenter Credentials",
                 Username = "administrator@vsphere.local",
-                Password = "c0mp2q",
+                Password = "VMware1!",
             };
             Assert.NotNull(GlobalVariables.SessionOrganization);
 

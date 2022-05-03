@@ -11,20 +11,24 @@ namespace Prinubes.Common.Kafka.Consumer
     {
         private readonly IKafkaConsumerBuilder kafkaConsumerBuilder;
         private readonly ILogger<KafkaTopicMessageConsumer> logger;
-        private readonly IServiceProvider serviceProvider;
+        private readonly ServiceSettings serviceSettings;
+        private readonly IMediator mediator;
+        private readonly IServiceProvider context;
 
-        public KafkaTopicMessageConsumer(ILogger<KafkaTopicMessageConsumer> _logger, IKafkaConsumerBuilder _kafkaConsumerBuilder, IServiceProvider _serviceProvider)
+        public KafkaTopicMessageConsumer(IServiceProvider _context, ILogger<KafkaTopicMessageConsumer> _logger, IKafkaConsumerBuilder _kafkaConsumerBuilder, ServiceSettings _serviceSettings, IMediator _mediator)
         {
             logger = _logger;
             kafkaConsumerBuilder = _kafkaConsumerBuilder;
-            serviceProvider = _serviceProvider;
+            serviceSettings = _serviceSettings;
+            mediator = _mediator;
+            context = _context;
         }
 
         public void StartConsuming(string topic, CancellationToken cancellationToken)
         {
             using (var consumer = kafkaConsumerBuilder.Build())
             {
-                KafkaHelpers.CreateTopic(topic, serviceProvider.GetRequiredService<ServiceSettings>(), logger);
+                KafkaHelpers.CreateTopic(topic, serviceSettings, logger);
                 logger.LogInformation($"Starting consumer for {topic}");
                 consumer.Subscribe(topic);
 
@@ -50,11 +54,7 @@ namespace Prinubes.Common.Kafka.Consumer
 
                                 ArgumentNullException.ThrowIfNull(messageNotification);
 
-                                using (var scope = serviceProvider.CreateScope())
-                                {
-                                    var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
-                                    mediator.Publish(messageNotification, cancellationToken).GetAwaiter().GetResult();
-                                }
+                                mediator.Publish(messageNotification, cancellationToken).GetAwaiter().GetResult();
                                 logger.LogInformation($"Commit message consumer for {topic}");
                                 consumer.Commit(consumeResult);
                             }

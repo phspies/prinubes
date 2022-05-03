@@ -1,4 +1,5 @@
-﻿using Prinubes.vCenterSDK;
+﻿using Prinubes.PlatformWorker.CloudLibraries.vSphere.VMware;
+using Prinubes.vCenterSDK;
 using ObjectContent = Prinubes.vCenterSDK.ObjectContent;
 
 namespace PlatformWorker.VMware

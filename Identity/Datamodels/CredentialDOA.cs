@@ -34,23 +34,23 @@ namespace Prinubes.Identity.Datamodels
                 CredentialDatabaseModel updatedCredential = mapper.Map<CredentialCRUDDataModel, CredentialDatabaseModel>(credential);
                 using (var transaction = dbContext.Database.BeginTransaction())
                 {
-                    string key;
-                    updatedCredential.EncryptedPassword = CipherService.EncryptString(credential.Password, out key);
-                    updatedCredential.EncryptedKey = key;
+
+                    updatedCredential.EncryptedKey = "b14ca5898a4e4142aace2ea2143a2410";// CipherService.GenerateKey();
+                    updatedCredential.EncryptedPassword = CipherService.EncryptString(credential.Password, updatedCredential.EncryptedKey);
                     updatedCredential.OrganizationID = organizationId;
                     dbContext.Credentials.Add(updatedCredential);
                     await dbContext.SaveChangesAsync();
                     KafkaMessage.SubmitKafkaMessageAync(
-                        new CredentialKafkaMessage()
-                        {
-                            Action = ActionEnum.create,
-                            CredentialID = updatedCredential.Id,
-                            Credential = mapper.Map<CredentialKafkaDataModel>(updatedCredential),
-                            OrganizationID = organizationId
+                                    new CredentialKafkaMessage()
+                                    {
+                                        Action = ActionEnum.create,
+                                        CredentialID = updatedCredential.Id,
+                                        Credential = mapper.Map<CredentialKafkaDataModel>(updatedCredential),
+                                        OrganizationID = organizationId
 
-                        },
-                        logger,
-                        kafkaProducer);
+                                    },
+                                    logger,
+                                    kafkaProducer);
                     await transaction.CommitAsync();
                 }
                 await distributedCaching.SetCachingAsync(updatedCredential, updatedCredential.Id.ToString());
@@ -138,9 +138,8 @@ namespace Prinubes.Identity.Datamodels
 
                     if (credential.Password != null)
                     {
-                        string key;
-                        updatedCredential.EncryptedPassword = CipherService.EncryptString(credential.Password, out key);
-                        updatedCredential.EncryptedKey = key;
+                        updatedCredential.EncryptedKey = CipherService.GenerateKey();
+                        updatedCredential.EncryptedPassword = CipherService.EncryptString(credential.Password, updatedCredential.EncryptedKey);
                     }
                     updatedCredential.OrganizationID = organizationId;
                     await dbContext.SaveChangesAsync();

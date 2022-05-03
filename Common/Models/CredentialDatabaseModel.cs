@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Prinubes.Common.Helpers;
 using Prinubes.Common.Kafka;
 
 namespace Prinubes.Common.DatabaseModels
@@ -37,6 +38,8 @@ namespace Prinubes.Common.DatabaseModels
         public string EncryptedPassword { get; set; }
         [JsonProperty("encrypted_key")]
         public string EncryptedKey { get; set; }
+
+        public virtual string DecryptedPassword => CipherService.DecryptString(EncryptedPassword, EncryptedKey);
 
     }
     public class CredentialKafkaDataModel : FoundationDatabaseModel

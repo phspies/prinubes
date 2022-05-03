@@ -1,7 +1,7 @@
 ﻿using Prinubes.vCenterSDK;
 using ObjectContent = Prinubes.vCenterSDK.ObjectContent;
 
-namespace PlatformWorker.VMware.Interfaces
+namespace Prinubes.PlatformWorker.CloudLibraries.vSphere.VMware.Interfaces
 {
     public interface IVimService
     {
@@ -11,7 +11,7 @@ namespace PlatformWorker.VMware.Interfaces
         string FullName { get; }
         bool IsVirtualCenter { get; }
         ManagedObjectReference PropertyCollector { get; }
-        IVimFolderOutsideDC RootFolder { get; }
+        VimFolderOutsideDC RootFolder { get; }
         VimPortType Service { get; }
         ManagedObjectReference VirtualDiskManager { get; }
 
@@ -27,7 +27,7 @@ namespace PlatformWorker.VMware.Interfaces
         Task<IVimDatastore> GetDatastoreByNameAsync(string name);
         Task<IVimDatastore> GetDatastoreByUrlAsync(string url);
         IVimFolderInsideDC GetFolderInsideDC(ManagedObjectReference managedObject);
-        IVimFolderOutsideDC GetFolderOutsideDC(ManagedObjectReference managedObject);
+        VimFolderOutsideDC GetFolderOutsideDC(ManagedObjectReference managedObject);
         Task<IVimHost> GetHostAsync(string name);
         Task<IVimHost> GetHostAsync(string name, bool retrieveCommonProperties);
         Task<Dictionary<string, InventoryNode>> GetHostInventoryAsync();
@@ -42,8 +42,7 @@ namespace PlatformWorker.VMware.Interfaces
         Task<Dictionary<string, InventoryNode>> GetVmInventoryAsync();
         Task<IVimVm> GetVmOrVmTemplateAsync(string name);
         Task HeartbeatAsync();
-        void LogOff();
-        void Logon();
+        void Logon(string url, string userName, string password);
         Dictionary<string, object> PropSetToDictionary(DynamicProperty[] dynamicProperties);
         Task<ObjectContent[]> RetrievePropertiesAsync(PropertyFilterSpec[] pfSpec);
         Task<List<string>> SearchDatastoreSubFolderAsync(string esxHost, string folderName, VimClientlContext ctx);
@@ -54,7 +53,6 @@ namespace PlatformWorker.VMware.Interfaces
         Task<IVimVm> SearchVmByDnsNameAsync(string dnsName, bool retrieveCommonProperties);
         Task<IVimVm> SearchVmByUuidAsync(string uuid);
         Task<IVimVm> SearchVmByUuidAsync(string uuid, bool retrieveCommonProperties);
-        void Shutdown();
         void UnregisterAndDestroyVm(IVimVm vm, VimClientlContext ctx);
         Task UnregisterVmAsync(IVimVm vm);
         ManagedObjectReference[]? VCManagedItemsToMors(IVimManagedItem[] items);

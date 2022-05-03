@@ -28,7 +28,7 @@ namespace UnitTesting
 
         static ComputePlatformCRUDDataModel computeObject = new ComputePlatformCRUDDataModel()
         {
-            Platform = "NSX-T Network Platform",
+            Platform = "vCenter Compute Platform",
             CredentialID = GlobalVariables.SessionvCenterCredentials.Id,
             PlatformType = ComputePlatformType.vSphere,
             AvailabilityZone = AvailabilityZoneType.AZ1,

@@ -1,7 +1,8 @@
-﻿using PlatformWorker.VMware.Interfaces;
+﻿using Prinubes.PlatformWorker.CloudLibraries.vSphere.VMware.Interfaces;
+using Prinubes.PlatformWorker.CloudLibraries.vSphere.VMware.VirtualMachine;
 using Prinubes.vCenterSDK;
 
-namespace PlatformWorker.VMware
+namespace Prinubes.PlatformWorker.CloudLibraries.vSphere.VMware
 {
     public class Datacenter : VCManagedItem, IVimDatacenter, IVimManagedItem
     {

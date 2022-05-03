@@ -1,9 +1,10 @@
-﻿using PlatformWorker.VMware.Interfaces;
+﻿using Prinubes.PlatformWorker.CloudLibraries.vSphere.VMware.Interfaces;
+using Prinubes.PlatformWorker.CloudLibraries.vSphere.VMware.VirtualMachine;
 using Prinubes.vCenterSDK;
 using System.Globalization;
 using ObjectContent = Prinubes.vCenterSDK.ObjectContent;
 
-namespace PlatformWorker.VMware
+namespace Prinubes.PlatformWorker.CloudLibraries.vSphere.VMware
 {
 
 

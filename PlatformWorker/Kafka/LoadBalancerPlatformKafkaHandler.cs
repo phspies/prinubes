@@ -8,22 +8,21 @@ using Prinubes.Platforms.Datamodels;
 using Prinubes.PlatformWorkers.Helpers;
 using System.Collections;
 
-namespace Prinubes.LoadBalancerPlatform.Kafka
+namespace Prinubes.PlatformWorker.Kafka
 {
     public class LoadBalancerPlatformKafkaHandler : INotificationHandler<MessageNotification<LoadBalancerPlatformKafkaMessage>>
     {
         private readonly ILogger<LoadBalancerPlatformKafkaHandler> logger;
         private readonly PrinubesPlatformWorkerDBContext DBContext;
-        private IMapper mapper;
         private string cachingListKey = "loadbalancerplatformslist";
         private IDistributedCache distributedCaching;
 
         public LoadBalancerPlatformKafkaHandler(IServiceProvider _serviceProvider)
         {
-            DBContext = _serviceProvider.GetRequiredService<PrinubesPlatformWorkerDBContext>();
-            logger = _serviceProvider.GetRequiredService<ILogger<LoadBalancerPlatformKafkaHandler>>();
-            mapper = _serviceProvider.GetRequiredService<IMapper>();
-            distributedCaching = _serviceProvider.GetRequiredService<IDistributedCache>();
+            var scope = _serviceProvider.CreateScope();
+            logger = scope.ServiceProvider.GetRequiredService<ILogger<LoadBalancerPlatformKafkaHandler>>();
+            DBContext = scope.ServiceProvider.GetRequiredService<PrinubesPlatformWorkerDBContext>();
+            distributedCaching = scope.ServiceProvider.GetRequiredService<IDistributedCache>();
         }
 
         public async Task Handle(MessageNotification<LoadBalancerPlatformKafkaMessage> notification, CancellationToken cancellationToken)

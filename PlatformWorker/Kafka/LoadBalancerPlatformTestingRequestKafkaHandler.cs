@@ -12,16 +12,15 @@ namespace Prinubes.PlatformWorker.Kafka
     public class LoadBalancerPlatformTestingRequestKafkaHandler : INotificationHandler<MessageNotification<LoadBalancerPlatformTestingRequestKafkaMessage>>
     {
         private readonly ILogger logger;
-        private IMapper mapper;
         private IMessageProducer kafkaProducer;
         private PrinubesPlatformWorkerDBContext DBContext;
 
         public LoadBalancerPlatformTestingRequestKafkaHandler(IServiceProvider _serviceProvider)
         {
-            logger = _serviceProvider.GetRequiredService<ILogger<LoadBalancerPlatformTestingRequestKafkaHandler>>();
-            mapper = _serviceProvider.GetRequiredService<IMapper>();
-            kafkaProducer = _serviceProvider.GetRequiredService<IMessageProducer>();
-            DBContext = _serviceProvider.GetRequiredService<PrinubesPlatformWorkerDBContext>();
+            var scope = _serviceProvider.CreateScope();
+            logger = scope.ServiceProvider.GetRequiredService<ILogger<LoadBalancerPlatformKafkaHandler>>();
+            DBContext = scope.ServiceProvider.GetRequiredService<PrinubesPlatformWorkerDBContext>();
+            kafkaProducer = scope.ServiceProvider.GetRequiredService<IMessageProducer>();
         }
 
         public async Task Handle(MessageNotification<LoadBalancerPlatformTestingRequestKafkaMessage> notification, CancellationToken cancellationToken)
@@ -29,7 +28,7 @@ namespace Prinubes.PlatformWorker.Kafka
             LoadBalancerPlatformTestingRequestKafkaMessage loadbalancerPlatformKafkaMessage = notification.Message;
             if (loadbalancerPlatformKafkaMessage != null)
             {
-                logger.LogInformation($"LoadbalancerPlatform message received with key: {loadbalancerPlatformKafkaMessage.LoadBalancerPlatform.Platform} and action: {loadbalancerPlatformKafkaMessage.Action}");
+                logger.LogInformation($"LoadbalancerPlatform testing message received with key: {loadbalancerPlatformKafkaMessage.LoadBalancerPlatform.Platform} and action: {loadbalancerPlatformKafkaMessage.Action}");
                 switch (loadbalancerPlatformKafkaMessage.Action)
                 {
                     case ActionEnum.test:

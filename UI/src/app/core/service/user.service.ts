@@ -35,10 +35,14 @@ export class UserService {
     return this.http.post<any>(this.authticateURL, body , { headers: this.contentHeaders} )
       .pipe(
         map((user) => {
-          localStorage.setItem('currentUser', JSON.stringify(user));
           this.currentUserSubject.next(user);
-          this.organizationService.getCurrent().subscribe();
-          return user;
+          localStorage.setItem('currentUser', JSON.stringify(user));
+          this.organizationService.getCurrent().subscribe(org => { 
+            console.debug(org);
+          });
+          return user; 
+
+          
         }),
           catchError((err) => {
             console.error(err);
@@ -51,6 +55,7 @@ export class UserService {
     localStorage.removeItem('currentUser');
     localStorage.removeItem('currentOrganization');
     localStorage.removeItem('currentOrganizations'); 
+    localStorage.removeItem('availableOrganizations'); 
     this.currentUserSubject.next(null);
     return of({ success: false });
   }

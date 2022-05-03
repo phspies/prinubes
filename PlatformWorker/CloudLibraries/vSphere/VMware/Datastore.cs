@@ -1,9 +1,9 @@
-﻿using PlatformWorker.VMware.Contracts;
-using PlatformWorker.VMware.Interfaces;
+﻿using Prinubes.PlatformWorker.CloudLibraries.vSphere.VMware.Contracts;
+using Prinubes.PlatformWorker.CloudLibraries.vSphere.VMware.Interfaces;
 using Prinubes.vCenterSDK;
 using System.Text.RegularExpressions;
 
-namespace PlatformWorker.VMware
+namespace Prinubes.PlatformWorker.CloudLibraries.vSphere.VMware
 {
 
     internal class Datastore : VCManagedItem, IVimDatastore, IVimManagedItem

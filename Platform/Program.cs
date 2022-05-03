@@ -50,8 +50,7 @@ ILogger<Program> logger = builder.Services.BuildServiceProvider().GetRequiredSer
 using ILoggerFactory loggerFactory = LoggerFactory.Create(StartupFactory.LoggingBuilder());
 
 
-logger.LogInformation("KAFKA Details: {0}@{1}", serviceSettings.KAFKA_BOOTSTRAP, serviceSettings.KAFKA_CONSUMER_GROUP_ID);
-builder.Services.AddKafkaProducer();
+
 
 if (!args.Any(x => x.ToLower().Contains("testing")))
 {
@@ -74,6 +73,8 @@ builder.Services.CachingBuilder(serviceSettings);
 
 
 //Kafka producer
+logger.LogInformation("KAFKA Details: {0}@{1}", serviceSettings.KAFKA_BOOTSTRAP, serviceSettings.KAFKA_CONSUMER_GROUP_ID);
+builder.Services.AddKafkaProducer();
 var kafkaProducerConfig = new ProducerConfig() { BootstrapServers = serviceSettings.KAFKA_BOOTSTRAP, EnableIdempotence = serviceSettings.KAFKA_IDEMPOTENCE, MessageSendMaxRetries = serviceSettings.KAFKA_RETRIES };
 builder.Services.AddSingleton<ProducerConfig>(kafkaProducerConfig);
 builder.Configuration.Bind("producer", kafkaProducerConfig);
@@ -117,8 +118,17 @@ builder.Services.AddAuthentication(x =>
     };
 }).AddCookie(options => options.LoginPath = "/identity/users/authenticate");
 
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(
+        builder =>
+        {
+            builder.SetIsOriginAllowed(origin => true).AllowAnyMethod().AllowAnyHeader().AllowCredentials();
+        });
+});
 
 var app = builder.Build();
+
 //update routemap information for this service and publish to service bus
 using (var scope = app.Services.CreateScope())
 {
@@ -132,16 +142,14 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+app.UseCors();
+
+
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
 
-app.UseCors(x => x
-             .AllowAnyMethod()
-             .AllowAnyHeader()
-             .SetIsOriginAllowed(origin => true) // allow any origin
-             .AllowCredentials()); // allow credentials
+
 
 app.Run();

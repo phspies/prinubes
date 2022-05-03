@@ -1,48 +1,133 @@
-﻿using PlatformWorker.VMware.Interfaces;
+﻿using Prinubes.PlatformWorker.CloudLibraries.vSphere.VMware.Interfaces;
+using Prinubes.PlatformWorker.CloudLibraries.vSphere.VMware.VirtualMachine;
 using Prinubes.vCenterSDK;
 using System.Net;
+using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
+using System.ServiceModel.Channels;
+using System.Text;
 using ObjectContent = Prinubes.vCenterSDK.ObjectContent;
 
-namespace PlatformWorker.VMware
+namespace Prinubes.PlatformWorker.CloudLibraries.vSphere.VMware
 {
     public class VCService : IVimService
     {
-        private static object _lockPolicyCert = new object();
-        private AutoResetEvent _shutdownEvent = new AutoResetEvent(false);
-        private int _nRetries = 1;
+        public enum ConnectionState
+        {
+            Connected,
+            Disconnected,
+        }
+        protected ConnectionState _connectionState;
         private VimPortType _Service;
         private ServiceContent _ServiceContent;
-
         private ILogger<VCService> logger;
-
-        private ServiceUtil _svcUtil = new ServiceUtil();
-        private SvcConnection _serviceInstance = new SvcConnection("ServiceInstance");
 
         private ManagedObjectReference _SvcRef;
         private ManagedObjectReference _PropCol;
-        private IVimFolderOutsideDC _RootFolder;
-        private Thread _keepAliveThread;
-        private bool _loggedOn;
-        private bool _shutdown;
-        private bool _logginOff;
-        private string _hostName;
-        private string _userName;
-        private string _password;
+        private VimFolderOutsideDC _RootFolder;
+        private UserSession _VimUserSession;
+
+        public event ConnectionEventHandler AfterConnect;
+        public event ConnectionEventHandler AfterDisconnect;
+        public event ConnectionEventHandler BeforeDisconnect;
+        public class ConnectionEventArgs : System.EventArgs
+        {
+
+        }
+        public delegate void ConnectionEventHandler(object sender, ConnectionEventArgs e);
+
+        public void Logon(string url, string userName, string password)
+        {
+            if (_Service != null)
+            {
+                Disconnect();
+            }
+            _SvcRef = new ManagedObjectReference();
+            _SvcRef.type = "ServiceInstance";
+            _SvcRef.Value = "ServiceInstance";
+
+            if (_ServiceContent != null)
+            {
+                Disconnect();
+            }
+            _Service = GetVimService(url, userName, password);
+            _ServiceContent = _Service.RetrieveServiceContentAsync(_SvcRef).Result;
+            _RootFolder = GetFolderOutsideDC(_ServiceContent.rootFolder);
+            if (_ServiceContent.sessionManager != null)
+            {
+                _VimUserSession = _Service.LoginAsync(_ServiceContent.sessionManager, userName, password, null).Result;
+            }
+            _connectionState = ConnectionState.Connected;
+            if (AfterConnect != null)
+            {
+                AfterConnect(this, new ConnectionEventArgs());
+            }
+        }
+        private static VimPortType GetVimService(string url, string username = null, string password = null)
+        {
+            var factory = new ChannelFactory<VimPortType>(GetBinding(), new EndpointAddress(url));
+            factory.Credentials.ServiceCertificate.SslCertificateAuthentication = new System.ServiceModel.Security.X509ServiceCertificateAuthentication()
+            {
+                CertificateValidationMode = System.ServiceModel.Security.X509CertificateValidationMode.None,
+                RevocationMode = X509RevocationMode.NoCheck
+            };
+
+            factory.Credentials.UserName.UserName = username;
+            factory.Credentials.UserName.Password = password;
+            return factory.CreateChannel();
+        }
+        private static MessageEncodingBindingElement GetWcfEncoding()
+        {
+            return new TextMessageEncodingBindingElement(MessageVersion.Soap11, Encoding.UTF8);
+        }
+        private static HttpsTransportBindingElement GetWcfTransport()
+        {
+            HttpsTransportBindingElement transport = new HttpsTransportBindingElement
+            {
+                RequireClientCertificate = false,
+                AuthenticationScheme = AuthenticationSchemes.Basic,
+                AllowCookies = true,
+                MaxReceivedMessageSize = int.MaxValue
+            };
+            return transport;
+        }
+        public static CustomBinding GetBinding()
+        {
+            return new CustomBinding(GetWcfEncoding(), GetWcfTransport());
+        }
+        public void Disconnect()
+        {
+            if (_ServiceContent != null)
+            {
+                if (BeforeDisconnect != null)
+                {
+                    BeforeDisconnect(this, new ConnectionEventArgs());
+                }
+                if (_Service != null)
+                    _Service.LogoutAsync(_ServiceContent.sessionManager);
+                _Service = null;
+                _ServiceContent = null;
+                _connectionState = ConnectionState.Disconnected;
+                if (AfterDisconnect != null)
+                {
+                    AfterDisconnect(this, new ConnectionEventArgs());
+                }
+            }
+        }
 
         public ManagedObjectReference PropertyCollector
         {
             get
             {
-                return this._PropCol;
+                return _PropCol;
             }
         }
 
-        public IVimFolderOutsideDC RootFolder
+        public VimFolderOutsideDC RootFolder
         {
             get
             {
-                return this._RootFolder;
+                return _RootFolder;
             }
         }
 
@@ -50,7 +135,7 @@ namespace PlatformWorker.VMware
         {
             get
             {
-                return this._Service;
+                return _Service;
             }
         }
 
@@ -58,7 +143,7 @@ namespace PlatformWorker.VMware
         {
             get
             {
-                return this._ServiceContent.rootFolder;
+                return _ServiceContent.rootFolder;
             }
         }
 
@@ -66,7 +151,7 @@ namespace PlatformWorker.VMware
         {
             get
             {
-                return this._ServiceContent.about.fullName;
+                return _ServiceContent.about.fullName;
             }
         }
 
@@ -74,7 +159,7 @@ namespace PlatformWorker.VMware
         {
             get
             {
-                return this._ServiceContent.about.productLineId.Equals("vpx", StringComparison.OrdinalIgnoreCase);
+                return _ServiceContent.about.productLineId.Equals("vpx", StringComparison.OrdinalIgnoreCase);
             }
         }
 
@@ -82,7 +167,7 @@ namespace PlatformWorker.VMware
         {
             get
             {
-                return this._ServiceContent.about.apiVersion;
+                return _ServiceContent.about.apiVersion;
             }
         }
 
@@ -90,7 +175,7 @@ namespace PlatformWorker.VMware
         {
             get
             {
-                return this._ServiceContent.fileManager;
+                return _ServiceContent.fileManager;
             }
         }
 
@@ -98,7 +183,7 @@ namespace PlatformWorker.VMware
         {
             get
             {
-                return this._ServiceContent.virtualDiskManager;
+                return _ServiceContent.virtualDiskManager;
             }
         }
 
@@ -114,7 +199,7 @@ namespace PlatformWorker.VMware
         {
             get
             {
-                return this._ServiceContent.dvSwitchManager;
+                return _ServiceContent.dvSwitchManager;
             }
         }
 
@@ -122,165 +207,18 @@ namespace PlatformWorker.VMware
         {
             get
             {
-                return this._ServiceContent.customizationSpecManager;
+                return _ServiceContent.customizationSpecManager;
             }
         }
 
 
 
-        internal VCService(string hostName, string userName, string password)
-        {
-            if (userName == null || password == null || hostName == null)
-                throw new Exception("VC Logon: user name or password is not set");
-            this._init(hostName, userName, password, 1);
-        }
 
-        private void _init(string hostName, string userName, string password, int nRetries)
-        {
-            ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) => true;
-            this._SvcRef = new ManagedObjectReference();
-            this._SvcRef.type = "ServiceInstance";
-            this._SvcRef.Value = "ServiceInstance";
-            _serviceInstance.ignoreCert = true;
-            _serviceInstance.ConnectAsync($"https://{hostName}/sdk", userName, password);
 
-            this._hostName = hostName;
-            this._userName = userName;
-            this._password = password;
-            this._nRetries = nRetries;
-        }
 
         public async Task HeartbeatAsync()
         {
-            await _Service.CurrentTimeAsync(this._SvcRef);
-        }
-
-        private async void ThreadFunc()
-        {
-            while (!this._logginOff)
-            {
-                this._shutdownEvent.WaitOne(600000, false);
-                if (!this._logginOff)
-                {
-                    try
-                    {
-                        await _Service.CurrentTimeAsync(this._SvcRef);
-                    }
-                    catch (FaultException ex1)
-                    {
-                        if (ex1.Data.Contains("xsi:type=\"NoPermission\""))
-                        {
-                            bool flag = false;
-                            while (!this._logginOff && !flag)
-                                flag = Monitor.TryEnter(this, 1000);
-                            if (!this._logginOff)
-                            {
-                                try
-                                {
-                                    this._LogOff();
-                                }
-                                catch (Exception ex2)
-                                {
-                                }
-                                try
-                                {
-                                    this._LogOn();
-                                }
-                                catch (Exception ex2)
-                                {
-                                }
-                            }
-                            if (flag)
-                                Monitor.Exit(this);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                    }
-                }
-                else
-                    break;
-            }
-        }
-
-        public void Logon()
-        {
-            lock (this)
-            {
-                this._LogOn();
-                this._shutdownEvent.Reset();
-                this._keepAliveThread = new Thread(new ThreadStart(this.ThreadFunc));
-                this._keepAliveThread.IsBackground = true;
-                this._keepAliveThread.Start();
-            }
-        }
-
-        private async void _LogOn()
-        {
-            if (!this._loggedOn && !this._shutdown)
-            {
-
-
-                _ServiceContent = _serviceInstance._sic;
-                _Service = _serviceInstance._service;
-                this._RootFolder = new FolderOutsideDC(this, this._ServiceContent.rootFolder);
-                this._RootFolder.Name = (string)(await _RootFolder.GetPropertiesAsync(new string[1] { "name" }))["name"];
-                this._ServiceContent = await _Service.RetrieveServiceContentAsync(this._SvcRef);
-                this._PropCol = _ServiceContent.propertyCollector;
-            }
-            this._loggedOn = true;
-            this._logginOff = false;
-            this._shutdown = false;
-        }
-
-        public void LogOff()
-        {
-            lock (this)
-            {
-                if (!this._loggedOn)
-                    return;
-                if (this._shutdown)
-                    return;
-                try
-                {
-                    this._logginOff = true;
-                    this._shutdownEvent.Set();
-                    this._keepAliveThread.Join();
-                    this._LogOff();
-                }
-                catch (Exception exception_0)
-                {
-                }
-            }
-        }
-
-        private async void _LogOff()
-        {
-            if (!this._loggedOn)
-                return;
-            this._loggedOn = false;
-            this._logginOff = false;
-            try
-            {
-                await _Service.LogoutAsync(this._ServiceContent.sessionManager);
-            }
-            catch (Exception ex)
-            {
-            }
-        }
-
-        public void Shutdown()
-        {
-            lock (this)
-            {
-                if (this._loggedOn)
-                    this.LogOff();
-                this._Service = null;
-                this._ServiceContent = null;
-                this._shutdown = true;
-                this._loggedOn = false;
-                this._logginOff = false;
-            }
+            await _Service.CurrentTimeAsync(_SvcRef);
         }
 
         public async Task<IVimHost> SearchHostByIPAsync(string ip, bool retrieveCommonProperties)
@@ -289,7 +227,7 @@ namespace PlatformWorker.VMware
             IPAddress address = null;
             if (!IPAddress.TryParse(ip, out address))
                 return vimHost;
-            ManagedObjectReference byIp = await _Service.FindByIpAsync(this._ServiceContent.searchIndex, null, ip, false);
+            ManagedObjectReference byIp = await _Service.FindByIpAsync(_ServiceContent.searchIndex, null, ip, false);
             if (byIp != null)
             {
                 vimHost = new Host(this, byIp);
@@ -304,7 +242,7 @@ namespace PlatformWorker.VMware
 
         public async Task<IVimHost> SearchHostByDnsNameAsync(string dnsName, bool retrieveCommonProperties)
         {
-            ManagedObjectReference byDnsName = await _Service.FindByDnsNameAsync(this._ServiceContent.searchIndex, null, dnsName, false);
+            ManagedObjectReference byDnsName = await _Service.FindByDnsNameAsync(_ServiceContent.searchIndex, null, dnsName, false);
             IVimHost vimHost = null;
             if (byDnsName != null)
             {
@@ -320,7 +258,7 @@ namespace PlatformWorker.VMware
 
         public async Task<IVimHost> SearchHostByUuidAsync(string uuid, bool retrieveCommonProperties)
         {
-            ManagedObjectReference byUuid = await _Service.FindByUuidAsync(this._ServiceContent.searchIndex, null, uuid, false, false);
+            ManagedObjectReference byUuid = await _Service.FindByUuidAsync(_ServiceContent.searchIndex, null, uuid, false, false);
             IVimHost? vimHost = null;
             if (byUuid != null)
             {
@@ -341,7 +279,7 @@ namespace PlatformWorker.VMware
 
         public async Task<IVimVm> SearchVmByUuidAsync(string uuid, bool retrieveCommonProperties)
         {
-            ManagedObjectReference byUuid = await _Service.FindByUuidAsync(this._ServiceContent.searchIndex, null, uuid, true, false);
+            ManagedObjectReference byUuid = await _Service.FindByUuidAsync(_ServiceContent.searchIndex, null, uuid, true, false);
             IVimVm? vimVm = null;
             if (byUuid != null)
             {
@@ -381,7 +319,7 @@ namespace PlatformWorker.VMware
         public IVimDatacenter[] GetDatacenters()
         {
             List<IVimDatacenter> datacenters = new List<IVimDatacenter>();
-            this.getChildrenAsync(this.RootFolder, datacenters);
+            getChildrenAsync(RootFolder, datacenters);
             return datacenters.ToArray();
         }
 
@@ -393,7 +331,7 @@ namespace PlatformWorker.VMware
             {
                 foreach (ObjectContent objectContent in datastoresObjectContents)
                 {
-                    Dictionary<string, object> dictionary = this.PropSetToDictionary(objectContent.propSet);
+                    Dictionary<string, object> dictionary = PropSetToDictionary(objectContent.propSet);
                     IVimDatastore vimDatastore = new Datastore(this, objectContent.obj);
                     vimDatastore.GetCommonPropertiesAsync(dictionary);
                     vimDatastoreList.Add(vimDatastore);
@@ -411,7 +349,7 @@ namespace PlatformWorker.VMware
             {
                 foreach (ObjectContent objectContent in datastoresObjectContents)
                 {
-                    Dictionary<string, object> dictionary = this.PropSetToDictionary(objectContent.propSet);
+                    Dictionary<string, object> dictionary = PropSetToDictionary(objectContent.propSet);
                     IVimDatastore vimDatastore2 = new Datastore(this, objectContent.obj);
                     vimDatastore2.GetCommonPropertiesAsync(dictionary);
                     if (string.Compare(url, vimDatastore2.DsProperties.Url, true) == 0)
@@ -433,7 +371,7 @@ namespace PlatformWorker.VMware
             {
                 foreach (ObjectContent objectContent in datastoresObjectContents)
                 {
-                    Dictionary<string, object> dictionary = this.PropSetToDictionary(objectContent.propSet);
+                    Dictionary<string, object> dictionary = PropSetToDictionary(objectContent.propSet);
                     IVimDatastore vimDatastore2 = new Datastore(this, objectContent.obj);
                     vimDatastore2.GetCommonPropertiesAsync(dictionary);
                     if (string.Compare(name, vimDatastore2.Name, true) == 0)
@@ -484,7 +422,7 @@ namespace PlatformWorker.VMware
          traversalSpec2
             };
             traversalSpec3.selectSet[0].name = "tFolderSpec";
-            return await RetrievePropertiesAsync(new PropertyFilterSpec[1] { new PropertyFilterSpec() { propSet = new PropertySpec[1] { propertySpec }, objectSet = new ObjectSpec[1] { new ObjectSpec() { obj = this.RootFolder.ManagedObject, skip = true, selectSet = new SelectionSpec[1] { traversalSpec3 } } } } });
+            return await RetrievePropertiesAsync(new PropertyFilterSpec[1] { new PropertyFilterSpec() { propSet = new PropertySpec[1] { propertySpec }, objectSet = new ObjectSpec[1] { new ObjectSpec() { obj = RootFolder.ManagedObject, skip = true, selectSet = new SelectionSpec[1] { traversalSpec3 } } } } });
         }
 
         public async Task<IVimHost[]> GetHostsAsync(IVimDatastore[] datastores)
@@ -528,7 +466,7 @@ namespace PlatformWorker.VMware
             {
         new PropertySpec()
             };
-            propertyFilterSpec.propSet[0].all = false;
+            propertyFilterSpec.propSet[0].all = true;
             propertyFilterSpec.propSet[0].type = managedObjects[0].type;
             propertyFilterSpec.propSet[0].pathSet = properties;
             propertyFilterSpec.objectSet = new ObjectSpec[managedObjects.Length];
@@ -550,7 +488,7 @@ namespace PlatformWorker.VMware
                 foreach (ObjectContent objectContent in objectContents)
                 {
                     DynamicProperty[] propSet = objectContent.propSet;
-                    ManagedObjectReference equivelentMor = this.getEquivelentMor(objectContent.obj.Value, managedObjects);
+                    ManagedObjectReference equivelentMor = getEquivelentMor(objectContent.obj.Value, managedObjects);
                     dictionary.Add(equivelentMor, new Dictionary<string, object>(StringComparer.CurrentCultureIgnoreCase));
                     if (propSet != null)
                     {
@@ -584,7 +522,7 @@ namespace PlatformWorker.VMware
         {
             if (items == null)
                 return null;
-            return await GetPropertiesAsync(this.VCManagedItemsToMors(items), properties);
+            return await GetPropertiesAsync(VCManagedItemsToMors(items), properties);
         }
 
         public ManagedObjectReference[]? VCManagedItemsToMors(IVimManagedItem[] items)
@@ -637,7 +575,7 @@ namespace PlatformWorker.VMware
             }
             while (token != null && token.Length != 0)
             {
-                rslts = await Service.ContinueRetrievePropertiesExAsync(this._ServiceContent.propertyCollector, token);
+                rslts = await Service.ContinueRetrievePropertiesExAsync(_ServiceContent.propertyCollector, token);
                 token = null;
                 if (rslts != null)
                 {
@@ -668,18 +606,18 @@ namespace PlatformWorker.VMware
             Dictionary<string, IVimHost> allHostsDict = await GetAllHostsDictAsync();
             if (allHostsDict.Count == 0)
             {
-                this.logInformationIfLoggerNotNullGetHost("No hosts were found.");
+                logInformationIfLoggerNotNullGetHost("No hosts were found.");
                 return null;
             }
             if (allHostsDict.TryGetValue(name, out vimHost2))
                 return vimHost2;
-            this.logInformationIfLoggerNotNullGetHost(string.Format("We still couldn't find the host.  We did find these hosts though: {0}", string.Join(", ", allHostsDict.Keys.ToArray<string>())));
+            logInformationIfLoggerNotNullGetHost(string.Format("We still couldn't find the host.  We did find these hosts though: {0}", string.Join(", ", allHostsDict.Keys.ToArray<string>())));
             return null;
         }
 
         private void logInformationIfLoggerNotNullGetHost(string message)
         {
-
+            logger.LogInformation(message);
         }
 
         public Task<IVimHost> GetHostWithoutCaseInsensetiveComparison(string name)
@@ -698,7 +636,7 @@ namespace PlatformWorker.VMware
                 {
                     try
                     {
-                        Dictionary<string, object> dictionary2 = this.PropSetToDictionary(objectContent.propSet);
+                        Dictionary<string, object> dictionary2 = PropSetToDictionary(objectContent.propSet);
                         Host host = new Host(this, objectContent.obj);
                         host.GetCommonPropertiesAsync(dictionary2);
                         if (!string.IsNullOrEmpty(host.Name))
@@ -755,7 +693,7 @@ namespace PlatformWorker.VMware
             {
         new ObjectSpec()
             };
-            propertyFilterSpec.objectSet[0].obj = this.RootFolder.ManagedObject;
+            propertyFilterSpec.objectSet[0].obj = RootFolder.ManagedObject;
             propertyFilterSpec.objectSet[0].skip = false;
             propertyFilterSpec.objectSet[0].selectSet = new SelectionSpec[1]
             {
@@ -764,7 +702,7 @@ namespace PlatformWorker.VMware
             return await RetrievePropertiesAsync(new PropertyFilterSpec[1] { propertyFilterSpec });
         }
 
-        private async Task getChildrenAsync(IVimFolderOutsideDC folder, List<IVimDatacenter> datacenters)
+        private async Task getChildrenAsync(VimFolderOutsideDC folder, List<IVimDatacenter> datacenters)
         {
             foreach (IVimManagedItem child in await folder.GetChildrenAsync())
             {
@@ -774,7 +712,7 @@ namespace PlatformWorker.VMware
                     datacenters.Add((IVimDatacenter)child);
                 }
                 else
-                    await this.getChildrenAsync((IVimFolderOutsideDC)child, datacenters);
+                    await getChildrenAsync((VimFolderOutsideDC)child, datacenters);
             }
         }
 
@@ -809,7 +747,7 @@ namespace PlatformWorker.VMware
                 {
                     try
                     {
-                        Dictionary<string, object> dictionary2 = this.PropSetToDictionary(objectContent.propSet);
+                        Dictionary<string, object> dictionary2 = PropSetToDictionary(objectContent.propSet);
                         IVimVm vimVm = new Vm(this, objectContent.obj);
                         vimVm.GetCommonProperties(dictionary2);
                         if (!string.IsNullOrEmpty(vimVm.Uuid))
@@ -839,7 +777,7 @@ namespace PlatformWorker.VMware
                 {
                     try
                     {
-                        Dictionary<string, object> dictionary2 = this.PropSetToDictionary(objectContent.propSet);
+                        Dictionary<string, object> dictionary2 = PropSetToDictionary(objectContent.propSet);
                         IVimVm vimVm = new Vm(this, objectContent.obj);
                         vimVm.GetCommonProperties(dictionary2);
                         if (!string.IsNullOrEmpty(vimVm.Name))
@@ -860,7 +798,7 @@ namespace PlatformWorker.VMware
         }
         public async Task<Dictionary<string, IVimVm>> GetAllVMsDictWithNameAsync(ManagedObjectReference _datacenter)
         {
-            this.logger.LogDebug("Retrieving all VMs from the host.");
+            logger.LogDebug("Retrieving all VMs from the host.");
             ObjectContent[] vmsObjectContents = await GetAllVMsObjectContentsAsync(_datacenter);
             Dictionary<string, IVimVm> dictionary1 = new Dictionary<string, IVimVm>(StringComparer.CurrentCultureIgnoreCase);
             if (vmsObjectContents != null)
@@ -869,7 +807,7 @@ namespace PlatformWorker.VMware
                 {
                     try
                     {
-                        Dictionary<string, object> dictionary2 = this.PropSetToDictionary(objectContent.propSet);
+                        Dictionary<string, object> dictionary2 = PropSetToDictionary(objectContent.propSet);
                         IVimVm vimVm = new Vm(this, objectContent.obj);
                         vimVm.GetCommonProperties(dictionary2);
                         if (!string.IsNullOrEmpty(vimVm.Name))
@@ -886,7 +824,7 @@ namespace PlatformWorker.VMware
                     }
                 }
             }
-            this.logger.LogDebug("Finished retrieving VMs.");
+            logger.LogDebug("Finished retrieving VMs.");
             return dictionary1;
         }
 
@@ -951,7 +889,7 @@ namespace PlatformWorker.VMware
          traversalSpec4
             };
             traversalSpec5.selectSet[0].name = "tFolderSpec";
-            return await RetrievePropertiesAsync(new PropertyFilterSpec[1] { new PropertyFilterSpec() { propSet = new PropertySpec[1] { propertySpec }, objectSet = new ObjectSpec[1] { new ObjectSpec() { obj = this.RootFolder.ManagedObject, skip = true, selectSet = new SelectionSpec[1] { traversalSpec5 } } } } });
+            return await RetrievePropertiesAsync(new PropertyFilterSpec[1] { new PropertyFilterSpec() { propSet = new PropertySpec[1] { propertySpec }, objectSet = new ObjectSpec[1] { new ObjectSpec() { obj = RootFolder.ManagedObject, skip = true, selectSet = new SelectionSpec[1] { traversalSpec5 } } } } });
         }
         private async Task<ObjectContent[]> GetAllVMsObjectContentsAsync(ManagedObjectReference _datacenter)
         {
@@ -1027,7 +965,7 @@ namespace PlatformWorker.VMware
                 {
                     try
                     {
-                        Dictionary<string, object> dictionary2 = this.PropSetToDictionary(objectContent.propSet);
+                        Dictionary<string, object> dictionary2 = PropSetToDictionary(objectContent.propSet);
                         IVimVm vimVm2 = new Vm(this, objectContent.obj);
                         vimVm2.GetCommonProperties(dictionary2);
                         if (string.Compare(vimVm2.Name, name, true) == 0)
@@ -1038,7 +976,7 @@ namespace PlatformWorker.VMware
                     }
                     catch (Exception ex)
                     {
-                        this.logger.LogError(ex, $"Error retrieving VM");
+                        logger.LogError(ex, $"Error retrieving VM");
                     }
                 }
             }
@@ -1059,13 +997,13 @@ namespace PlatformWorker.VMware
         {
             foreach (InventoryNode inventoryNode in inventory.Values)
             {
-                if (this.RootFolder.ManagedObject.Value == inventoryNode.ManagedObject.Value)
+                if (RootFolder.ManagedObject.Value == inventoryNode.ManagedObject.Value)
                     return inventoryNode;
             }
             return null;
         }
 
-        public IVimFolderOutsideDC GetFolderOutsideDC(ManagedObjectReference managedObject)
+        public VimFolderOutsideDC GetFolderOutsideDC(ManagedObjectReference managedObject)
         {
             return new FolderOutsideDC(this, managedObject);
         }
@@ -1102,7 +1040,7 @@ namespace PlatformWorker.VMware
 
         public async Task<CustomizationSpecItem> GetCustomizationSpecAsync(string name)
         {
-            return await _Service.GetCustomizationSpecAsync(this.CustomizationSpecManager, name);
+            return await _Service.GetCustomizationSpecAsync(CustomizationSpecManager, name);
         }
     }
 }

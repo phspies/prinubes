@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace PlatformWorker.VMware.Contracts
+namespace Prinubes.PlatformWorker.CloudLibraries.vSphere.VMware.Contracts
 {
     public class VimDatastoreItem : IExtensibleDataObject
     {

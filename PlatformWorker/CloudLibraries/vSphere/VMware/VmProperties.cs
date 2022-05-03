@@ -1,6 +1,6 @@
 ﻿using Prinubes.vCenterSDK;
 
-namespace PlatformWorker.VMware
+namespace Prinubes.PlatformWorker.CloudLibraries.vSphere.VMware
 {
     public struct VmProperties
     {

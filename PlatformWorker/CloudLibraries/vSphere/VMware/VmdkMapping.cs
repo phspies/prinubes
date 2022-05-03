@@ -1,4 +1,4 @@
-﻿namespace PlatformWorker.VMware
+﻿namespace Prinubes.PlatformWorker.CloudLibraries.vSphere.VMware
 {
     public class VmdkMapping
     {

@@ -12,17 +12,15 @@ namespace Prinubes.PlatformWorker.Kafka
     public class NetworkPlatformTestingRequestKafkaHandler : INotificationHandler<MessageNotification<NetworkPlatformTestingRequestKafkaMessage>>
     {
         private readonly ILogger logger;
-        private IMapper mapper;
         private IMessageProducer kafkaProducer;
         private PrinubesPlatformWorkerDBContext DBContext;
 
         public NetworkPlatformTestingRequestKafkaHandler(IServiceProvider _serviceProvider)
         {
-            logger = _serviceProvider.GetRequiredService<ILogger<NetworkPlatformTestingRequestKafkaMessage>>();
-            mapper = _serviceProvider.GetRequiredService<IMapper>();
+            var scope = _serviceProvider.CreateScope();
+            logger = scope.ServiceProvider.GetRequiredService<ILogger<NetworkPlatformTestingRequestKafkaHandler>>();
+            DBContext = scope.ServiceProvider.GetRequiredService<PrinubesPlatformWorkerDBContext>();
             kafkaProducer = _serviceProvider.GetRequiredService<IMessageProducer>();
-            DBContext = _serviceProvider.GetRequiredService<PrinubesPlatformWorkerDBContext>();
-
         }
 
         public async Task Handle(MessageNotification<NetworkPlatformTestingRequestKafkaMessage> notification, CancellationToken cancellationToken)
@@ -30,7 +28,7 @@ namespace Prinubes.PlatformWorker.Kafka
             NetworkPlatformTestingRequestKafkaMessage networkPlatformKafkaMessage = notification.Message;
             if (networkPlatformKafkaMessage != null)
             {
-                logger.LogInformation($"NetworkPlatform message received with key: {networkPlatformKafkaMessage.NetworkPlatform.Platform} and action: {networkPlatformKafkaMessage.Action}");
+                logger.LogInformation($"NetworkPlatform testing message received with key: {networkPlatformKafkaMessage.NetworkPlatform.Platform} and action: {networkPlatformKafkaMessage.Action}");
                 switch (networkPlatformKafkaMessage.Action)
                 {
                     case ActionEnum.test:

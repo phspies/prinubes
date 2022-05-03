@@ -45,7 +45,6 @@ export class SigninComponent implements OnInit {
             if (res) {
               const token = this.userService.currentUserValue.token;
               if (token) {
-                this.organizationService.list().subscribe();
                 this.organizationService.getCurrent().subscribe();
                 this.router.navigate(['/dashboard/main']);
               }

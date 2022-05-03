@@ -8,22 +8,21 @@ using Prinubes.Platforms.Datamodels;
 using Prinubes.PlatformWorkers.Helpers;
 using System.Collections;
 
-namespace Prinubes.NetworkPlatform.Kafka
+namespace Prinubes.PlatformWorker.Kafka
 {
     public class NetworkPlatformKafkaHandler : INotificationHandler<MessageNotification<NetworkPlatformKafkaMessage>>
     {
         private readonly ILogger<NetworkPlatformKafkaHandler> logger;
         private readonly PrinubesPlatformWorkerDBContext DBContext;
-        private IMapper mapper;
         private string cachingListKey = "networkplatformslist";
         private IDistributedCache distributedCaching;
 
         public NetworkPlatformKafkaHandler(IServiceProvider _serviceProvider)
         {
-            DBContext = _serviceProvider.GetRequiredService<PrinubesPlatformWorkerDBContext>();
-            logger = _serviceProvider.GetRequiredService<ILogger<NetworkPlatformKafkaHandler>>();
-            mapper = _serviceProvider.GetRequiredService<IMapper>();
-            distributedCaching = _serviceProvider.GetRequiredService<IDistributedCache>();
+            var scope = _serviceProvider.CreateScope();
+            logger = scope.ServiceProvider.GetRequiredService<ILogger<NetworkPlatformKafkaHandler>>();
+            DBContext = scope.ServiceProvider.GetRequiredService<PrinubesPlatformWorkerDBContext>();
+            distributedCaching = scope.ServiceProvider.GetRequiredService<IDistributedCache>();
         }
 
         public async Task Handle(MessageNotification<NetworkPlatformKafkaMessage> notification, CancellationToken cancellationToken)
@@ -63,7 +62,7 @@ namespace Prinubes.NetworkPlatform.Kafka
                             }
                             else
                             {
-                                logger.LogDebug($"NetworkPlatform message out of order, networkplatform not found: {networkplatformKafkaMessage.NetworkPlatformID} and row version: {networkplatformKafkaMessage.RowVersion}");
+                                logger.LogDebug($"NetworkPlatform message out of order, networkplatform rowversion not found: {networkplatformKafkaMessage.NetworkPlatformID} and row version: {networkplatformKafkaMessage.RowVersion}");
                             }
                         }
                         else
@@ -82,7 +81,7 @@ namespace Prinubes.NetworkPlatform.Kafka
                         }
                         else
                         {
-                            logger.LogDebug($"NetworkPlatform message out of order, networkplatform not found: {networkplatformKafkaMessage.NetworkPlatformID} and row version: {networkplatformKafkaMessage.RowVersion}");
+                            logger.LogDebug($"NetworkPlatform message out of order, networkplatform rowversion not found: {networkplatformKafkaMessage.NetworkPlatformID} and row version: {networkplatformKafkaMessage.RowVersion}");
                         }
                         break;
                     default:

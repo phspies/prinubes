@@ -7,7 +7,7 @@ using Prinubes.Platforms.Datamodels;
 using Prinubes.PlatformWorkers.Helpers;
 using System.Collections;
 
-namespace Prinubes.ComputePlatform.Kafka
+namespace Prinubes.PlatformWorker.Kafka
 {
     public class CredentialKafkaHandler : INotificationHandler<MessageNotification<CredentialKafkaMessage>>
     {
@@ -18,9 +18,10 @@ namespace Prinubes.ComputePlatform.Kafka
 
         public CredentialKafkaHandler(IServiceProvider _serviceProvider)
         {
-            DBContext = _serviceProvider.GetRequiredService<PrinubesPlatformWorkerDBContext>();
-            logger = _serviceProvider.GetRequiredService<ILogger<CredentialKafkaHandler>>();
-            distributedCaching = _serviceProvider.GetRequiredService<IDistributedCache>();
+            var scope = _serviceProvider.CreateScope();
+            logger = scope.ServiceProvider.GetRequiredService<ILogger<CredentialKafkaHandler>>();
+            DBContext = scope.ServiceProvider.GetRequiredService<PrinubesPlatformWorkerDBContext>();
+            distributedCaching = scope.ServiceProvider.GetRequiredService<IDistributedCache>();
         }
 
         public async Task Handle(MessageNotification<CredentialKafkaMessage> notification, CancellationToken cancellationToken)

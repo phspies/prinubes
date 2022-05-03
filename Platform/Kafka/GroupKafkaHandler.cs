@@ -11,15 +11,16 @@ namespace Prinubes.ComputePlatform.Kafka
 {
     public class GroupKafkaHandler : INotificationHandler<MessageNotification<GroupKafkaMessage>>
     {
-        private readonly ILogger<GroupKafkaHandler> _logger;
+        private readonly ILogger<GroupKafkaHandler> logger;
         private readonly PrinubesPlatformDBContext DBContext;
         private IMapper mapper;
 
-        public GroupKafkaHandler(ILogger<GroupKafkaHandler> logger, PrinubesPlatformDBContext _DBContext, IMapper _mapper)
+        public GroupKafkaHandler(IServiceProvider _serviceProvider)
         {
-            _logger = logger;
-            DBContext = _DBContext;
-            mapper = _mapper;
+            var scope = _serviceProvider.CreateScope();
+            logger = scope.ServiceProvider.GetRequiredService<ILogger<GroupKafkaHandler>>();
+            mapper = _serviceProvider.GetRequiredService<IMapper>();
+            DBContext = scope.ServiceProvider.GetRequiredService<PrinubesPlatformDBContext>();
         }
 
         public async Task Handle(MessageNotification<GroupKafkaMessage> notification, CancellationToken cancellationToken)
@@ -27,13 +28,13 @@ namespace Prinubes.ComputePlatform.Kafka
             GroupKafkaMessage groupKafkaMessage = notification.Message;
             if (groupKafkaMessage != null)
             {
-                _logger.LogInformation($"Group message received with key: {groupKafkaMessage.GroupID} and action: {groupKafkaMessage.Action}");
+                logger.LogInformation($"Group message received with key: {groupKafkaMessage.GroupID} and action: {groupKafkaMessage.Action}");
                 switch (groupKafkaMessage.Action)
                 {
                     case ActionEnum.create:
                         try
                         {
-                            await RecordExistanceConfirmation.OrganizationExistsAsync(groupKafkaMessage.OrganizationID, _logger, DBContext);
+                            await RecordExistanceConfirmation.OrganizationExistsAsync(groupKafkaMessage.OrganizationID, logger, DBContext);
                             if (!DBContext.Groups.Any(x => x.Id == groupKafkaMessage.GroupID && x.OrganizationID == groupKafkaMessage.OrganizationID))
                             {
                                 DBContext.Groups.Add(mapper.Map<GroupDatabaseModel>(groupKafkaMessage.Group));
@@ -41,12 +42,12 @@ namespace Prinubes.ComputePlatform.Kafka
                             }
                             else
                             {
-                                _logger.LogDebug($"Group message, group already exists: {groupKafkaMessage.GroupID} with row version: {groupKafkaMessage.Group.RowVersion}");
+                                logger.LogDebug($"Group message, group already exists: {groupKafkaMessage.GroupID} with row version: {groupKafkaMessage.Group.RowVersion}");
                             }
                         }
                         catch (Exception ex)
                         {
-                            _logger.LogDebug(ex, "Group Kafka Create event");
+                            logger.LogDebug(ex, "Group Kafka Create event");
                         }
                         break;
                     case ActionEnum.update:
@@ -62,17 +63,17 @@ namespace Prinubes.ComputePlatform.Kafka
                                 }
                                 else
                                 {
-                                    _logger.LogDebug($"Group message out of order, group not found: {groupKafkaMessage.GroupID} and row version: {groupKafkaMessage.Group.RowVersion}");
+                                    logger.LogDebug($"Group message out of order, group not found: {groupKafkaMessage.GroupID} and row version: {groupKafkaMessage.Group.RowVersion}");
                                 }
                             }
                             else
                             {
-                                _logger.LogDebug($"Group message out of order, group not found: {groupKafkaMessage.GroupID} and row version: {groupKafkaMessage.Group.RowVersion}");
+                                logger.LogDebug($"Group message out of order, group not found: {groupKafkaMessage.GroupID} and row version: {groupKafkaMessage.Group.RowVersion}");
                             }
                         }
                         catch (Exception ex)
                         {
-                            _logger.LogDebug(ex, "Group Kafka Update event");
+                            logger.LogDebug(ex, "Group Kafka Update event");
                         }
                         break;
                     case ActionEnum.attach:
@@ -97,17 +98,17 @@ namespace Prinubes.ComputePlatform.Kafka
                                 }
                                 else
                                 {
-                                    _logger.LogDebug($"Group message out of order, group not found: {groupKafkaMessage.GroupID} and row version: {groupKafkaMessage.Group.RowVersion}");
+                                    logger.LogDebug($"Group message out of order, group not found: {groupKafkaMessage.GroupID} and row version: {groupKafkaMessage.Group.RowVersion}");
                                 }
                             }
                             else
                             {
-                                _logger.LogDebug($"Group message out of order, group not found: {groupKafkaMessage.GroupID} and row version: {groupKafkaMessage.Group.RowVersion}");
+                                logger.LogDebug($"Group message out of order, group not found: {groupKafkaMessage.GroupID} and row version: {groupKafkaMessage.Group.RowVersion}");
                             }
                         }
                         catch (Exception ex)
                         {
-                            _logger.LogDebug(ex, "Group Kafka Attach/Detach event");
+                            logger.LogDebug(ex, "Group Kafka Attach/Detach event");
                         }
                         break;
                     case ActionEnum.delete:
@@ -123,27 +124,27 @@ namespace Prinubes.ComputePlatform.Kafka
                                 }
                                 else
                                 {
-                                    _logger.LogDebug($"Group message out of order, group not found: {groupKafkaMessage.GroupID} and row version: {groupKafkaMessage.Group.RowVersion}");
+                                    logger.LogDebug($"Group message out of order, group not found: {groupKafkaMessage.GroupID} and row version: {groupKafkaMessage.Group.RowVersion}");
                                 }
                             }
                             else
                             {
-                                _logger.LogDebug($"Group message out of order, group not found: {groupKafkaMessage.GroupID} and row version: {groupKafkaMessage.Group.RowVersion}");
+                                logger.LogDebug($"Group message out of order, group not found: {groupKafkaMessage.GroupID} and row version: {groupKafkaMessage.Group.RowVersion}");
                             }
                         }
                         catch (Exception ex)
                         {
-                            _logger.LogDebug(ex, "Group Kafka Delete event");
+                            logger.LogDebug(ex, "Group Kafka Delete event");
                         }
                         break;
                     default:
-                        _logger.LogError($"Group message action not implemented {groupKafkaMessage.Action}");
+                        logger.LogError($"Group message action not implemented {groupKafkaMessage.Action}");
                         break;
                 }
             }
             else
             {
-                _logger.LogError($"Group message received null value");
+                logger.LogError($"Group message received null value");
             }
             return;
         }

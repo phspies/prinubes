@@ -4,8 +4,8 @@
 
 export const environment = {
   production: false,
-  identityApiUrl: 'https://localhost:7001',
-  platformApiUrl: 'https://localhost:7002',
+  identityApiUrl: 'http://localhost:7001',
+  platformApiUrl: 'http://localhost:7002',
 };
 
 /*

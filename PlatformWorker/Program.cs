@@ -7,9 +7,26 @@ using Prinubes.Common.Kafka.Consumer;
 using Prinubes.Common.Kafka.Producer;
 using Prinubes.Common.Models;
 using Prinubes.Platforms.Datamodels;
-using Prinubes.PlatformWorker;
+using Prinubes.PlatformWorker.CloudLibraries.vSphere.VMware;
+
+//var VapiAuthHelper = new VapiAuthenticationHelper();
+//StubConfiguration SessionStubConfiguration = VapiAuthHelper.LoginByUsernameAndPassword("vc01.lab.local", "administrator@vsphere.local", "VMware1!");
+
+//var vmService = VapiAuthHelper.StubFactory.CreateStub<vmware.vcenter.VM>(SessionStubConfiguration);
+//List<VMTypes.Summary> vmList = vmService.List(new VMTypes.FilterSpec());
+
+
+
+
+VCService vcService = new VCService();
+vcService.Logon("https://10.0.100.16/sdk", "administrator@vsphere.local", "VMware1!");
+var version = vcService.ApiVersion;
+var dc = await vcService.GetVmInventoryAsync();
+
+
 
 var builder = WebApplication.CreateBuilder(args);
+
 
 builder.WebHost.UseKestrel(options =>
 {
@@ -29,30 +46,10 @@ IMapper mapper = mapperConfig.CreateMapper();
 builder.Services.AddSingleton(mapper);
 
 builder.Services.AddLogging(StartupFactory.LoggingBuilder());
-ILogger<Program> logger = builder.Services.BuildServiceProvider().GetRequiredService<ILogger<PlatformWorkerProgram>>();
+ILogger<Program> logger = builder.Services.BuildServiceProvider().GetRequiredService<ILogger<Program>>();
 using ILoggerFactory loggerFactory = LoggerFactory.Create(StartupFactory.LoggingBuilder());
 
-//Kafka producer
-var kafkaProducerConfig = new ProducerConfig() { BootstrapServers = serviceSettings.KAFKA_BOOTSTRAP, EnableIdempotence = serviceSettings.KAFKA_IDEMPOTENCE, MessageSendMaxRetries = serviceSettings.KAFKA_RETRIES };
-builder.Services.AddSingleton<ProducerConfig>(kafkaProducerConfig);
-builder.Configuration.Bind("producer", kafkaProducerConfig);
-builder.Services.AddKafkaProducer();
 
-
-//start kafka consumers
-var consumerConfig = new ConsumerConfig()
-{
-    BootstrapServers = serviceSettings.KAFKA_BOOTSTRAP,
-    GroupId = serviceSettings.KAFKA_CONSUMER_GROUP_ID,
-    EnableAutoCommit = serviceSettings.KAFKA_ENABLE_AUTO_COMMIT,
-    AllowAutoCreateTopics = true
-};
-
-builder.Services.AddSingleton<ConsumerConfig>(consumerConfig);
-builder.Configuration.Bind("consumer", consumerConfig);
-builder.Services.AddHostedService<KafkaWorker>();
-
-builder.Services.AddKafkaConsumer(typeof(Program));
 
 if (!args.Any(x => x.ToLower().Contains("testing")))
 {
@@ -69,6 +66,29 @@ if (!args.Any(x => x.ToLower().Contains("testing")))
     builder.Services.BuildServiceProvider().GetRequiredService<PrinubesPlatformWorkerDBContext>().MigrateIfRequired(); ;
 
 }
+
+
+//Kafka producer
+var kafkaProducerConfig = new ProducerConfig() { BootstrapServers = serviceSettings.KAFKA_BOOTSTRAP, EnableIdempotence = serviceSettings.KAFKA_IDEMPOTENCE, MessageSendMaxRetries = serviceSettings.KAFKA_RETRIES };
+builder.Services.AddSingleton<ProducerConfig>(kafkaProducerConfig);
+builder.Configuration.Bind("producer", kafkaProducerConfig);
+builder.Services.AddKafkaProducer();
+
+//start kafka consumers
+var consumerConfig = new ConsumerConfig()
+{
+    BootstrapServers = serviceSettings.KAFKA_BOOTSTRAP,
+    GroupId = serviceSettings.KAFKA_CONSUMER_GROUP_ID,
+    EnableAutoCommit = serviceSettings.KAFKA_ENABLE_AUTO_COMMIT,
+    AllowAutoCreateTopics = true
+};
+
+builder.Services.AddSingleton<ConsumerConfig>(consumerConfig);
+builder.Configuration.Bind("consumer", consumerConfig);
+builder.Services.AddHostedService<KafkaWorker>();
+
+builder.Services.AddKafkaConsumer(typeof(Program));
+
 //redis caching
 builder.Services.CachingBuilder(serviceSettings);
 
