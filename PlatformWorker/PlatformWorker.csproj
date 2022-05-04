@@ -54,7 +54,7 @@
 	    <HintPath>Libraries\nsxtsdk.dll</HintPath>
 	  </Reference>
 	  <Reference Include="vCenterSDK">
-	    <HintPath>Libraries\vCenterSDK.dll</HintPath>
+	    <HintPath>..\..\vCenterSDK\bin\Release\net6.0\vCenterSDK.dll</HintPath>
 	  </Reference>
 	</ItemGroup>
 	<ItemGroup>

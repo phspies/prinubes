@@ -1,6 +1,6 @@
-﻿using Prinubes.Platforms.Datamodels;
+﻿using Prinubes.PlatformWorker.Datamodels;
 
-namespace Prinubes.PlatformWorkers.Helpers
+namespace Prinubes.PlatformWorker.Helpers
 {
     public class RecordExistanceConfirmation
     {

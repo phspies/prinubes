@@ -39,7 +39,7 @@ namespace Prinubes.Common.DatabaseModels
         [JsonProperty("encrypted_key")]
         public string EncryptedKey { get; set; }
 
-        public virtual string DecryptedPassword => CipherService.DecryptString(EncryptedPassword, EncryptedKey);
+        public virtual string DecryptedPassword => CipherService.DecryptString(EncryptedPassword, Convert.FromBase64String(EncryptedKey));
 
     }
     public class CredentialKafkaDataModel : FoundationDatabaseModel

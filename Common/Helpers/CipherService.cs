@@ -16,7 +16,6 @@ namespace Prinubes.Common.Helpers
                 passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
             }
         }
-
         public static bool VerifyPasswordHash(string password, byte[] storedHash, byte[] storedSalt)
         {
             if (password == null) throw new ArgumentNullException("password");
@@ -34,14 +33,23 @@ namespace Prinubes.Common.Helpers
             }
             return true;
         }
-        public static string EncryptString(string plainText, string key)
+        public static string  GenerateRandomCryptographicKey(int keyLength)
+        {
+            RNGCryptoServiceProvider rngCryptoServiceProvider = new RNGCryptoServiceProvider();
+            byte[] randomBytes = new byte[keyLength];
+            rngCryptoServiceProvider.GetBytes(randomBytes);
+            return Convert.ToBase64String(randomBytes);
+        }
+        public static string EncryptString(string plainText, byte[] key)
         {
             byte[] iv = new byte[16];
             byte[] array;
+
             using (Aes aes = Aes.Create())
             {
-                aes.Key = Encoding.UTF8.GetBytes(key);
+                aes.Key = key;
                 aes.IV = iv;
+                //aes.BlockSize = 256;
                 ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
                 using (MemoryStream memoryStream = new MemoryStream())
                 {
@@ -57,13 +65,13 @@ namespace Prinubes.Common.Helpers
             }
             return Convert.ToBase64String(array);
         }
-        public static string DecryptString(string cipherText, string key)
+        public static string DecryptString(string cipherText, byte[] key)
         {
             byte[] iv = new byte[16];
             byte[] buffer = Convert.FromBase64String(cipherText);
             using (Aes aes = Aes.Create())
             {
-                aes.Key = Encoding.UTF8.GetBytes(key);
+                aes.Key = key;
                 aes.IV = iv;
                 ICryptoTransform decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
                 using (MemoryStream memoryStream = new MemoryStream(buffer))

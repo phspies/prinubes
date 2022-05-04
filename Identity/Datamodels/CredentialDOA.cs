@@ -35,8 +35,8 @@ namespace Prinubes.Identity.Datamodels
                 using (var transaction = dbContext.Database.BeginTransaction())
                 {
 
-                    updatedCredential.EncryptedKey = "b14ca5898a4e4142aace2ea2143a2410";// CipherService.GenerateKey();
-                    updatedCredential.EncryptedPassword = CipherService.EncryptString(credential.Password, updatedCredential.EncryptedKey);
+                    updatedCredential.EncryptedKey = CipherService.GenerateRandomCryptographicKey(32); //"b14ca5898a4e4142aace2ea2143a2410";// CipherService.GenerateKey();
+                    updatedCredential.EncryptedPassword = CipherService.EncryptString(credential.Password, Convert.FromBase64String(updatedCredential.EncryptedKey));
                     updatedCredential.OrganizationID = organizationId;
                     dbContext.Credentials.Add(updatedCredential);
                     await dbContext.SaveChangesAsync();
@@ -138,8 +138,10 @@ namespace Prinubes.Identity.Datamodels
 
                     if (credential.Password != null)
                     {
-                        updatedCredential.EncryptedKey = CipherService.GenerateKey();
-                        updatedCredential.EncryptedPassword = CipherService.EncryptString(credential.Password, updatedCredential.EncryptedKey);
+                        //updatedCredential.EncryptedKey = CipherService.GenerateKey();
+                        //updatedCredential.EncryptedPassword = CipherService.EncryptString(credential.Password,   updatedCredential.EncryptedKey);
+                        updatedCredential.EncryptedKey = CipherService.GenerateRandomCryptographicKey(14); //"b14ca5898a4e4142aace2ea2143a2410";// CipherService.GenerateKey();
+                        updatedCredential.EncryptedPassword = CipherService.EncryptString(credential.Password, Convert.FromBase64String(updatedCredential.EncryptedKey));
                     }
                     updatedCredential.OrganizationID = organizationId;
                     await dbContext.SaveChangesAsync();

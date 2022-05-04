@@ -4,8 +4,8 @@ using Prinubes.Common.DatabaseModels;
 using Prinubes.Common.DatabaseModels.PlatformEnums;
 using Prinubes.Common.Kafka;
 using Prinubes.Common.Kafka.Producer;
-using Prinubes.Platforms.Datamodels;
-using Prinubes.PlatformWorkers.Helpers;
+using Prinubes.PlatformWorker.Datamodels;
+using Prinubes.PlatformWorker.Helpers;
 
 namespace Prinubes.PlatformWorker.Kafka
 {

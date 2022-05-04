@@ -1,4 +1,4 @@
-﻿using PlatformWorker.Common;
+﻿using Prinubes.PlatformWorker.CloudLibraries.vSphere.Common;
 using System.Collections;
 using System.Diagnostics;
 using System.Globalization;

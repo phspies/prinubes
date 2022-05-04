@@ -2,7 +2,7 @@
 using Prinubes.Common.DatabaseModels;
 using Prinubes.Common.Helpers;
 using Prinubes.Common.Kafka;
-using Prinubes.Platforms.Datamodels;
+using Prinubes.PlatformWorker.Datamodels;
 
 namespace Prinubes.PlatformWorker.Kafka
 {

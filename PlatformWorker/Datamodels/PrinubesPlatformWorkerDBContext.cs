@@ -5,7 +5,7 @@ using Prinubes.Common.DatabaseModels;
 using Prinubes.Common.DatabaseModels.Factories;
 using Prinubes.Common.Datamodels;
 
-namespace Prinubes.Platforms.Datamodels
+namespace Prinubes.PlatformWorker.Datamodels
 {
     public class PrinubesPlatformWorkerDBContext : DbContext, IPrinubesDBContext
     {

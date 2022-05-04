@@ -3,8 +3,8 @@ using Microsoft.Extensions.Caching.Distributed;
 using Prinubes.Common.DatabaseModels;
 using Prinubes.Common.Helpers;
 using Prinubes.Common.Kafka;
-using Prinubes.Platforms.Datamodels;
-using Prinubes.PlatformWorkers.Helpers;
+using Prinubes.PlatformWorker.Datamodels;
+using Prinubes.PlatformWorker.Helpers;
 using System.Collections;
 
 namespace Prinubes.PlatformWorker.Kafka

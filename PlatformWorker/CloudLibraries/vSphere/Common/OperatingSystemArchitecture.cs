@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace PlatformWorker.Common
+namespace Prinubes.PlatformWorker.CloudLibraries.vSphere.Common
 {
     [DataContract]
     public enum OperatingSystemArchitecture
