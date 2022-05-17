@@ -1,9 +1,11 @@
-﻿using AutoMapper;
-using MediatR;
+﻿using MediatR;
+using nsxtalbsdk;
+using nsxtalbsdk.Models;
 using Prinubes.Common.DatabaseModels;
 using Prinubes.Common.DatabaseModels.PlatformEnums;
 using Prinubes.Common.Kafka;
 using Prinubes.Common.Kafka.Producer;
+using Prinubes.PlatformWorker.CloudLibraries.NSXTALB;
 using Prinubes.PlatformWorker.Datamodels;
 using Prinubes.PlatformWorker.Helpers;
 
@@ -35,13 +37,8 @@ namespace Prinubes.PlatformWorker.Kafka
                         switch (loadbalancerPlatformKafkaMessage.LoadBalancerPlatform.PlatformType)
                         {
                             case LoadBalancerPlatformType.NSXTALB:
-                                await RecordExistanceConfirmation.CredentialExistsAsync(loadbalancerPlatformKafkaMessage.LoadBalancerPlatform.CredentialID, logger, DBContext);
-                                KafkaMessage.SubmitKafkaMessageAync(
-                                new LoadBalancerPlatformTestingResponseModel()
-                                {
-                                    Message = "Sucess!!",
-                                    Success = true,
-                                }, logger, kafkaProducer, topic: loadbalancerPlatformKafkaMessage.ReturnTopic);
+                                NSXTALBFactory nsxtalbfactory = new NSXTALBFactory(loadbalancerPlatformKafkaMessage.LoadBalancerPlatform, DBContext);
+                                KafkaMessage.SubmitKafkaMessageAync(await nsxtalbfactory.TestCredentials(), logger, kafkaProducer, topic: loadbalancerPlatformKafkaMessage.ReturnTopic);
                                 logger.LogInformation($"LoadbalancerPlatform test message sent to topic: {loadbalancerPlatformKafkaMessage.ReturnTopic}");
 
                                 break;

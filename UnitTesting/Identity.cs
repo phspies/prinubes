@@ -160,7 +160,7 @@ namespace UnitTesting
             {
                 Credential = "NSX-T Credentials",
                 Username = "admin",
-                Password = "c0mp2q",
+                Password = "VMware1!VMware1!",
             };
             Assert.NotNull(GlobalVariables.SessionOrganization);
 
@@ -189,7 +189,7 @@ namespace UnitTesting
             {
                 Credential = "NSXALB Credentials",
                 Username = "admin",
-                Password = "c0mp2q",
+                Password = "VMware1!",
             };
             HttpResponseMessage vnsxalbCredentialsResponse = await GlobalVariables.identityFactory.Client.PostAsJsonAsync($"/identity/{GlobalVariables.SessionOrganization.Id}/credentials", vNSXALBCredentialsObject);
             Assert.Equal(HttpStatusCode.OK, vnsxalbCredentialsResponse.StatusCode);
@@ -350,7 +350,6 @@ namespace UnitTesting
             var get2Contents = await get2Response.Content.ReadAsStringAsync();
             var update2Object = JsonConvert.DeserializeObject<CredentialCRUDDataModel>(get2Contents);
 
-            Assert.Equal(updateObject.Credential, update2Object.Credential);
             while (true)
             {
                 if (!GlobalVariables.platformFactory.DBContext.Credentials.AsNoTracking().Any(x => x.Id == GlobalVariables.SessionNSXTCredentials.Id && x.Credential == updateObject.Credential))
@@ -362,6 +361,8 @@ namespace UnitTesting
                     break;
                 }
             }
+            Assert.Equal(updateObject.Credential, update2Object.Credential);
+
         }
         [Fact, TestPriority(11)]
         public async Task UpdateNSXALBCredentials()

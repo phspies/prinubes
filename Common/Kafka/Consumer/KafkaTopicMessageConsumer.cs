@@ -61,6 +61,7 @@ namespace Prinubes.Common.Kafka.Consumer
                         }
                         catch (Exception ex)
                         {
+                            logger.LogError($"Random exception in topic consumer: {topic} : {ex.Message}");
                             Thread.Sleep(1000);
                         }
                     }

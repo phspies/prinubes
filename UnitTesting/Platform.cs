@@ -2,12 +2,10 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Prinubes.Common.DatabaseModels;
 using Prinubes.Common.DatabaseModels.PlatformEnums;
-using StackExchange.Redis;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Json;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -38,10 +36,10 @@ namespace UnitTesting
         static LoadBalancerPlatformCRUDDataModel loadbalancerObject = new LoadBalancerPlatformCRUDDataModel()
         {
             Platform = "NSX-T ALB Load Balancer Platform",
-            CredentialID = GlobalVariables.SessionvCenterCredentials.Id,
+            CredentialID = GlobalVariables.SessionNSXALBCredentials.Id,
             PlatformType = LoadBalancerPlatformType.NSXTALB,
             AvailabilityZone = AvailabilityZoneType.AZ1,
-            UrlEndpoint = "https://nsxtalb.lab.local",
+            UrlEndpoint = "10.0.100.18",
             Tags = new List<TaggingModel>() { new TaggingModel() { Key = "Organization", Value = "Test Organization" }, new TaggingModel() { Key = "Cost Center", Value = "Testing" } }
         };
         [Fact, TestPriority(1)]
@@ -211,7 +209,7 @@ namespace UnitTesting
             {
                 Platform = "TestingPlatform",
                 CredentialID = GlobalVariables.SessionNSXTCredentials.Id,
-                UrlEndpoint = "vc01.lab.local",
+                UrlEndpoint = "10.0.100.14",
                 VertifySSLCert = false,
                 PlatformType = NetworkPlatformType.NSXT
             };
@@ -229,7 +227,7 @@ namespace UnitTesting
             {
                 Platform = "TestingPlatform",
                 CredentialID = GlobalVariables.SessionNSXALBCredentials.Id,
-                UrlEndpoint = "vc01.lab.local",
+                UrlEndpoint = "10.0.100.18",
                 VertifySSLCert = false,
                 PlatformType = LoadBalancerPlatformType.NSXTALB
             };

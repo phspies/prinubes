@@ -25,7 +25,6 @@ namespace Prinubes.PlatformWorker.Kafka
             distributedCaching = scope.ServiceProvider.GetRequiredService<IDistributedCache>();
         }
 
-
         public async Task Handle(MessageNotification<ComputePlatformKafkaMessage> notification, CancellationToken cancellationToken)
         {
             ComputePlatformKafkaMessage computeplatformKafkaMessage = notification.Message;

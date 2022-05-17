@@ -8,7 +8,7 @@
 		<RootNamespace>Prinubes.PlatformWorker</RootNamespace>
 		<UserSecretsId>25c95758-1453-495a-aff3-795ef4a9cab2</UserSecretsId>
 	</PropertyGroup>
-	
+
 
 	<ItemGroup>
 		<ProjectReference Include="..\Common\Common.csproj" />
@@ -17,62 +17,69 @@
 		<InternalsVisibleTo Include="UnitTesting" />
 	</ItemGroup>
 	<ItemGroup>
-	  <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.4" />
-	  <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.4">
-	    <PrivateAssets>all</PrivateAssets>
-	    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-	  </PackageReference>
-	  <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="6.0.4" />
-	  <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="6.0.4" />
-	  <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="6.0.1" />
-	  <PackageReference Include="System.Private.ServiceModel" Version="4.9.0" />
-	  <PackageReference Include="System.ServiceModel.Duplex" Version="4.9.0" />
-	  <PackageReference Include="System.ServiceModel.Federation" Version="4.9.0" />
-	  <PackageReference Include="System.ServiceModel.Http" Version="4.9.0" />
-	  <PackageReference Include="System.ServiceModel.NetTcp" Version="4.9.0" />
-	  <PackageReference Include="System.ServiceModel.Primitives" Version="4.9.0" />
-	  <PackageReference Include="System.ServiceModel.Security" Version="4.9.0" />
-	  <PackageReference Include="System.ServiceModel.Syndication" Version="6.0.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.5" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.5">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="6.0.5" />
+		<PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="6.0.5" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+		<PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="6.0.1" />
+		<PackageReference Include="RestSharp" Version="106.13.0" />
+		<PackageReference Include="System.Private.ServiceModel" Version="4.9.0" />
+		<PackageReference Include="System.ServiceModel.Duplex" Version="4.9.0" />
+		<PackageReference Include="System.ServiceModel.Federation" Version="4.9.0" />
+		<PackageReference Include="System.ServiceModel.Http" Version="4.9.0" />
+		<PackageReference Include="System.ServiceModel.NetTcp" Version="4.9.0" />
+		<PackageReference Include="System.ServiceModel.Primitives" Version="4.9.0" />
+		<PackageReference Include="System.ServiceModel.Security" Version="4.9.0" />
+		<PackageReference Include="System.ServiceModel.Syndication" Version="6.0.0" />
+		<PackageReference Include="Polly" Version="7.2.3" />
+		<PackageReference Include="Polly.Extensions.Http" Version="3.0.0" />
+		<PackageReference Include="RestSharp" Version="107.3.0" />
+		<PackageReference Include="RestSharp.Serializers.NewtonsoftJson" Version="107.3.0" />
+		<PackageReference Include="System.Management.Automation" Version="7.2.3" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Datamodels\Domain\" />
-	  <Folder Include="Datamodels\Slave\" />
+		<Folder Include="Datamodels\Domain\" />
+		<Folder Include="Datamodels\Slave\" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Include="..\.dockerignore" Link=".dockerignore">
-	    <DependentUpon>$(DockerDefaultDockerfile)</DependentUpon>
-	  </None>
+		<None Include="..\.dockerignore" Link=".dockerignore">
+			<DependentUpon>$(DockerDefaultDockerfile)</DependentUpon>
+		</None>
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Reference Include="nsxtalbsdk">
-	    <HintPath>Libraries\nsxtalbsdk.dll</HintPath>
-	  </Reference>
-	  <Reference Include="nsxtsdk">
-	    <HintPath>Libraries\nsxtsdk.dll</HintPath>
-	  </Reference>
-	  <Reference Include="vCenterSDK">
-	    <HintPath>..\..\vCenterSDK\bin\Release\net6.0\vCenterSDK.dll</HintPath>
-	  </Reference>
+		<Reference Include="nsxtalbsdk">
+		  <HintPath>..\..\nsxtalbsdk\nsxtalbsdk\bin\Debug\net6.0\nsxtalbsdk.dll</HintPath>
+		</Reference>
+		<Reference Include="nsxtsdk">
+		  <HintPath>..\..\nsxtsdk\nsxtsdk\bin\Release\net6.0\nsxtsdk.dll</HintPath>
+		</Reference>
+		<Reference Include="vspheresdk">
+		  <HintPath>Libraries\vspheresdk.dll</HintPath>
+		</Reference>
 	</ItemGroup>
 	<ItemGroup>
-	  <Content Update="appsettings.Development.json">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-	  </Content>
-	  <Content Update="appsettings.json">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-	  </Content>
-	  <Content Update="appsettings.Testing.json">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-	  </Content>
+		<Content Update="appsettings.Development.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+		</Content>
+		<Content Update="appsettings.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+		</Content>
+		<Content Update="appsettings.Testing.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+		</Content>
 	</ItemGroup>
 
 </Project>

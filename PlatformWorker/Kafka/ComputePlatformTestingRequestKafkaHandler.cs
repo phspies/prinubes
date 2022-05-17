@@ -3,7 +3,7 @@ using Prinubes.Common.DatabaseModels;
 using Prinubes.Common.DatabaseModels.PlatformEnums;
 using Prinubes.Common.Kafka;
 using Prinubes.Common.Kafka.Producer;
-using Prinubes.PlatformWorker.CloudLibraries.vSphere.VMware;
+using Prinubes.PlatformWorker.CloudLibraries.vSphere;
 using Prinubes.PlatformWorker.Datamodels;
 using Prinubes.PlatformWorker.Helpers;
 
@@ -36,29 +36,8 @@ namespace Prinubes.PlatformWorker.Kafka
                         switch (computePlatformKafkaMessage.ComputePlatform.PlatformType)
                         {
                             case ComputePlatformType.vSphere:
-                                string endpointDetails;
-                                bool success = false;
-                                try
-                                {
-                                    var credentials = DBContext.Credentials.Find(computePlatformKafkaMessage.ComputePlatform.CredentialID);
-                                    var hostname = computePlatformKafkaMessage.ComputePlatform.UrlEndpoint;
-                                    ArgumentNullException.ThrowIfNull(credentials);
-                                    ArgumentNullException.ThrowIfNull(hostname);
-                                    VCService vcService = new VCService();
-                                    vcService.Logon(hostname, credentials.Username, credentials.DecryptedPassword);
-                                    endpointDetails = vcService.ApiVersion;
-                                    success = true;
-                                }
-                                catch (Exception ex)
-                                {
-                                    endpointDetails = ex.Message;
-                                }
-                                KafkaMessage.SubmitKafkaMessageAync(
-                                new ComputePlatformTestingResponseModel()
-                                {
-                                    Message = endpointDetails,
-                                    Success = success,
-                                }, logger, kafkaProducer, topic: computePlatformKafkaMessage.ReturnTopic);
+                                vSphereFactory vsphereFactory = new vSphereFactory(computePlatformKafkaMessage.ComputePlatform, DBContext);
+                                KafkaMessage.SubmitKafkaMessageAync(await vsphereFactory.TestCredentials(), logger, kafkaProducer, topic: computePlatformKafkaMessage.ReturnTopic);
                                 logger.LogInformation($"ComputePlatform test message sent to topic: {computePlatformKafkaMessage.ReturnTopic}");
 
                                 break;

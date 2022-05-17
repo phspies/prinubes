@@ -4,6 +4,7 @@ using Prinubes.Common.DatabaseModels;
 using Prinubes.Common.DatabaseModels.PlatformEnums;
 using Prinubes.Common.Kafka;
 using Prinubes.Common.Kafka.Producer;
+using Prinubes.PlatformWorker.CloudLibraries.NSXT;
 using Prinubes.PlatformWorker.Datamodels;
 using Prinubes.PlatformWorker.Helpers;
 
@@ -36,12 +37,8 @@ namespace Prinubes.PlatformWorker.Kafka
                         switch (networkPlatformKafkaMessage.NetworkPlatform.PlatformType)
                         {
                             case NetworkPlatformType.NSXT:
-                                KafkaMessage.SubmitKafkaMessageAync(
-                                new NetworkPlatformTestingResponseModel()
-                                {
-                                    Message = "Sucess!!",
-                                    Success = true,
-                                }, logger, kafkaProducer, topic: networkPlatformKafkaMessage.ReturnTopic);
+                                NSXTFactory factory = new NSXTFactory(networkPlatformKafkaMessage.NetworkPlatform, DBContext);
+                                KafkaMessage.SubmitKafkaMessageAync(await factory.TestCredentials(), logger, kafkaProducer, topic: networkPlatformKafkaMessage.ReturnTopic);
                                 logger.LogInformation($"NetworkPlatform test message sent to topic: {networkPlatformKafkaMessage.ReturnTopic}");
 
                                 break;

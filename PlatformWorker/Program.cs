@@ -6,7 +6,6 @@ using Prinubes.Common.Kafka;
 using Prinubes.Common.Kafka.Consumer;
 using Prinubes.Common.Kafka.Producer;
 using Prinubes.Common.Models;
-using Prinubes.PlatformWorker.CloudLibraries.vSphere.VMware;
 using Prinubes.PlatformWorker.Datamodels;
 
 var builder = WebApplication.CreateBuilder(args);
