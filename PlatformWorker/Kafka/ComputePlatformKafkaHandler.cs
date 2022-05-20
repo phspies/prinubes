@@ -4,6 +4,7 @@ using Microsoft.Extensions.Caching.Distributed;
 using Prinubes.Common.DatabaseModels;
 using Prinubes.Common.Helpers;
 using Prinubes.Common.Kafka;
+using Prinubes.PlatformWorker.BackgroundWorkers;
 using Prinubes.PlatformWorker.Datamodels;
 using Prinubes.PlatformWorker.Helpers;
 using System.Collections;
@@ -14,6 +15,8 @@ namespace Prinubes.PlatformWorker.Kafka
     {
         private readonly ILogger<ComputePlatformKafkaHandler> logger;
         private readonly PrinubesPlatformWorkerDBContext DBContext;
+        private readonly GlobalComputePlatformBackgroundWorker computeWorker;
+        
         private string cachingListKey = "computeplatformslist";
         private IDistributedCache distributedCaching;
 
@@ -23,6 +26,7 @@ namespace Prinubes.PlatformWorker.Kafka
             logger = scope.ServiceProvider.GetRequiredService<ILogger<ComputePlatformKafkaHandler>>();
             DBContext = scope.ServiceProvider.GetRequiredService<PrinubesPlatformWorkerDBContext>();
             distributedCaching = scope.ServiceProvider.GetRequiredService<IDistributedCache>();
+            computeWorker = scope.ServiceProvider.GetRequiredService<GlobalComputePlatformBackgroundWorker>();
         }
 
         public async Task Handle(MessageNotification<ComputePlatformKafkaMessage> notification, CancellationToken cancellationToken)
@@ -43,6 +47,7 @@ namespace Prinubes.PlatformWorker.Kafka
                             DBContext.SaveChanges();
                             distributedCaching.SetCaching(computeplatform, computeplatform.Id.ToString());
                             distributedCaching.Remove(cachingListKey);
+                            computeWorker.AddPlatform(computeplatformKafkaMessage.ComputePlatformID);
                         }
                         else
                         {
@@ -78,6 +83,8 @@ namespace Prinubes.PlatformWorker.Kafka
                             DBContext.SaveChanges();
                             distributedCaching.Remove(deleteComputePlatform.Id.ToString());
                             distributedCaching.Remove(cachingListKey);
+                            computeWorker.StopPlatform(computeplatformKafkaMessage.ComputePlatformID);
+
                         }
                         else
                         {

@@ -18,7 +18,7 @@ namespace UnitTesting
         [Fact, TestPriority(1)]
         public async Task WaitForChannels()
         {
-            await Task.Delay(10000);
+            await Task.Delay(1200000);
         }
         [Fact, TestPriority(47)]
         public async Task DeleteALBPlatform()

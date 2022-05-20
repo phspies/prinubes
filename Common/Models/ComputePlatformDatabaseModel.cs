@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Prinubes.Common.DatabaseModels.PlatformEnums;
 using Prinubes.Common.Kafka;
+using Prinubes.Common.Models.Enums;
 using shortid;
 using shortid.Configuration;
 using System.ComponentModel.DataAnnotations;
@@ -58,6 +59,7 @@ namespace Prinubes.Common.DatabaseModels
         public OrganizationDatabaseModel Organization { get; set; }
         [JsonProperty("credential")]
         public CredentialDatabaseModel? Credential { get; set; }
+
         //public List<ComputePlatformsToTags> ComputePlatformTags { get; set; }
         //public ComputePlatformDatabaseModel()
         //{
@@ -127,5 +129,12 @@ namespace Prinubes.Common.DatabaseModels
         [JsonProperty("resourcepool_moid")]
         [StringLength(255)]
         public string? ResourcepoolMoid { get; set; }
+
+        [JsonProperty("enabled")]
+        public bool? Enabled { get; set; }
+        [JsonProperty("state")]
+        public PlatformState? state { get; set; }
+        [JsonProperty("message")]
+        public string? message { get; set; }
     }
 }

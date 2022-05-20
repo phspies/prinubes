@@ -2,17 +2,19 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Prinubes.Platforms.Datamodels;
+using Prinubes.PlatformWorker.Datamodels;
 
 #nullable disable
 
-namespace Prinubes.Platform.Migrations
+namespace Prinubes.PlatformWorker.Migrations
 {
-    [DbContext(typeof(PrinubesPlatformDBContext))]
-    partial class PrinubesPlatformDBContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(PrinubesPlatformWorkerDBContext))]
+    [Migration("20220518160409_platformchanges")]
+    partial class platformchanges
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -34,7 +36,6 @@ namespace Prinubes.Platform.Migrations
                         .HasColumnType("varchar(255)");
 
                     b.Property<DateTime>("CreateTimeStamp")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)");
 
                     b.Property<byte[]>("CredentialID")
@@ -67,16 +68,13 @@ namespace Prinubes.Platform.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("varchar(255)");
 
-                    b.Property<DateTime?>("RowVersion")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("timestamp(6)");
+                    b.Property<byte[]>("RowVersion")
+                        .HasColumnType("longblob");
 
                     b.Property<string>("Tags")
                         .HasColumnType("JSON");
 
                     b.Property<DateTime>("UpdateTimeStamp")
-                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("UrlEndpoint")
@@ -154,7 +152,7 @@ namespace Prinubes.Platform.Migrations
                         .HasDefaultValueSql("(UUID_TO_BIN(UUID()))");
 
                     b.Property<DateTime>("CreateTimeStamp")
-                        .HasColumnType("timestamp(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("Group")
                         .IsRequired()
@@ -168,7 +166,7 @@ namespace Prinubes.Platform.Migrations
                         .HasColumnType("longblob");
 
                     b.Property<DateTime>("UpdateTimeStamp")
-                        .HasColumnType("timestamp(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.HasKey("Id");
 
@@ -191,7 +189,6 @@ namespace Prinubes.Platform.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<DateTime>("CreateTimeStamp")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)");
 
                     b.Property<byte[]>("CredentialID")
@@ -212,16 +209,13 @@ namespace Prinubes.Platform.Migrations
                     b.Property<int>("PlatformType")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("RowVersion")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("timestamp(6)");
+                    b.Property<byte[]>("RowVersion")
+                        .HasColumnType("longblob");
 
                     b.Property<string>("Tags")
                         .HasColumnType("JSON");
 
                     b.Property<DateTime>("UpdateTimeStamp")
-                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("UrlEndpoint")
@@ -298,7 +292,6 @@ namespace Prinubes.Platform.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreateTimeStamp")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)");
 
                     b.Property<byte[]>("CredentialID")
@@ -319,16 +312,13 @@ namespace Prinubes.Platform.Migrations
                     b.Property<int>("PlatformType")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("RowVersion")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("timestamp(6)");
+                    b.Property<byte[]>("RowVersion")
+                        .HasColumnType("longblob");
 
                     b.Property<string>("Tags")
                         .HasColumnType("JSON");
 
                     b.Property<DateTime>("UpdateTimeStamp")
-                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("UrlEndpoint")
@@ -390,7 +380,7 @@ namespace Prinubes.Platform.Migrations
                         .HasDefaultValueSql("(UUID_TO_BIN(UUID()))");
 
                     b.Property<DateTime>("CreateTimeStamp")
-                        .HasColumnType("timestamp(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<byte[]>("OrganizationID")
                         .IsRequired()
@@ -404,7 +394,7 @@ namespace Prinubes.Platform.Migrations
                         .HasColumnType("longblob");
 
                     b.Property<DateTime>("UpdateTimeStamp")
-                        .HasColumnType("timestamp(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.HasKey("Id");
 
@@ -462,7 +452,7 @@ namespace Prinubes.Platform.Migrations
                         .HasDefaultValueSql("(UUID_TO_BIN(UUID()))");
 
                     b.Property<DateTime>("CreateTimeStamp")
-                        .HasColumnType("timestamp(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("EmailAddress")
                         .IsRequired()
@@ -491,7 +481,7 @@ namespace Prinubes.Platform.Migrations
                         .HasColumnType("longblob");
 
                     b.Property<DateTime>("UpdateTimeStamp")
-                        .HasColumnType("timestamp(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.HasKey("Id");
 

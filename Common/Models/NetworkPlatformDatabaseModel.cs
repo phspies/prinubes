@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Prinubes.Common.DatabaseModels.PlatformEnums;
 using Prinubes.Common.Kafka;
+using Prinubes.Common.Models.Enums;
 using shortid;
 using shortid.Configuration;
 using System.Reflection;
@@ -56,8 +57,6 @@ namespace Prinubes.Common.DatabaseModels
         public OrganizationDatabaseModel Organization { get; set; }
         [JsonProperty("credential")]
         public CredentialDatabaseModel Credential { get; set; }
-        //public List<NetworkPlatformsToTags> NetworkPlatformTags { get; set; }
-
         public NetworkPlatformDatabaseModel()
         {
             Tags = new List<TaggingModel>();
@@ -103,5 +102,12 @@ namespace Prinubes.Common.DatabaseModels
 
         [JsonProperty("tags")]
         public List<TaggingModel> Tags { get; set; }
+
+        [JsonProperty("enabled")]
+        public bool? Enabled { get; set; }
+        [JsonProperty("state")]
+        public PlatformState? state { get; set; }
+        [JsonProperty("message")]
+        public string? message { get; set; }
     }
 }

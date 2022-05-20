@@ -16,7 +16,7 @@ namespace Prinubes.PlatformWorker.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.3")
+                .HasAnnotation("ProductVersion", "6.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             modelBuilder.Entity("Prinubes.Common.DatabaseModels.ComputePlatformDatabaseModel", b =>
@@ -43,6 +43,9 @@ namespace Prinubes.PlatformWorker.Migrations
                     b.Property<string>("DatacenterMoid")
                         .HasMaxLength(255)
                         .HasColumnType("varchar(255)");
+
+                    b.Property<bool?>("Enabled")
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("FolderMoid")
                         .HasMaxLength(255)
@@ -78,6 +81,12 @@ namespace Prinubes.PlatformWorker.Migrations
 
                     b.Property<bool?>("VertifySSLCert")
                         .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("message")
+                        .HasColumnType("longtext");
+
+                    b.Property<int?>("state")
+                        .HasColumnType("int");
 
                     b.HasKey("Id")
                         .HasName("pk_computeplatforms");
@@ -184,6 +193,9 @@ namespace Prinubes.PlatformWorker.Migrations
                         .IsRequired()
                         .HasColumnType("BINARY(16)");
 
+                    b.Property<bool?>("Enabled")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<byte[]>("OrganizationID")
                         .IsRequired()
                         .HasColumnType("BINARY(16)");
@@ -210,6 +222,12 @@ namespace Prinubes.PlatformWorker.Migrations
 
                     b.Property<bool>("VertifySSLCert")
                         .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("message")
+                        .HasColumnType("longtext");
+
+                    b.Property<int?>("state")
+                        .HasColumnType("int");
 
                     b.HasKey("Id")
                         .HasName("pk_loadbalancerplatforms");
@@ -278,6 +296,9 @@ namespace Prinubes.PlatformWorker.Migrations
                         .IsRequired()
                         .HasColumnType("BINARY(16)");
 
+                    b.Property<bool?>("Enabled")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<byte[]>("OrganizationID")
                         .IsRequired()
                         .HasColumnType("BINARY(16)");
@@ -304,6 +325,12 @@ namespace Prinubes.PlatformWorker.Migrations
 
                     b.Property<bool>("VertifySSLCert")
                         .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("message")
+                        .HasColumnType("longtext");
+
+                    b.Property<int?>("state")
+                        .HasColumnType("int");
 
                     b.HasKey("Id")
                         .HasName("pk_networkplatforms");

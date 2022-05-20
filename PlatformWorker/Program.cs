@@ -6,6 +6,7 @@ using Prinubes.Common.Kafka;
 using Prinubes.Common.Kafka.Consumer;
 using Prinubes.Common.Kafka.Producer;
 using Prinubes.Common.Models;
+using Prinubes.PlatformWorker.BackgroundWorkers;
 using Prinubes.PlatformWorker.Datamodels;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -74,6 +75,10 @@ builder.Services.AddKafkaConsumer(typeof(Program));
 
 //redis caching
 builder.Services.CachingBuilder(serviceSettings);
+
+//start background worker services
+builder.Services.AddSingleton<GlobalComputePlatformBackgroundWorker>();
+builder.Services.AddHostedService<GlobalComputePlatformBackgroundWorker>(p => p.GetRequiredService<GlobalComputePlatformBackgroundWorker>());
 
 var app = builder.Build();
 
