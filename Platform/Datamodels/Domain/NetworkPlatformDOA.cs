@@ -196,7 +196,7 @@ namespace Prinubes.Platforms.Datamodels
                     KafkaMessage.SubmitKafkaMessageAync(
                         new NetworkPlatformKafkaMessage()
                         {
-                            Action = ActionEnum.update,
+                            Action = ActionEnum.delete,
                             NetworkPlatformID = id,
                             OrganizationID = organizationId
 

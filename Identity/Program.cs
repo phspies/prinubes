@@ -54,7 +54,12 @@ if (!args.Any(x => x.ToLower().Contains("testing")))
     builder.Services.AddDbContextPool<PrinubesIdentityDBContext>((serviceProvider, optionsBuilder) =>
     {
         optionsBuilder.UseLoggerFactory(LoggerFactory.Create(StartupFactory.LoggingBuilder()));
-        optionsBuilder.UseMySql(serviceSettings.GetMysqlConnection().ConnectionString, ServerVersion.AutoDetect(serviceSettings.GetMysqlConnection().ConnectionString));
+        optionsBuilder.UseMySql(serviceSettings.GetMysqlConnection().ConnectionString, ServerVersion.AutoDetect(serviceSettings.GetMysqlConnection().ConnectionString),
+            mysqlOptions => mysqlOptions.EnableRetryOnFailure(
+                maxRetryCount: 10,
+                maxRetryDelay: TimeSpan.FromSeconds(30),
+                errorNumbersToAdd: null)
+            );
     });
 
     //perform migrations

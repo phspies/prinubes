@@ -4,16 +4,16 @@ using Prinubes.PlatformWorker.Datamodels;
 
 namespace Prinubes.PlatformWorker.BackgroundWorkers
 {
-    public class GlobalComputePlatformBackgroundWorker : BackgroundService, IDisposable
+    public class GlobalNetworkPlatformBackgroundWorker : BackgroundService, IDisposable
     {
         private SynchronizedCollection<Tuple<Guid, string, CancellationTokenSource, Task>> processes = new SynchronizedCollection<Tuple<Guid, string, CancellationTokenSource, Task>>();
-        private readonly ILogger<GlobalComputePlatformBackgroundWorker> logger;
+        private readonly ILogger<GlobalNetworkPlatformBackgroundWorker> logger;
         private readonly PrinubesPlatformWorkerDBContext DBContext;
         private ServiceSettings settings;
         object guard = new object();
 
 
-        public GlobalComputePlatformBackgroundWorker(ILogger<GlobalComputePlatformBackgroundWorker> _logger, IServiceProvider _serviceProvider)
+        public GlobalNetworkPlatformBackgroundWorker(ILogger<GlobalNetworkPlatformBackgroundWorker> _logger, IServiceProvider _serviceProvider)
         {
             var scope = _serviceProvider.CreateScope();
             logger = _logger;
@@ -23,10 +23,10 @@ namespace Prinubes.PlatformWorker.BackgroundWorkers
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken) => Task.Run(async () =>
         {
-            logger.LogInformation("GlobalComputePlatformThreadPool Thread running.");
+            logger.LogInformation("GlobalNetworkPlatformThreadPool Thread running.");
 
             //load all known compute platforms in database
-            var knownPlatforms = DBContext.ComputePlatforms.Where(x => x.Enabled == true && x.state != PlatformState.Error);
+            var knownPlatforms = DBContext.NetworkPlatforms.Where(x => x.Enabled == true && x.state != PlatformState.Error);
             foreach (var platform in knownPlatforms)
             {
                 AddPlatform(platform.Id);
@@ -37,17 +37,17 @@ namespace Prinubes.PlatformWorker.BackgroundWorkers
             {
                 foreach (var process in processes)
                 {
-                    logger.LogInformation($"GlobalComputePlatformThreadPool Thread is running: {process.Item2}");
+                    logger.LogInformation($"GlobalNetworkPlatformThreadPool Thread is running: {process.Item2}");
                 }
                 Thread.Sleep((settings.BACKGROUND_WORKER_INTERVAL ?? 10) * 1000);
                 await Task.Yield();
             }
         });
-        public void AddPlatform(Guid ComputePlatformID)
+        public void AddPlatform(Guid NetworkPlatformID)
         {
             lock (guard)
             {
-                var platform = DBContext.ComputePlatforms.Single(x => x.Id.Equals(ComputePlatformID));
+                var platform = DBContext.NetworkPlatforms.Single(x => x.Id.Equals(NetworkPlatformID));
                 CancellationTokenSource cts = new CancellationTokenSource();
                 processes.Add(Tuple.Create(platform.Id, platform.Platform, cts, Task.Run(async () =>
                 {
@@ -63,38 +63,37 @@ namespace Prinubes.PlatformWorker.BackgroundWorkers
                         }
                     }
                     return;
-
                 }, cts.Token)));
             }
         }
-        public void StopPlatform(Guid ComputePlatformID)
+        public void StopPlatform(Guid NetworkPlatformID)
         {
-            logger.LogInformation($"GlobalComputePlatformThreadPool Thread is stopping: {ComputePlatformID}");
+            logger.LogInformation($"GlobalNetworkPlatformThreadPool Thread is stopping: {NetworkPlatformID}");
             lock (guard)
             {
-                if (processes.Any(x => x.Item1.Equals(ComputePlatformID)))
+                if (processes.Any(x => x.Item1.Equals(NetworkPlatformID)))
                 {
-                    var process = processes.Single(x => x.Item1.Equals(ComputePlatformID));
+                    var process = processes.Single(x => x.Item1.Equals(NetworkPlatformID));
                     process.Item3.Cancel();
                     while (!process.Item4.IsCompleted)
                     {
-                        logger.LogInformation($"GlobalComputePlatformThreadPool waiting to stop: {ComputePlatformID} - Is Completed: {process.Item4.IsCompleted}");
+                        logger.LogInformation($"GlobalNetworkPlatformThreadPool waiting to stop: {NetworkPlatformID} - Is Completed: {process.Item4.IsCompleted}");
                         Thread.Sleep(1000);
                     }
-                    processes.Remove(processes.Single(x => x.Item1.Equals(ComputePlatformID)));
+                    processes.Remove(processes.Single(x => x.Item1.Equals(NetworkPlatformID)));
                 }
-                logger.LogInformation($"GlobalComputePlatformThreadPool Thread stopped: {ComputePlatformID}");
+                logger.LogInformation($"GlobalNetworkPlatformThreadPool Thread stopped: {NetworkPlatformID}");
             }
         }
 
         public override async Task StopAsync(CancellationToken stoppingToken)
         {
-            logger.LogInformation("GlobalComputePlatformThreadPool is stopping.");
+            logger.LogInformation("GlobalNetworkPlatformThreadPool is stopping.");
             for (int i = 0; i < processes.Count; i++)
             {
                 StopPlatform(processes[i].Item1);
             }
-            logger.LogInformation("GlobalComputePlatformThreadPool is stopped.");
+            logger.LogInformation("GlobalNetworkPlatformThreadPool is stopped.");
         }
 
         public void Dispose()

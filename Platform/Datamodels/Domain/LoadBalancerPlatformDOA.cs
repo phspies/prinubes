@@ -193,7 +193,7 @@ namespace Prinubes.Platforms.Datamodels
                     KafkaMessage.SubmitKafkaMessageAync(
                         new LoadBalancerPlatformKafkaMessage()
                         {
-                            Action = ActionEnum.update,
+                            Action = ActionEnum.delete,
                             LoadBalancerPlatformID = id,
                             OrganizationID = organizationId
                         },

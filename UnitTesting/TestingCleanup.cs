@@ -15,10 +15,15 @@ namespace UnitTesting
     [CollectionPriority(99)]
     public class TestingCleanup
     {
+        [Fact, TestPriority(999999)]
+        public async Task WaitForCleanup()
+        {
+            await Task.Delay(60000);
+        }
         [Fact, TestPriority(1)]
         public async Task WaitForChannels()
         {
-            await Task.Delay(1200000);
+            await Task.Delay(10000);
         }
         [Fact, TestPriority(47)]
         public async Task DeleteALBPlatform()

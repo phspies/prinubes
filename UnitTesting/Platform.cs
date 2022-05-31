@@ -184,7 +184,8 @@ namespace UnitTesting
             Assert.NotEmpty(tagQuery2);
             Assert.NotEmpty(loadbalancerList);
         }
-        [Fact, TestPriority(50)]
+        
+          //[Fact, TestPriority(50)]
         public async Task TestComputePlatformCredentials()
         {
             var testPlatform = new ComputePlatformCRUDDataModel()
@@ -202,7 +203,7 @@ namespace UnitTesting
 
             Assert.NotNull(credentialTestResponse);
         }
-        [Fact, TestPriority(51)]
+        //[Fact, TestPriority(51)]
         public async Task TestNetworkPlatformCredentials()
         {
             var testPlatform = new NetworkPlatformCRUDDataModel()
@@ -220,7 +221,7 @@ namespace UnitTesting
 
             Assert.NotNull(testResponse);
         }
-        [Fact, TestPriority(52)]
+        //[Fact, TestPriority(52)]
         public async Task TestLoadBalancerPlatformCredentials()
         {
             var testPlatform = new LoadBalancerPlatformCRUDDataModel()

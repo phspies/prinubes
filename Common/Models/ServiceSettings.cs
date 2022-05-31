@@ -17,6 +17,8 @@ namespace Prinubes.Common.Models
         }
         public ServiceSettings(string? _KAFKA_CONSUMER_GROUP_ID = null, string? _MYSQL_DATABASE = null)
         {
+            BACKGROUND_WORKER_INTERVAL = 10;
+
             if (Environment.GetEnvironmentVariable("MYSQL_DATABASE") == null)
             {
                 JWT_SECRET = "EBOHltOtlvsBorhGvfOxq27k5X334nYU";
@@ -74,6 +76,10 @@ namespace Prinubes.Common.Models
                                 prop.SetValue(this, Convert.ToString(Environment.GetEnvironmentVariable(prop.Name)));
                             }
                         }
+                        else if (prop.GetType().IsGenericType && prop.GetType().GetGenericTypeDefinition() == typeof(Nullable<>) && prop.GetValue(this, null) == null)
+                        {
+                            throw new Exception($"Environment variable {prop.Name} does not exist and doesn't have a default value");
+                        }
                         else
                         {
                             throw new Exception($"Environment variable {prop.Name} does not exist");
@@ -98,5 +104,6 @@ namespace Prinubes.Common.Models
         public bool KAFKA_IDEMPOTENCE { get; set; }
         public string KAFKA_CONSUMER_GROUP_ID { get { return MYSQL_DATABASE; } set { } }
         public bool KAFKA_ENABLE_AUTO_COMMIT { get; set; }
+        public int? BACKGROUND_WORKER_INTERVAL { get; set; }
     }
 }

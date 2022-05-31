@@ -36,7 +36,7 @@ namespace Prinubes.PlatformWorker.Kafka
                         switch (computePlatformKafkaMessage.ComputePlatform.PlatformType)
                         {
                             case ComputePlatformType.vSphere:
-                                vSphereFactory vsphereFactory = new vSphereFactory(computePlatformKafkaMessage.ComputePlatform, DBContext);
+                                vSphereFactory vsphereFactory = new vSphereFactory(computePlatformKafkaMessage.ComputePlatform, DBContext, logger);
                                 KafkaMessage.SubmitKafkaMessageAync(await vsphereFactory.TestCredentials(), logger, kafkaProducer, topic: computePlatformKafkaMessage.ReturnTopic);
                                 logger.LogInformation($"ComputePlatform test message sent to topic: {computePlatformKafkaMessage.ReturnTopic}");
 

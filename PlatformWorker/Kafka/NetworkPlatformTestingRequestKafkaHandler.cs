@@ -37,7 +37,7 @@ namespace Prinubes.PlatformWorker.Kafka
                         switch (networkPlatformKafkaMessage.NetworkPlatform.PlatformType)
                         {
                             case NetworkPlatformType.NSXT:
-                                NSXTFactory factory = new NSXTFactory(networkPlatformKafkaMessage.NetworkPlatform, DBContext);
+                                NSXTFactory factory = new NSXTFactory(networkPlatformKafkaMessage.NetworkPlatform, DBContext, logger);
                                 KafkaMessage.SubmitKafkaMessageAync(await factory.TestCredentials(), logger, kafkaProducer, topic: networkPlatformKafkaMessage.ReturnTopic);
                                 logger.LogInformation($"NetworkPlatform test message sent to topic: {networkPlatformKafkaMessage.ReturnTopic}");
 

@@ -37,7 +37,7 @@ namespace Prinubes.PlatformWorker.Kafka
                         switch (loadbalancerPlatformKafkaMessage.LoadBalancerPlatform.PlatformType)
                         {
                             case LoadBalancerPlatformType.NSXTALB:
-                                NSXTALBFactory nsxtalbfactory = new NSXTALBFactory(loadbalancerPlatformKafkaMessage.LoadBalancerPlatform, DBContext);
+                                NSXTALBFactory nsxtalbfactory = new NSXTALBFactory(loadbalancerPlatformKafkaMessage.LoadBalancerPlatform, DBContext, logger);
                                 KafkaMessage.SubmitKafkaMessageAync(await nsxtalbfactory.TestCredentials(), logger, kafkaProducer, topic: loadbalancerPlatformKafkaMessage.ReturnTopic);
                                 logger.LogInformation($"LoadbalancerPlatform test message sent to topic: {loadbalancerPlatformKafkaMessage.ReturnTopic}");
 

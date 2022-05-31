@@ -43,7 +43,13 @@ if (!args.Any(x => x.ToLower().Contains("testing")))
     builder.Services.AddDbContextPool<PrinubesPlatformWorkerDBContext>((serviceProvider, optionsBuilder) =>
     {
         optionsBuilder.UseLoggerFactory(LoggerFactory.Create(StartupFactory.LoggingBuilder()));
-        optionsBuilder.UseMySql(serviceSettings.GetMysqlConnection().ConnectionString, ServerVersion.AutoDetect(serviceSettings.GetMysqlConnection().ConnectionString));
+        optionsBuilder.UseMySql(serviceSettings.GetMysqlConnection().ConnectionString, ServerVersion.AutoDetect(serviceSettings.GetMysqlConnection().ConnectionString),
+            mysqlOptions => mysqlOptions.EnableRetryOnFailure(
+                maxRetryCount: 10,
+                maxRetryDelay: TimeSpan.FromSeconds(30),
+                errorNumbersToAdd: null)
+            );
+        
     });
 
     //perform migrations
@@ -78,7 +84,15 @@ builder.Services.CachingBuilder(serviceSettings);
 
 //start background worker services
 builder.Services.AddSingleton<GlobalComputePlatformBackgroundWorker>();
-builder.Services.AddHostedService<GlobalComputePlatformBackgroundWorker>(p => p.GetRequiredService<GlobalComputePlatformBackgroundWorker>());
+builder.Services.AddSingleton<IHostedService>(p => p.GetRequiredService<GlobalComputePlatformBackgroundWorker>());
+
+builder.Services.AddSingleton<GlobalNetworkPlatformBackgroundWorker>();
+builder.Services.AddSingleton<IHostedService>(p => p.GetRequiredService<GlobalNetworkPlatformBackgroundWorker>());
+
+builder.Services.AddSingleton<GlobalLoadBalancerPlatformBackgroundWorker>();
+builder.Services.AddSingleton<IHostedService>(p => p.GetRequiredService<GlobalLoadBalancerPlatformBackgroundWorker>());
+
+
 
 var app = builder.Build();
 

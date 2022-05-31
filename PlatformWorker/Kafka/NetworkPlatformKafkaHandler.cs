@@ -4,6 +4,7 @@ using Microsoft.Extensions.Caching.Distributed;
 using Prinubes.Common.DatabaseModels;
 using Prinubes.Common.Helpers;
 using Prinubes.Common.Kafka;
+using Prinubes.PlatformWorker.BackgroundWorkers;
 using Prinubes.PlatformWorker.Datamodels;
 using Prinubes.PlatformWorker.Helpers;
 using System.Collections;
@@ -16,6 +17,7 @@ namespace Prinubes.PlatformWorker.Kafka
         private readonly PrinubesPlatformWorkerDBContext DBContext;
         private string cachingListKey = "networkplatformslist";
         private IDistributedCache distributedCaching;
+        private GlobalNetworkPlatformBackgroundWorker networkWorker;
 
         public NetworkPlatformKafkaHandler(IServiceProvider _serviceProvider)
         {
@@ -23,6 +25,8 @@ namespace Prinubes.PlatformWorker.Kafka
             logger = scope.ServiceProvider.GetRequiredService<ILogger<NetworkPlatformKafkaHandler>>();
             DBContext = scope.ServiceProvider.GetRequiredService<PrinubesPlatformWorkerDBContext>();
             distributedCaching = scope.ServiceProvider.GetRequiredService<IDistributedCache>();
+            networkWorker = scope.ServiceProvider.GetRequiredService<GlobalNetworkPlatformBackgroundWorker>();
+
         }
 
         public async Task Handle(MessageNotification<NetworkPlatformKafkaMessage> notification, CancellationToken cancellationToken)
@@ -43,6 +47,7 @@ namespace Prinubes.PlatformWorker.Kafka
                             DBContext.SaveChanges();
                             distributedCaching.SetCaching(networkplatform, networkplatform.Id.ToString());
                             distributedCaching.Remove(cachingListKey);
+                            networkWorker.AddPlatform(networkplatformKafkaMessage.NetworkPlatformID);
                         }
                         else
                         {
@@ -74,6 +79,7 @@ namespace Prinubes.PlatformWorker.Kafka
                         var deleteNetworkPlatform = DBContext.NetworkPlatforms.FirstOrDefault(x => x.Id == networkplatformKafkaMessage.NetworkPlatformID && x.OrganizationID == networkplatformKafkaMessage.OrganizationID);
                         if (deleteNetworkPlatform != null && CommonHelpers.ByteArrayCompare(deleteNetworkPlatform.RowVersion, networkplatformKafkaMessage.RowVersion))
                         {
+                            networkWorker.StopPlatform(networkplatformKafkaMessage.NetworkPlatformID);
                             DBContext.NetworkPlatforms.Remove(deleteNetworkPlatform);
                             DBContext.SaveChanges();
                             distributedCaching.Remove(deleteNetworkPlatform.Id.ToString());

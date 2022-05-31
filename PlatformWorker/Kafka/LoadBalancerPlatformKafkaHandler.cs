@@ -4,6 +4,7 @@ using Microsoft.Extensions.Caching.Distributed;
 using Prinubes.Common.DatabaseModels;
 using Prinubes.Common.Helpers;
 using Prinubes.Common.Kafka;
+using Prinubes.PlatformWorker.BackgroundWorkers;
 using Prinubes.PlatformWorker.Datamodels;
 using Prinubes.PlatformWorker.Helpers;
 using System.Collections;
@@ -16,6 +17,8 @@ namespace Prinubes.PlatformWorker.Kafka
         private readonly PrinubesPlatformWorkerDBContext DBContext;
         private string cachingListKey = "loadbalancerplatformslist";
         private IDistributedCache distributedCaching;
+        private GlobalLoadBalancerPlatformBackgroundWorker loadbalancerWorker;
+
 
         public LoadBalancerPlatformKafkaHandler(IServiceProvider _serviceProvider)
         {
@@ -23,6 +26,7 @@ namespace Prinubes.PlatformWorker.Kafka
             logger = scope.ServiceProvider.GetRequiredService<ILogger<LoadBalancerPlatformKafkaHandler>>();
             DBContext = scope.ServiceProvider.GetRequiredService<PrinubesPlatformWorkerDBContext>();
             distributedCaching = scope.ServiceProvider.GetRequiredService<IDistributedCache>();
+            loadbalancerWorker = scope.ServiceProvider.GetRequiredService<GlobalLoadBalancerPlatformBackgroundWorker>();
         }
 
         public async Task Handle(MessageNotification<LoadBalancerPlatformKafkaMessage> notification, CancellationToken cancellationToken)
@@ -43,6 +47,7 @@ namespace Prinubes.PlatformWorker.Kafka
                             DBContext.SaveChanges();
                             distributedCaching.SetCaching(loadbalancerplatform, loadbalancerplatform.Id.ToString());
                             distributedCaching.Remove(cachingListKey);
+                            loadbalancerWorker.AddPlatform(loadbalancerplatformKafkaMessage.LoadBalancerPlatformID);
                         }
                         else
                         {
@@ -74,6 +79,7 @@ namespace Prinubes.PlatformWorker.Kafka
                         var deleteLoadBalancerPlatform = DBContext.LoadBalancerPlatforms.FirstOrDefault(x => x.Id == loadbalancerplatformKafkaMessage.LoadBalancerPlatformID && x.OrganizationID == loadbalancerplatformKafkaMessage.OrganizationID);
                         if (deleteLoadBalancerPlatform != null && CommonHelpers.ByteArrayCompare(deleteLoadBalancerPlatform.RowVersion, loadbalancerplatformKafkaMessage.RowVersion))
                         {
+                            loadbalancerWorker.StopPlatform(loadbalancerplatformKafkaMessage.LoadBalancerPlatformID);
                             DBContext.LoadBalancerPlatforms.Remove(deleteLoadBalancerPlatform);
                             DBContext.SaveChanges();
                             distributedCaching.Remove(deleteLoadBalancerPlatform.Id.ToString());

@@ -79,12 +79,11 @@ namespace Prinubes.PlatformWorker.Kafka
                         var deleteComputePlatform = DBContext.ComputePlatforms.FirstOrDefault(x => x.Id == computeplatformKafkaMessage.ComputePlatformID && x.OrganizationID == computeplatformKafkaMessage.OrganizationID);
                         if (deleteComputePlatform != null && CommonHelpers.ByteArrayCompare(deleteComputePlatform.RowVersion, computeplatformKafkaMessage.RowVersion))
                         {
+                            computeWorker.StopPlatform(computeplatformKafkaMessage.ComputePlatformID);
                             DBContext.ComputePlatforms.Remove(deleteComputePlatform);
                             DBContext.SaveChanges();
                             distributedCaching.Remove(deleteComputePlatform.Id.ToString());
                             distributedCaching.Remove(cachingListKey);
-                            computeWorker.StopPlatform(computeplatformKafkaMessage.ComputePlatformID);
-
                         }
                         else
                         {
