@@ -13,9 +13,8 @@ namespace Prinubes.PlatformWorker.Kafka
 
         public OrganizationKafkaHandler(IServiceProvider _serviceProvider)
         {
-            var scope = _serviceProvider.CreateScope();
-            logger = scope.ServiceProvider.GetRequiredService<ILogger<OrganizationKafkaHandler>>();
-            DBContext = scope.ServiceProvider.GetRequiredService<PrinubesPlatformWorkerDBContext>();
+            logger = ServiceActivator.GetRequiredService<ILogger<OrganizationKafkaHandler>>(_serviceProvider);
+            DBContext = ServiceActivator.GetRequiredService<PrinubesPlatformWorkerDBContext>(_serviceProvider);
         }
 
         public Task Handle(MessageNotification<OrganizationKafkaMessage> notification, CancellationToken cancellationToken)

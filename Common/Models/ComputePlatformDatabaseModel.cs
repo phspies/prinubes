@@ -65,6 +65,7 @@ namespace Prinubes.Common.DatabaseModels
         //{
         //    Tags = new List<TaggingCRUDDataModel>();
         //}
+
     }
     public class ComputePlatformCRUDDataModel : RowVersionModel
     {

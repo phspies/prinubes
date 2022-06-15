@@ -1,4 +1,5 @@
-﻿using Prinubes.Common.Models;
+﻿using Prinubes.Common.Helpers;
+using Prinubes.Common.Models;
 using Prinubes.Common.Models.Enums;
 using Prinubes.PlatformWorker.Datamodels;
 
@@ -10,15 +11,13 @@ namespace Prinubes.PlatformWorker.BackgroundWorkers
         private readonly ILogger<GlobalLoadBalancerPlatformBackgroundWorker> logger;
         private readonly PrinubesPlatformWorkerDBContext DBContext;
         private ServiceSettings settings;
-        object guard = new object();
+        static SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1, 1);
 
-
-        public GlobalLoadBalancerPlatformBackgroundWorker(ILogger<GlobalLoadBalancerPlatformBackgroundWorker> _logger, IServiceProvider _serviceProvider)
+        public GlobalLoadBalancerPlatformBackgroundWorker(IServiceProvider _serviceProvider)
         {
-            var scope = _serviceProvider.CreateScope();
-            logger = _logger;
-            DBContext = scope.ServiceProvider.GetRequiredService<PrinubesPlatformWorkerDBContext>();
-            settings = scope.ServiceProvider.GetRequiredService<ServiceSettings>();
+            logger = ServiceActivator.GetRequiredService<ILogger<GlobalLoadBalancerPlatformBackgroundWorker>>(_serviceProvider);
+            DBContext = ServiceActivator.GetRequiredService<PrinubesPlatformWorkerDBContext>(_serviceProvider);
+            settings = ServiceActivator.GetRequiredService<ServiceSettings>(_serviceProvider);
         }
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken) => Task.Run(async () =>
@@ -29,7 +28,7 @@ namespace Prinubes.PlatformWorker.BackgroundWorkers
             var knownPlatforms = DBContext.LoadBalancerPlatforms.Where(x => x.Enabled == true && x.state != PlatformState.Error);
             foreach (var platform in knownPlatforms)
             {
-                AddPlatform(platform.Id);
+                await AddPlatformAsync(platform.Id);
             }
 
             //loop until we 
@@ -43,47 +42,46 @@ namespace Prinubes.PlatformWorker.BackgroundWorkers
                 await Task.Yield();
             }
         });
-        public void AddPlatform(Guid LoadBalancerPlatformID)
+        public async Task AddPlatformAsync(Guid LoadBalancerPlatformID)
         {
             var platform = DBContext.LoadBalancerPlatforms.Single(x => x.Id.Equals(LoadBalancerPlatformID));
             CancellationTokenSource cts = new CancellationTokenSource();
-            lock (guard)
+            await semaphoreSlim.WaitAsync();
+            processes.Add(Tuple.Create(platform.Id, platform.Platform, cts, Task.Run(async () =>
             {
-                processes.Add(Tuple.Create(platform.Id, platform.Platform, cts, Task.Run(async () =>
+                while (!cts.IsCancellationRequested)
                 {
-                    while (!cts.IsCancellationRequested)
+                    try
                     {
-                        try
-                        {
-                            await Task.Delay(2000);
-                        }
-                        catch (Exception ex)
-                        {
-
-                        }
+                        await Task.Delay(2000);
                     }
-                    return;
-                }, cts.Token)));
-            }
+                    catch (Exception ex)
+                    {
+
+                    }
+                }
+                return;
+            }, cts.Token)));
+            semaphoreSlim.Release();
         }
-        public void StopPlatform(Guid LoadBalancerPlatformID)
+        public async Task StopPlatformAsync(Guid LoadBalancerPlatformID)
         {
             logger.LogInformation($"GlobalLoadBalancerPlatformThreadPool Thread is stopping: {LoadBalancerPlatformID}");
-            lock (guard)
+            await semaphoreSlim.WaitAsync();
+
+            if (processes.Any(x => x.Item1.Equals(LoadBalancerPlatformID)))
             {
-                if (processes.Any(x => x.Item1.Equals(LoadBalancerPlatformID)))
+                var process = processes.Single(x => x.Item1.Equals(LoadBalancerPlatformID));
+                process.Item3.Cancel();
+                while (!process.Item4.IsCompleted)
                 {
-                    var process = processes.Single(x => x.Item1.Equals(LoadBalancerPlatformID));
-                    process.Item3.Cancel();
-                    while (!process.Item4.IsCompleted)
-                    {
-                        logger.LogInformation($"GlobalLoadBalancerPlatformThreadPool waiting to stop: {LoadBalancerPlatformID} - Is Completed: {process.Item4.IsCompleted}");
-                        Thread.Sleep(1000);
-                    }
-                    processes.Remove(processes.Single(x => x.Item1.Equals(LoadBalancerPlatformID)));
+                    logger.LogInformation($"GlobalLoadBalancerPlatformThreadPool waiting to stop: {LoadBalancerPlatformID} - Is Completed: {process.Item4.IsCompleted}");
+                    Thread.Sleep(1000);
                 }
-                logger.LogInformation($"GlobalLoadBalancerPlatformThreadPool Thread stopped: {LoadBalancerPlatformID}");
+                processes.Remove(processes.Single(x => x.Item1.Equals(LoadBalancerPlatformID)));
             }
+            logger.LogInformation($"GlobalLoadBalancerPlatformThreadPool Thread stopped: {LoadBalancerPlatformID}");
+            semaphoreSlim.Release();
         }
 
         public override async Task StopAsync(CancellationToken stoppingToken)
@@ -91,9 +89,9 @@ namespace Prinubes.PlatformWorker.BackgroundWorkers
             logger.LogInformation("GlobalLoadBalancerPlatformThreadPool is stopping.");
             for (int i = 0; i < processes.Count; i++)
             {
-                StopPlatform(processes[i].Item1);
+                await StopPlatformAsync(processes[i].Item1);
             }
-            logger.LogInformation("GlobalLoadBalancerPlatformThreadPool is stopped.");
+            logger.LogInformation("GlobalLoadBalancerPlatformThreadPool stopped.");
         }
 
         public void Dispose()

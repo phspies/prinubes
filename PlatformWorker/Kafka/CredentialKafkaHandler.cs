@@ -18,10 +18,9 @@ namespace Prinubes.PlatformWorker.Kafka
 
         public CredentialKafkaHandler(IServiceProvider _serviceProvider)
         {
-            var scope = _serviceProvider.CreateScope();
-            logger = scope.ServiceProvider.GetRequiredService<ILogger<CredentialKafkaHandler>>();
-            DBContext = scope.ServiceProvider.GetRequiredService<PrinubesPlatformWorkerDBContext>();
-            distributedCaching = scope.ServiceProvider.GetRequiredService<IDistributedCache>();
+            logger = ServiceActivator.GetRequiredService<ILogger<CredentialKafkaHandler>>(_serviceProvider);
+            DBContext = ServiceActivator.GetRequiredService<PrinubesPlatformWorkerDBContext>(_serviceProvider);
+            distributedCaching = ServiceActivator.GetRequiredService<IDistributedCache>(_serviceProvider);
         }
 
         public async Task Handle(MessageNotification<CredentialKafkaMessage> notification, CancellationToken cancellationToken)

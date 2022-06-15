@@ -3,6 +3,7 @@ using nsxtalbsdk;
 using nsxtalbsdk.Models;
 using Prinubes.Common.DatabaseModels;
 using Prinubes.Common.DatabaseModels.PlatformEnums;
+using Prinubes.Common.Helpers;
 using Prinubes.Common.Kafka;
 using Prinubes.Common.Kafka.Producer;
 using Prinubes.PlatformWorker.CloudLibraries.NSXTALB;
@@ -19,10 +20,9 @@ namespace Prinubes.PlatformWorker.Kafka
 
         public LoadBalancerPlatformTestingRequestKafkaHandler(IServiceProvider _serviceProvider)
         {
-            var scope = _serviceProvider.CreateScope();
-            logger = scope.ServiceProvider.GetRequiredService<ILogger<LoadBalancerPlatformKafkaHandler>>();
-            DBContext = scope.ServiceProvider.GetRequiredService<PrinubesPlatformWorkerDBContext>();
-            kafkaProducer = scope.ServiceProvider.GetRequiredService<IMessageProducer>();
+            logger = ServiceActivator.GetRequiredService<ILogger<LoadBalancerPlatformTestingRequestKafkaHandler>>(_serviceProvider);
+            DBContext = ServiceActivator.GetRequiredService<PrinubesPlatformWorkerDBContext>(_serviceProvider);
+            kafkaProducer = ServiceActivator.GetRequiredService<IMessageProducer>(_serviceProvider);
         }
 
         public async Task Handle(MessageNotification<LoadBalancerPlatformTestingRequestKafkaMessage> notification, CancellationToken cancellationToken)

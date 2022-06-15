@@ -11,7 +11,6 @@ using Prinubes.PlatformWorker.Datamodels;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
 builder.WebHost.UseKestrel(options =>
 {
     //options.Limits.MaxConcurrentConnections = 100;
@@ -20,7 +19,7 @@ builder.WebHost.UseKestrel(options =>
 
 //Build ServiceSettings object from environment variables
 ServiceSettings serviceSettings = new ServiceSettings(_MYSQL_DATABASE: "prinubes_platformworker");
-builder.Services.AddSingleton<ServiceSettings>(serviceSettings);
+builder.Services.AddSingleton(serviceSettings);
 var mapperConfig = new MapperConfiguration(mc =>
 {
     mc.AddProfile(new AutoMapperProfile());
@@ -92,6 +91,8 @@ builder.Services.AddSingleton<IHostedService>(p => p.GetRequiredService<GlobalNe
 builder.Services.AddSingleton<GlobalLoadBalancerPlatformBackgroundWorker>();
 builder.Services.AddSingleton<IHostedService>(p => p.GetRequiredService<GlobalLoadBalancerPlatformBackgroundWorker>());
 
+
+ServiceActivator.Configure(builder.Services);
 
 
 var app = builder.Build();

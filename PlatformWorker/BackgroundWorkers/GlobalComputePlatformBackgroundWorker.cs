@@ -1,6 +1,10 @@
-﻿using Prinubes.Common.Models;
+﻿using Prinubes.Common.DatabaseModels;
+using Prinubes.Common.Helpers;
+using Prinubes.Common.Models;
 using Prinubes.Common.Models.Enums;
+using Prinubes.PlatformWorker.CloudLibraries.vSphere;
 using Prinubes.PlatformWorker.Datamodels;
+using vspheresdk.Appliance.Models;
 
 namespace Prinubes.PlatformWorker.BackgroundWorkers
 {
@@ -8,17 +12,15 @@ namespace Prinubes.PlatformWorker.BackgroundWorkers
     {
         private SynchronizedCollection<Tuple<Guid, string, CancellationTokenSource, Task>> processes = new SynchronizedCollection<Tuple<Guid, string, CancellationTokenSource, Task>>();
         private readonly ILogger<GlobalComputePlatformBackgroundWorker> logger;
-        private readonly PrinubesPlatformWorkerDBContext DBContext;
-        private ServiceSettings settings;
-        object guard = new object();
+        private readonly PrinubesPlatformWorkerDBContext dbContext;
+        private ServiceSettings settingsContext;
+        static SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1, 1);
 
-
-        public GlobalComputePlatformBackgroundWorker(ILogger<GlobalComputePlatformBackgroundWorker> _logger, IServiceProvider _serviceProvider)
+        public GlobalComputePlatformBackgroundWorker(IServiceProvider _serviceProvider)
         {
-            var scope = _serviceProvider.CreateScope();
-            logger = _logger;
-            DBContext = scope.ServiceProvider.GetRequiredService<PrinubesPlatformWorkerDBContext>();
-            settings = scope.ServiceProvider.GetRequiredService<ServiceSettings>();
+            logger = ServiceActivator.GetRequiredService<ILogger<GlobalComputePlatformBackgroundWorker>>(_serviceProvider);
+            dbContext = ServiceActivator.GetRequiredService<PrinubesPlatformWorkerDBContext>(_serviceProvider);
+            settingsContext = ServiceActivator.GetRequiredService<ServiceSettings>(_serviceProvider);
         }
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken) => Task.Run(async () =>
@@ -26,10 +28,10 @@ namespace Prinubes.PlatformWorker.BackgroundWorkers
             logger.LogInformation("GlobalComputePlatformThreadPool Thread running.");
 
             //load all known compute platforms in database
-            var knownPlatforms = DBContext.ComputePlatforms.Where(x => x.Enabled == true && x.state != PlatformState.Error);
+            var knownPlatforms = dbContext.ComputePlatforms.Where(x => x.Enabled == true && x.state != PlatformState.Error);
             foreach (var platform in knownPlatforms)
             {
-                AddPlatform(platform.Id);
+                await AddPlatformAsync(platform.Id);
             }
 
             //loop until we 
@@ -39,52 +41,54 @@ namespace Prinubes.PlatformWorker.BackgroundWorkers
                 {
                     logger.LogInformation($"GlobalComputePlatformThreadPool Thread is running: {process.Item2}");
                 }
-                Thread.Sleep((settings.BACKGROUND_WORKER_INTERVAL ?? 10) * 1000);
+                Thread.Sleep((settingsContext.BACKGROUND_WORKER_INTERVAL ?? 10) * 1000);
                 await Task.Yield();
             }
         });
-        public void AddPlatform(Guid ComputePlatformID)
+        public async Task AddPlatformAsync(Guid ComputePlatformID)
         {
-            lock (guard)
+            await semaphoreSlim.WaitAsync();
+            ComputePlatformDatabaseModel platform = dbContext.ComputePlatforms.Single(x => x.Id.Equals(ComputePlatformID));
+            CancellationTokenSource cts = new CancellationTokenSource();
+            processes.Add(Tuple.Create(platform.Id, platform.Platform, cts, Task.Run(async () =>
             {
-                var platform = DBContext.ComputePlatforms.Single(x => x.Id.Equals(ComputePlatformID));
-                CancellationTokenSource cts = new CancellationTokenSource();
-                processes.Add(Tuple.Create(platform.Id, platform.Platform, cts, Task.Run(async () =>
+                //discover new platform
+                vSphereFactory vsphereFactory = new vSphereFactory(platform, dbContext, logger);
+                while (!cts.IsCancellationRequested)
                 {
-                    while (!cts.IsCancellationRequested)
+                    try
                     {
-                        try
-                        {
-                            await Task.Delay(2000);
-                        }
-                        catch (Exception ex)
-                        {
+                        ApplianceSystemVersionVersionStructType information = await vsphereFactory.Discover();
 
-                        }
+                        await Task.Delay(2000);
                     }
-                    return;
+                    catch (Exception ex)
+                    {
 
-                }, cts.Token)));
-            }
+                    }
+                }
+                return;
+
+            }, cts.Token)));
+            semaphoreSlim.Release();
         }
-        public void StopPlatform(Guid ComputePlatformID)
+        public async Task StopPlatformAsync(Guid ComputePlatformID)
         {
             logger.LogInformation($"GlobalComputePlatformThreadPool Thread is stopping: {ComputePlatformID}");
-            lock (guard)
+            await semaphoreSlim.WaitAsync();
+            if (processes.Any(x => x.Item1.Equals(ComputePlatformID)))
             {
-                if (processes.Any(x => x.Item1.Equals(ComputePlatformID)))
+                var process = processes.Single(x => x.Item1.Equals(ComputePlatformID));
+                process.Item3.Cancel();
+                while (!process.Item4.IsCompleted)
                 {
-                    var process = processes.Single(x => x.Item1.Equals(ComputePlatformID));
-                    process.Item3.Cancel();
-                    while (!process.Item4.IsCompleted)
-                    {
-                        logger.LogInformation($"GlobalComputePlatformThreadPool waiting to stop: {ComputePlatformID} - Is Completed: {process.Item4.IsCompleted}");
-                        Thread.Sleep(1000);
-                    }
-                    processes.Remove(processes.Single(x => x.Item1.Equals(ComputePlatformID)));
+                    logger.LogInformation($"GlobalComputePlatformThreadPool waiting to stop: {ComputePlatformID} - Is Completed: {process.Item4.IsCompleted}");
+                    Thread.Sleep(1000);
                 }
-                logger.LogInformation($"GlobalComputePlatformThreadPool Thread stopped: {ComputePlatformID}");
+                processes.Remove(processes.Single(x => x.Item1.Equals(ComputePlatformID)));
             }
+            logger.LogInformation($"GlobalComputePlatformThreadPool Thread stopped: {ComputePlatformID}");
+            semaphoreSlim.Release();
         }
 
         public override async Task StopAsync(CancellationToken stoppingToken)
@@ -92,12 +96,12 @@ namespace Prinubes.PlatformWorker.BackgroundWorkers
             logger.LogInformation("GlobalComputePlatformThreadPool is stopping.");
             for (int i = 0; i < processes.Count; i++)
             {
-                StopPlatform(processes[i].Item1);
+                await StopPlatformAsync(processes[i].Item1);
             }
-            logger.LogInformation("GlobalComputePlatformThreadPool is stopped.");
+            logger.LogInformation("GlobalComputePlatformThreadPool stopped.");
         }
 
-        public void Dispose()
+        public override void Dispose()
         {
             // Do resource cleanup
         }

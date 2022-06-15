@@ -20,7 +20,18 @@ namespace Prinubes.Common.Kafka
             kafkaMessageConsumerManager.StartConsumers(stoppingToken);
             while (!stoppingToken.IsCancellationRequested)
             {
-                await Task.Delay(1000, stoppingToken);
+                try
+                {
+                    await Task.Delay(1000, stoppingToken);
+                }
+                catch (TaskCanceledException ex)
+                {
+                     //we missed the cancelation request
+                }
+                catch (Exception ex)
+                {
+
+                }
             }
         }
     }

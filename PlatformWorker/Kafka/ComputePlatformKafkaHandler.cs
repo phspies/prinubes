@@ -23,10 +23,10 @@ namespace Prinubes.PlatformWorker.Kafka
         public ComputePlatformKafkaHandler(IServiceProvider _serviceProvider)
         {
             var scope = _serviceProvider.CreateScope();
-            logger = scope.ServiceProvider.GetRequiredService<ILogger<ComputePlatformKafkaHandler>>();
-            DBContext = scope.ServiceProvider.GetRequiredService<PrinubesPlatformWorkerDBContext>();
-            distributedCaching = scope.ServiceProvider.GetRequiredService<IDistributedCache>();
-            computeWorker = scope.ServiceProvider.GetRequiredService<GlobalComputePlatformBackgroundWorker>();
+            logger = ServiceActivator.GetRequiredService<ILogger<ComputePlatformKafkaHandler>>(_serviceProvider);
+            DBContext = ServiceActivator.GetRequiredService<PrinubesPlatformWorkerDBContext>(_serviceProvider);
+            distributedCaching = ServiceActivator.GetRequiredService<IDistributedCache>(_serviceProvider);
+            computeWorker = ServiceActivator.GetRequiredService<GlobalComputePlatformBackgroundWorker>(_serviceProvider);
         }
 
         public async Task Handle(MessageNotification<ComputePlatformKafkaMessage> notification, CancellationToken cancellationToken)
@@ -47,7 +47,7 @@ namespace Prinubes.PlatformWorker.Kafka
                             DBContext.SaveChanges();
                             distributedCaching.SetCaching(computeplatform, computeplatform.Id.ToString());
                             distributedCaching.Remove(cachingListKey);
-                            computeWorker.AddPlatform(computeplatformKafkaMessage.ComputePlatformID);
+                            await computeWorker.AddPlatformAsync(computeplatformKafkaMessage.ComputePlatformID);
                         }
                         else
                         {
@@ -79,7 +79,7 @@ namespace Prinubes.PlatformWorker.Kafka
                         var deleteComputePlatform = DBContext.ComputePlatforms.FirstOrDefault(x => x.Id == computeplatformKafkaMessage.ComputePlatformID && x.OrganizationID == computeplatformKafkaMessage.OrganizationID);
                         if (deleteComputePlatform != null && CommonHelpers.ByteArrayCompare(deleteComputePlatform.RowVersion, computeplatformKafkaMessage.RowVersion))
                         {
-                            computeWorker.StopPlatform(computeplatformKafkaMessage.ComputePlatformID);
+                            await computeWorker.StopPlatformAsync(computeplatformKafkaMessage.ComputePlatformID);
                             DBContext.ComputePlatforms.Remove(deleteComputePlatform);
                             DBContext.SaveChanges();
                             distributedCaching.Remove(deleteComputePlatform.Id.ToString());

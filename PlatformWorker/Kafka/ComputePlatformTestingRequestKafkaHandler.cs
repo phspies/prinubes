@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Prinubes.Common.DatabaseModels;
 using Prinubes.Common.DatabaseModels.PlatformEnums;
+using Prinubes.Common.Helpers;
 using Prinubes.Common.Kafka;
 using Prinubes.Common.Kafka.Producer;
 using Prinubes.PlatformWorker.CloudLibraries.vSphere;
@@ -17,10 +18,9 @@ namespace Prinubes.PlatformWorker.Kafka
 
         public ComputePlatformTestingRequestKafkaHandler(IServiceProvider _serviceProvider)
         {
-            var scope = _serviceProvider.CreateScope();
-            logger = scope.ServiceProvider.GetRequiredService<ILogger<ComputePlatformKafkaHandler>>();
-            DBContext = scope.ServiceProvider.GetRequiredService<PrinubesPlatformWorkerDBContext>();
-            kafkaProducer = scope.ServiceProvider.GetRequiredService<IMessageProducer>();
+            logger = ServiceActivator.GetRequiredService<ILogger<ComputePlatformKafkaHandler>>(_serviceProvider);
+            DBContext = ServiceActivator.GetRequiredService<PrinubesPlatformWorkerDBContext>(_serviceProvider);
+            kafkaProducer = ServiceActivator.GetRequiredService<IMessageProducer>(_serviceProvider);
         }
 
         public async Task Handle(MessageNotification<ComputePlatformTestingRequestKafkaMessage> notification, CancellationToken cancellationToken)
