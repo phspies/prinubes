@@ -13,14 +13,12 @@ namespace Prinubes.PlatformWorker.BackgroundWorkers
         private SynchronizedCollection<Tuple<Guid, string, CancellationTokenSource, Task>> processes = new SynchronizedCollection<Tuple<Guid, string, CancellationTokenSource, Task>>();
         private readonly ILogger<GlobalComputePlatformBackgroundWorker> logger;
         private readonly PrinubesPlatformWorkerDBContext dbContext;
-        private ServiceSettings settingsContext;
         static SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1, 1);
 
         public GlobalComputePlatformBackgroundWorker(IServiceProvider _serviceProvider)
         {
             logger = ServiceActivator.GetRequiredService<ILogger<GlobalComputePlatformBackgroundWorker>>(_serviceProvider);
             dbContext = ServiceActivator.GetRequiredService<PrinubesPlatformWorkerDBContext>(_serviceProvider);
-            settingsContext = ServiceActivator.GetRequiredService<ServiceSettings>(_serviceProvider);
         }
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken) => Task.Run(async () =>
@@ -28,21 +26,9 @@ namespace Prinubes.PlatformWorker.BackgroundWorkers
             logger.LogInformation("GlobalComputePlatformThreadPool Thread running.");
 
             //load all known compute platforms in database
-            var knownPlatforms = dbContext.ComputePlatforms.Where(x => x.Enabled == true && x.state != PlatformState.Error);
-            foreach (var platform in knownPlatforms)
+            foreach (var platform in dbContext.ComputePlatforms.Where(x => x.Enabled == true))
             {
                 await AddPlatformAsync(platform.Id);
-            }
-
-            //loop until we 
-            while (true)
-            {
-                foreach (var process in processes)
-                {
-                    logger.LogInformation($"GlobalComputePlatformThreadPool Thread is running: {process.Item2}");
-                }
-                Thread.Sleep((settingsContext.BACKGROUND_WORKER_INTERVAL ?? 10) * 1000);
-                await Task.Yield();
             }
         });
         public async Task AddPlatformAsync(Guid ComputePlatformID)
@@ -58,8 +44,16 @@ namespace Prinubes.PlatformWorker.BackgroundWorkers
                 {
                     try
                     {
-                        ApplianceSystemVersionVersionStructType information = await vsphereFactory.Discover();
-
+                        logger.LogInformation($"GlobalComputePlatformThreadPool Thread is running: {platform.Id}");
+                        try
+                        {
+                            ApplianceSystemVersionVersionStructType information = await vsphereFactory.Discover();
+                            logger.LogInformation($"Found platform: {information.Version}");
+                        }
+                        catch (Exception ex)
+                        {
+                            logger.LogInformation($"Cannot connect to platform: {ex.Message}");
+                        }
                         await Task.Delay(2000);
                     }
                     catch (Exception ex)
