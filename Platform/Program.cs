@@ -23,7 +23,7 @@ builder.WebHost.UseKestrel(options =>
 });
 
 //Build ServiceSettings object from environment variables
-ServiceSettings serviceSettings = new ServiceSettings(_MYSQL_DATABASE: "prinubes_platform");
+ServiceSettings serviceSettings = new(_MYSQL_DATABASE: "prinubes_platform");
 builder.Services.AddSingleton<ServiceSettings>(serviceSettings);
 
 // Add services to the container.

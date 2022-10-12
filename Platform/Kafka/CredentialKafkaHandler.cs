@@ -52,7 +52,7 @@ namespace Prinubes.ComputePlatform.Kafka
                         }
                         break;
                     case ActionEnum.update:
-                        var updateCredential = DBContext.Credentials.FirstOrDefault(x => x.Id == credentialKafkaMessage.CredentialID && x.OrganizationID == credentialKafkaMessage.OrganizationID);
+                        var updateCredential = DBContext.Credentials.First(x => x.Id == credentialKafkaMessage.CredentialID && x.OrganizationID == credentialKafkaMessage.OrganizationID);
                         if (updateCredential != null)
                         {
                             if (StructuralComparisons.StructuralEqualityComparer.Equals(updateCredential.RowVersion, credentialKafkaMessage.RowVersion))
@@ -73,7 +73,7 @@ namespace Prinubes.ComputePlatform.Kafka
                         }
                         break;
                     case ActionEnum.delete:
-                        var deleteCredential = DBContext.Credentials.FirstOrDefault(x => x.Id == credentialKafkaMessage.CredentialID && x.OrganizationID == credentialKafkaMessage.OrganizationID);
+                        var deleteCredential = DBContext.Credentials.First(x => x.Id == credentialKafkaMessage.CredentialID && x.OrganizationID == credentialKafkaMessage.OrganizationID);
                         if (deleteCredential != null && CommonHelpers.ByteArrayCompare(deleteCredential.RowVersion, credentialKafkaMessage.RowVersion))
                         {
                             DBContext.Credentials.Remove(deleteCredential);

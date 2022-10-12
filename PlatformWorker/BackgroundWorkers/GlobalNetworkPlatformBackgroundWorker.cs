@@ -64,9 +64,9 @@ namespace Prinubes.PlatformWorker.BackgroundWorkers
                 while (!process.Item4.IsCompleted)
                 {
                     logger.LogInformation($"GlobalNetworkPlatformThreadPool waiting to stop: {NetworkPlatformID} - Is Completed: {process.Item4.IsCompleted}");
-                    Thread.Sleep(1000);
+                    await Task.Delay(1000);
                 }
-                platformProcesses.Remove(platformProcesses.Single(x => x.Item1.Equals(NetworkPlatformID)));
+                platformProcesses.Remove(process);
             }
             logger.LogInformation($"GlobalNetworkPlatformThreadPool Thread stopped: {NetworkPlatformID}");
             semaphoreSlim.Release();

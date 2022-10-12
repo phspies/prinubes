@@ -63,9 +63,9 @@ namespace Prinubes.PlatformWorker.BackgroundWorkers
                 while (!process.Item4.IsCompleted)
                 {
                     logger.LogInformation($"GlobalLoadBalancerPlatformThreadPool waiting to stop: {LoadBalancerPlatformID} - Is Completed: {process.Item4.IsCompleted}");
-                    Thread.Sleep(1000);
+                    await Task.Delay(1000);
                 }
-                processes.Remove(processes.Single(x => x.Item1.Equals(LoadBalancerPlatformID)));
+                processes.Remove(process);
             }
             logger.LogInformation($"GlobalLoadBalancerPlatformThreadPool Thread stopped: {LoadBalancerPlatformID}");
             semaphoreSlim.Release();
