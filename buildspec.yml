@@ -9,6 +9,3 @@ phases:
         commands:
         - echo Build started on `date`
         - dotnet build -c release -o ./build_output prinubes.sln
-artifacts:
-    files:
-    - prinubes/build_output/**/*
