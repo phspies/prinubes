@@ -1,6 +1,5 @@
 ﻿using Confluent.Kafka;
 using Prinubes.Common.Models;
-using StackExchange.Redis;
 using System;
 using UnitTesting;
 using Xunit;

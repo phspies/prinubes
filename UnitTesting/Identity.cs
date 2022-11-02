@@ -31,10 +31,11 @@ namespace UnitTesting
         [Fact, Order(1)]
         public async Task RegisterTestUser()
         {
-            ArgumentNullException.ThrowIfNull(GlobalVariables.identityFactory?.Client);
-            ArgumentNullException.ThrowIfNull(GlobalVariables.platformFactory?.Client);
-            ArgumentNullException.ThrowIfNull(userObject.Password);
-            ArgumentNullException.ThrowIfNull(userObject.EmailAddress);
+
+            Assert.NotNull(GlobalVariables.identityFactory?.Client);
+            Assert.NotNull(GlobalVariables.platformFactory?.Client);
+            Assert.NotNull(userObject.Password);
+            Assert.NotNull(userObject.EmailAddress);
 
             HttpResponseMessage registerResponse = await GlobalVariables.identityFactory.Client.PostAsJsonAsync("/identity/users/register", userObject);
             var returnContent = await registerResponse.Content.ReadAsStringAsync();
@@ -91,16 +92,9 @@ namespace UnitTesting
             Assert.Equal(HttpStatusCode.OK, groupResponse.StatusCode);
             GlobalVariables.SessionGroup = JsonConvert.DeserializeObject<GroupDisplayDataModel>(await groupResponse.Content.ReadAsStringAsync());
             Assert.NotNull(GlobalVariables.SessionGroup);
-            while (true)
+            while (!GlobalVariables.platformFactory.DBContext.Groups.AsNoTracking().Any(x => x.Id == GlobalVariables.SessionGroup.Id))
             {
-                if (!GlobalVariables.platformFactory.DBContext.Groups.AsNoTracking().Any(x => x.Id == GlobalVariables.SessionGroup.Id))
-                {
-                    Task.Delay(1000).Wait();
-                }
-                else
-                {
-                    break;
-                }
+                Task.Delay(1000).Wait();
             }
         }
         [Fact, TestPriority(4)]
@@ -110,16 +104,9 @@ namespace UnitTesting
             HttpResponseMessage groupAttachResponse = await GlobalVariables.identityFactory.Client.PutAsJsonAsync($"/identity/{GlobalVariables.SessionOrganization.Id}/groups/{GlobalVariables.SessionGroup.Id}/attachUser/{GlobalVariables.SessionToken.id}", new Object());
             var groupAttachContents = await groupAttachResponse.Content.ReadAsStringAsync();
             Assert.Equal(HttpStatusCode.OK, groupAttachResponse.StatusCode);
-            while (true)
+            while (!GlobalVariables.platformFactory.DBContext.Groups.AsNoTracking().Include(x => x.Users).Single(x => x.Id == GlobalVariables.SessionGroup.Id).Users.Any(x => x.Id == GlobalVariables.SessionToken.id))
             {
-                if (!GlobalVariables.platformFactory.DBContext.Groups.AsNoTracking().Include(x => x.Users).Single(x => x.Id == GlobalVariables.SessionGroup.Id).Users.Any(x => x.Id == GlobalVariables.SessionToken.id))
-                {
-                    Task.Delay(1000).Wait();
-                }
-                else
-                {
-                    break;
-                }
+                Task.Delay(1000).Wait();
             }
         }
         [Fact, TestPriority(5)]
@@ -140,17 +127,12 @@ namespace UnitTesting
             var vcenterCredentialsContents = await vcenterCredentialsResponse.Content.ReadAsStringAsync();
             GlobalVariables.SessionvCenterCredentials = JsonConvert.DeserializeObject<CredentialDisplayDataModel>(vcenterCredentialsContents);
             Assert.NotNull(GlobalVariables.SessionvCenterCredentials);
-            while (true)
-            {
-                if (!GlobalVariables.platformFactory.DBContext.Credentials.AsNoTracking().Any(x => x.Id == GlobalVariables.SessionvCenterCredentials.Id))
-                {
-                    Task.Delay(1000).Wait();
 
-                }
-                else
-                {
-                    break;
-                }
+            while (!GlobalVariables.platformFactory.DBContext.Credentials.AsNoTracking().Any(x => x.Id == GlobalVariables.SessionvCenterCredentials.Id))
+            {
+                Task.Delay(1000).Wait();
+
+
             }
         }
         [Fact, TestPriority(6)]
@@ -170,16 +152,10 @@ namespace UnitTesting
             var vnsxtCredentialsContents = await vnsxtCredentialsResponse.Content.ReadAsStringAsync();
             GlobalVariables.SessionNSXTCredentials = JsonConvert.DeserializeObject<CredentialDisplayDataModel>(vnsxtCredentialsContents);
             Assert.NotNull(GlobalVariables.SessionNSXTCredentials);
-            while (true)
+
+            while (!GlobalVariables.platformFactory.DBContext.Credentials.AsNoTracking().Any(x => x.Id == GlobalVariables.SessionNSXTCredentials.Id))
             {
-                if (!GlobalVariables.platformFactory.DBContext.Credentials.AsNoTracking().Any(x => x.Id == GlobalVariables.SessionNSXTCredentials.Id))
-                {
-                    Task.Delay(1000).Wait();
-                }
-                else
-                {
-                    break;
-                }
+                Task.Delay(1000).Wait();
             }
         }
         [Fact, TestPriority(7)]
@@ -197,16 +173,10 @@ namespace UnitTesting
             var vnsxalbCredentialsContents = await vnsxalbCredentialsResponse.Content.ReadAsStringAsync();
             GlobalVariables.SessionNSXALBCredentials = JsonConvert.DeserializeObject<CredentialDisplayDataModel>(vnsxalbCredentialsContents);
             Assert.NotNull(GlobalVariables.SessionNSXALBCredentials);
-            while (true)
+
+            while (!GlobalVariables.platformFactory.DBContext.Credentials.AsNoTracking().Any(x => x.Id == GlobalVariables.SessionNSXALBCredentials.Id))
             {
-                if (!GlobalVariables.platformFactory.DBContext.Credentials.AsNoTracking().Any(x => x.Id == GlobalVariables.SessionNSXALBCredentials.Id))
-                {
-                    Task.Delay(1000).Wait();
-                }
-                else
-                {
-                    break;
-                }
+                Task.Delay(1000).Wait();
             }
         }
         [Fact, TestPriority(8)]
@@ -229,16 +199,10 @@ namespace UnitTesting
             HttpResponseMessage updatePutResponse = await GlobalVariables.identityFactory.Client.PutAsJsonAsync($"/identity/users/{user.Id}", crudUser);
             var updateContents = await updatePutResponse.Content.ReadAsStringAsync();
             Assert.Equal(HttpStatusCode.OK, updatePutResponse.StatusCode);
-            while (true)
+
+            while (!GlobalVariables.platformFactory.DBContext.Users.AsNoTracking().Any(x => x.Id == GlobalVariables.SessionToken.id && x.Firstname == crudUser.Firstname))
             {
-                if (!GlobalVariables.platformFactory.DBContext.Users.AsNoTracking().Any(x => x.Id == GlobalVariables.SessionToken.id && x.Firstname == crudUser.Firstname))
-                {
-                    Task.Delay(1000).Wait();
-                }
-                else
-                {
-                    break;
-                }
+                Task.Delay(1000).Wait();
             }
         }
         [Fact, TestPriority(9)]
@@ -254,16 +218,9 @@ namespace UnitTesting
 
             HttpResponseMessage updateResponse = await GlobalVariables.identityFactory.Client.PutAsJsonAsync($"/identity/organizations/{GlobalVariables.SessionOrganization.Id}", updateObject);
             Assert.Equal(HttpStatusCode.OK, updateResponse.StatusCode);
-            while (true)
+            while (!GlobalVariables.platformFactory.DBContext.Organizations.AsNoTracking().Any(x => x.Id == GlobalVariables.SessionOrganization.Id && x.Organization == updateObject.Organization))
             {
-                if (!GlobalVariables.platformFactory.DBContext.Organizations.AsNoTracking().Any(x => x.Id == GlobalVariables.SessionOrganization.Id && x.Organization == updateObject.Organization))
-                {
-                    Task.Delay(1000).Wait();
-                }
-                else
-                {
-                    break;
-                }
+                Task.Delay(1000).Wait();
             }
         }
         [Fact, TestPriority(9)]
@@ -286,17 +243,11 @@ namespace UnitTesting
             var update2Object = JsonConvert.DeserializeObject<GroupCRUDDataModel>(get2Contents);
 
             Assert.Equal(updateObject.Group, update2Object.Group);
-            while (true)
+            while (!GlobalVariables.platformFactory.DBContext.Groups.AsNoTracking().Any(x => x.Id == GlobalVariables.SessionGroup.Id && x.Group == updateObject.Group))
             {
-                if (!GlobalVariables.platformFactory.DBContext.Groups.AsNoTracking().Any(x => x.Id == GlobalVariables.SessionGroup.Id && x.Group == updateObject.Group))
-                {
-                    Task.Delay(1000).Wait();
-                }
-                else
-                {
-                    break;
-                }
+                Task.Delay(1000).Wait();
             }
+
         }
         [Fact, TestPriority(9)]
         public async Task UpdatevCenterCredentials()
@@ -318,16 +269,9 @@ namespace UnitTesting
             var update2Object = JsonConvert.DeserializeObject<CredentialCRUDDataModel>(get2Contents);
 
             Assert.Equal(updateObject.Credential, update2Object.Credential);
-            while (true)
+            while (!GlobalVariables.platformFactory.DBContext.Credentials.AsNoTracking().Any(x => x.Id == GlobalVariables.SessionvCenterCredentials.Id && x.Credential == updateObject.Credential))
             {
-                if (!GlobalVariables.platformFactory.DBContext.Credentials.AsNoTracking().Any(x => x.Id == GlobalVariables.SessionvCenterCredentials.Id && x.Credential == updateObject.Credential))
-                {
-                    Task.Delay(1000).Wait();
-                }
-                else
-                {
-                    break;
-                }
+                Task.Delay(1000).Wait();
             }
         }
 
@@ -350,16 +294,9 @@ namespace UnitTesting
             var get2Contents = await get2Response.Content.ReadAsStringAsync();
             var update2Object = JsonConvert.DeserializeObject<CredentialCRUDDataModel>(get2Contents);
 
-            while (true)
+            while (!GlobalVariables.platformFactory.DBContext.Credentials.AsNoTracking().Any(x => x.Id == GlobalVariables.SessionNSXTCredentials.Id && x.Credential == updateObject.Credential))
             {
-                if (!GlobalVariables.platformFactory.DBContext.Credentials.AsNoTracking().Any(x => x.Id == GlobalVariables.SessionNSXTCredentials.Id && x.Credential == updateObject.Credential))
-                {
-                    Task.Delay(1000).Wait();
-                }
-                else
-                {
-                    break;
-                }
+                Task.Delay(1000).Wait();
             }
             Assert.Equal(updateObject.Credential, update2Object.Credential);
 
@@ -384,17 +321,11 @@ namespace UnitTesting
             var update2Object = JsonConvert.DeserializeObject<CredentialCRUDDataModel>(get2Contents);
 
             Assert.Equal(updateObject.Credential, update2Object.Credential);
-            while (true)
+            while (!GlobalVariables.platformFactory.DBContext.Credentials.AsNoTracking().Any(x => x.Id == GlobalVariables.SessionNSXALBCredentials.Id && x.Credential == updateObject.Credential))
             {
-                if (!GlobalVariables.platformFactory.DBContext.Credentials.AsNoTracking().Any(x => x.Id == GlobalVariables.SessionNSXALBCredentials.Id && x.Credential == updateObject.Credential))
-                {
-                    Task.Delay(1000).Wait();
-                }
-                else
-                {
-                    break;
-                }
+                Task.Delay(1000).Wait();
             }
+
         }
 
     }

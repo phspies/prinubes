@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Prinubes.Platforms.Datamodels;
 
@@ -10,9 +11,10 @@ using Prinubes.Platforms.Datamodels;
 namespace Prinubes.Platform.Migrations
 {
     [DbContext(typeof(PrinubesPlatformDBContext))]
-    partial class PrinubesPlatformDBContextModelSnapshot : ModelSnapshot
+    [Migration("20221025214617_PlatformTypeChange")]
+    partial class PlatformTypeChange
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

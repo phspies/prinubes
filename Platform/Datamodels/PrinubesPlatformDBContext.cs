@@ -9,7 +9,7 @@ namespace Prinubes.Platforms.Datamodels
 {
     public class PrinubesPlatformDBContext : DbContext, IPrinubesDBContext
     {
-        public DbSet<Common.DatabaseModels.OrganizationDatabaseModel> Organizations { get; set; }
+        public DbSet<OrganizationDatabaseModel> Organizations { get; set; }
         public DbSet<UserDatabaseModel> Users { get; set; }
         public DbSet<GroupDatabaseModel> Groups { get; set; }
         public DbSet<RoleDatabaseModel> Roles { get; set; }
@@ -27,7 +27,7 @@ namespace Prinubes.Platforms.Datamodels
         }
         public bool Exists()
         {
-            return (this.Database.GetService<IDatabaseCreator>() as RelationalDatabaseCreator).Exists();
+            return (Database.GetService<IDatabaseCreator>() as RelationalDatabaseCreator).Exists();
         }
         public void MigrateIfRequired()
         {

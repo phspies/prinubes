@@ -134,7 +134,7 @@ namespace Prinubes.Common.DatabaseModels
         [JsonProperty("enabled")]
         public bool? Enabled { get; set; }
         [JsonProperty("state")]
-        public PlatformState? state { get; set; }
+        public PlatformStateEnum? state { get; set; }
         [JsonProperty("message")]
         public string? message { get; set; }
     }

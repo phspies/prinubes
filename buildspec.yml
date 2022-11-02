@@ -1,0 +1,13 @@
+version 0.2
+phases
+  pre_build
+    commands
+      - echo Restore started on `date`
+      - dotnet restore prinubes.sln
+  build
+    commands
+      - echo Build started on `date`
+      - dotnet build -c release -o ./build_output prinubes.sln
+artifacts
+  files
+    - prinubes/build_output/**/*
