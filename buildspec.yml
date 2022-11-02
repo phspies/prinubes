@@ -5,10 +5,28 @@ phases:
         commands:
         - echo Restore started on `date`
         - dotnet restore prinubes.sln
+        - echo Logging in to Amazon ECR...
+        - aws --version
+        - $(aws ecr get-login --region us-east-1 --no-include-email)
+        - REPOSITORY_URI=299129499635.dkr.ecr.us-east-1.amazonaws.com/development
+        - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+        - IMAGE_TAG=${COMMIT_HASH:=latest}
     build:
         commands:
         - echo Build started on `date`
         - dotnet build -c release -o ./build_output prinubes.sln
+        - echo Building the Docker images...
+        - docker compose build -t $REPOSITORY_URI:latest .
+        - docker tag prinubes-platformworker:latest prinubes-platformworker:$IMAGE_TAG
+        - docker tag prinubes-platform:latest prinubes-platform:$IMAGE_TAG
+        - docker tag prinubes-identity:latest prinubes-identity:$IMAGE_TAG
+    post_build:
+        commands:
+        - echo Build completed on `date`
+        - echo Pushing the Docker images...
+        - docker push prinubes-platformworker:$IMAGE_TAG
+        - docker push prinubes-platform:$IMAGE_TAG
+        - docker push prinubes-identity:$IMAGE_TAG
 artifacts:
     files:
     - "**/*"
