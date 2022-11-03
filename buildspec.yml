@@ -17,9 +17,9 @@ phases:
         - dotnet build -c release -o ./build_output prinubes.sln
         - echo Building the Docker images...
         - docker-compose -f docker-compose.yml build 
-        - docker tag prinubes-platformworker:latest prinubes-platformworker:$IMAGE_TAG
-        - docker tag prinubes-platform:latest prinubes-platform:$IMAGE_TAG
-        - docker tag prinubes-identity:latest prinubes-identity:$IMAGE_TAG
+        - docker tag prinubes-platformworker:latest $REPOSITORY_URI/prinubes-platformworker:$IMAGE_TAG
+        - docker tag prinubes-platform:latest $REPOSITORY_URI/prinubes-platform:$IMAGE_TAG
+        - docker tag prinubes-identity:latest $REPOSITORY_URI/prinubes-identity:$IMAGE_TAG
     post_build:
         commands:
         - echo Build completed on `date`
