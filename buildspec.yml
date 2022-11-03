@@ -24,6 +24,7 @@ phases:
         commands:
         - echo Build completed on `date`
         - echo Pushing the Docker images...
+        - docker image ls
         - docker push $REPOSITORY_URI/prinubes-platformworker:$IMAGE_TAG
         - docker push $REPOSITORY_URI/prinubes-platform:$IMAGE_TAG
         - docker push $REPOSITORY_URI/prinubes-identity:$IMAGE_TAG
