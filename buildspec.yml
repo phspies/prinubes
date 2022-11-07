@@ -8,6 +8,7 @@ phases:
         - echo Logging in to Amazon ECR...
         - aws --version
         - $(aws ecr get-login --region us-east-1 --no-include-email)
+        - aws ecr describe-repositories --repository-name development
         - REPOSITORY_URI=299129499635.dkr.ecr.us-east-1.amazonaws.com/development
         - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
         - IMAGE_TAG=${COMMIT_HASH:=latest}
@@ -17,20 +18,17 @@ phases:
         - dotnet build -c release -o ./build_output prinubes.sln
         - echo Building the Docker images...
         - docker-compose -f docker-compose.yml build 
-        - docker tag prinubes-platformworker:latest $REPOSITORY_URI/prinubes-platformworker:$IMAGE_TAG
-        - docker tag prinubes-platform:latest $REPOSITORY_URI/prinubes-platform:$IMAGE_TAG
-        - docker tag prinubes-identity:latest $REPOSITORY_URI/prinubes-identity:$IMAGE_TAG
+        - docker tag prinubes-platformworker:latest $REPOSITORY_URI:prinubes-platformworker
+        - docker tag prinubes-platform:latest $REPOSITORY_URI:prinubes-platform
+        - docker tag prinubes-identity:latest $REPOSITORY_URI:prinubes-identity
     post_build:
         commands:
         - echo Build completed on `date`
         - echo Pushing the Docker images...
         - docker image ls
-        - docker push 299129499635.dkr.ecr.us-east-1.amazonaws.com/development:latest
         - docker push $REPOSITORY_URI/prinubes-platformworker:$IMAGE_TAG
         - docker push $REPOSITORY_URI/prinubes-platform:$IMAGE_TAG
         - docker push $REPOSITORY_URI/prinubes-identity:$IMAGE_TAG
-        - printf '[{"name":"<Your Container Name>","imageUri":"%s"}]'    $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
-        - cat imagedefinitions.json
 artifacts:
     files:
     - "**/*"
