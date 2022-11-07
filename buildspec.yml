@@ -25,9 +25,12 @@ phases:
         - echo Build completed on `date`
         - echo Pushing the Docker images...
         - docker image ls
+        - docker push 299129499635.dkr.ecr.us-east-1.amazonaws.com/development:latest
         - docker push $REPOSITORY_URI/prinubes-platformworker:$IMAGE_TAG
         - docker push $REPOSITORY_URI/prinubes-platform:$IMAGE_TAG
         - docker push $REPOSITORY_URI/prinubes-identity:$IMAGE_TAG
+        - printf '[{"name":"<Your Container Name>","imageUri":"%s"}]'    $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
+        - cat imagedefinitions.json
 artifacts:
     files:
     - "**/*"
