@@ -35,7 +35,11 @@ phases:
         - MANIFEST=$(aws ecr batch-get-image --repository-name development --image-ids imageTag=prinubes-identity --output json | jq --raw-output --join-output '.images[0].imageManifest')
         - aws ecr put-image --repository-name development --image-tag prinubes-identity-$IMAGE_TAG --image-manifest "$MANIFEST"
         - docker push $REPOSITORY_URI:prinubes-identity
-        - echo "[{"name":"prinubes-platformworker","imageUri":"$REPOSITORY_URI:prinubes-platformworker"}, {"name":"prinubes-platform","imageUri":"$REPOSITORY_URI:prinubes-platform"}, {"name":"prinubes-identity","imageUri":"$REPOSITORY_URI:prinubes-identity"}]" > imagedefinitions.json
+        - printf '[' > imagedefinitions.json
+        - printf '{"name":"prinubes-platformworker","imageUri":"%s"}]' $REPOSITORY_URI:prinubes-platformworker >> imagedefinitions.json
+        - printf '{"name":"prinubes-platform","imageUri":"%s"}]' $REPOSITORY_URI:prinubes-platform >> imagedefinitions.json
+        - printf '{"name":"prinubes-identity","imageUri":"%s"}]' $REPOSITORY_URI:prinubes-identity >> imagedefinitions.json
+        - printf ']' >> imagedefinitions.json
         - cat imagedefinitions.json
 artifacts:
     files:
